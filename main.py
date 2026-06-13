@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.routes import router
+from api.stage2_routes import router_stage2
 from config import get_settings
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -18,7 +19,8 @@ app = FastAPI(
     title="DevForge AI",
     description=(
         "Autonomous End-to-End SDLC Intelligence Engine.\n\n"
-        "Stage 1: Requirements Agent — Feature Request → PRD"
+        "Stage 1: Requirements Agent — Feature Request → PRD\n"
+        "Stage 2: Task Orchestration Agent — PRD → Linear Tasks + Dependency Graph"
     ),
     version="1.0.0",
 )
@@ -31,11 +33,12 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(router_stage2)
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "DevForge AI", "stage": "1 — Requirements Agent"}
+    return {"status": "ok", "service": "DevForge AI", "stages": ["1 — Requirements Agent", "2 — Task Orchestration"]}
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
