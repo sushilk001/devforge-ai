@@ -765,7 +765,7 @@ export default function DevForgeDashboard() {
     }
     if(detail==="pr_review") {
       const p=progress["pr_review"]||0;
-      return <div><div className="df-dtitle" style={{color:"#ff9500"}}>PR Review Panel</div><div className="df-dsub">4 Agents · Simultaneous</div><div className="df-agents">{AGENTS_DATA.map((ag,i)=>{const th=20+i*18,run=p>=th&&p<th+40,dn=p>=th+40;return(<div key={ag.id} className={`df-agent ${run?"running":""} ${dn?(ag.status==="WARN"?"warned":"passed"):""}`} style={{"--ac":ag.color}}><div className="df-agh"><div className="df-agd" style={{background:dn?ag.sc:(run?ag.color:"rgba(200,214,232,.15)"),animation:run?"pulse .8s infinite":"none"}}/><div><div className="df-agname">{ag.name}</div><div className="df-agst" style={{color:dn?ag.sc:"inherit"}}>{dn?ag.status:(run?"SCANNING...":"WAITING")}</div></div></div>{dn&&<div className="df-agf">{ag.finding}</div>}</div>);})}</div></div>;
+      return <div><div className="df-dtitle" style={{color:"#ff9500"}}>PR Review Panel</div><div className="df-dsub">4 Agents · Simultaneous</div><div className="df-agents">{AGENTS_DATA.map((ag,i)=>{const th=8+i*14,run=p>=th&&p<th+22,dn=p>=th+22;return(<div key={ag.id} className={`df-agent ${run?"running":""} ${dn?(ag.status==="WARN"?"warned":"passed"):""}`} style={{"--ac":ag.color}}><div className="df-agh"><div className="df-agd" style={{background:dn?ag.sc:(run?ag.color:"rgba(200,214,232,.15)"),animation:run?"pulse .8s infinite":"none"}}/><div><div className="df-agname">{ag.name}</div><div className="df-agst" style={{color:dn?ag.sc:"inherit"}}>{dn?ag.status:(run?"SCANNING...":"WAITING")}</div></div></div>{dn&&<div className="df-agf">{ag.finding}</div>}</div>);})}</div></div>;
     }
     if(detail==="qa") {
       const p=progress["qa"]||0, vis=Math.max(1,Math.floor((p/100)*QA_DATA.length));
@@ -839,7 +839,7 @@ export default function DevForgeDashboard() {
             const isActive=activeStage===stage.id, isDone=doneStages.has(stage.id), isGate=gateStage===stage.id;
             const rev=stageReviews[stage.id], p=progress[stage.id]||0;
             return <div key={stage.id}>
-              <div className={`df-card ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.3)":stage.glow}}>
+              <div className={`df-card ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.3)":stage.glow,cursor:(isDone||isActive||isGate)?"pointer":"default"}} onClick={()=>{ if(isGate) setDetail("gate_"+stage.id); else if(isDone||isActive) setDetail(stage.id); }}>
                 <div className="df-crow">
                   <span className="df-cnum">{stage.num}</span>
                   <span className={`df-cicon ${isActive?"spin":""}`} style={{color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):"rgba(200,214,232,.25)"}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
