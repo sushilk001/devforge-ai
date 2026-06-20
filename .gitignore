@@ -14,5 +14,8 @@ node_modules/
 dist/
 .vite/
 
+# Generated code output
+output/
+
 # OS
 .DS_Store

@@ -1,6 +1,7 @@
 import json
+import time
 import logging
-from collections import deque
+
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
 
@@ -14,9 +15,24 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
+def _llm_invoke(llm, messages, stage: str, label: str):
+    from api.observability import record_llm_call
+    t0 = time.time()
+    response = llm.invoke(messages)
+    latency_ms = int((time.time() - t0) * 1000)
+    usage = getattr(response, "response_metadata", {}).get("usage", {})
+    record_llm_call(
+        stage=stage, label=label, model=llm.model,
+        input_tokens=usage.get("input_tokens", 0),
+        output_tokens=usage.get("output_tokens", 0),
+        latency_ms=latency_ms,
+    )
+    return response
+
+
 def get_llm():
     return ChatAnthropic(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         api_key=settings.anthropic_api_key,
         temperature=0.2,
         max_tokens=8000,
@@ -43,7 +59,7 @@ def decompose_tasks(state: Stage2State) -> Stage2State:
     prompt = DECOMPOSE_TASKS_PROMPT.format(prd_json=prd_json)
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], "tasks", "decompose_tasks")
         data = _parse_json_response(response.content)
         tasks = [EngineeringTask(**t) for t in data["tasks"]]
         state.tasks = tasks
@@ -160,7 +176,7 @@ def revise_tasks(state: Stage2State) -> Stage2State:
     )
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], "tasks", "revise_tasks")
         data = _parse_json_response(response.content)
         tasks = [EngineeringTask(**t) for t in data["tasks"]]
         state.tasks = tasks
@@ -178,10 +194,19 @@ def revise_tasks(state: Stage2State) -> Stage2State:
 # ── Node 4: Create Linear Issues ──────────────────────────────────────────────
 
 def create_linear_issues(state: Stage2State) -> Stage2State:
-    """Create all approved tasks as Linear issues in topological order."""
-    logger.info("[Stage2/Node4] Creating Linear issues...")
+    """Create a Linear project for this run, then create all tasks as issues inside it."""
+    logger.info("[Stage2/Node4] Creating Linear project and issues...")
 
-    from integrations.linear import create_task_issue
+    from integrations.linear import create_task_issue, create_project
+
+    prd_title = (state.prd or {}).get("title", "DevForge Run")
+    project = create_project(
+        name=prd_title,
+        description=(state.prd or {}).get("problem_statement", ""),
+    )
+    project_id = project["id"] if project else None
+    if project_id:
+        logger.info(f"[Stage2/Node4] Project created: {project['name']}")
 
     tasks = state.tasks
     task_map = {t.id: t for t in tasks}
@@ -217,8 +242,8 @@ def create_linear_issues(state: Stage2State) -> Stage2State:
             task_type=task.type.value,
             priority=priority_map.get(task.priority.value, 3),
             estimate_hours=task.estimate_hours,
-            labels=task.labels,
             blocked_by_ids=blocked_by_linear_ids,
+            project_id=project_id,
         )
 
         if result:
