@@ -1,4 +1,5 @@
 import json
+import time
 import logging
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
@@ -11,9 +12,24 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
+def _llm_invoke(llm, messages, stage: str, label: str) -> any:
+    from api.observability import record_llm_call
+    t0 = time.time()
+    response = llm.invoke(messages)
+    latency_ms = int((time.time() - t0) * 1000)
+    usage = getattr(response, "response_metadata", {}).get("usage", {})
+    record_llm_call(
+        stage=stage, label=label, model=llm.model,
+        input_tokens=usage.get("input_tokens", 0),
+        output_tokens=usage.get("output_tokens", 0),
+        latency_ms=latency_ms,
+    )
+    return response
+
+
 def get_llm():
     return ChatAnthropic(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         api_key=settings.anthropic_api_key,
         temperature=0.3,
         max_tokens=4096,
@@ -35,7 +51,7 @@ def parse_request(state: AgentState) -> AgentState:
     prompt = PARSE_REQUEST_PROMPT.format(raw_text=state.feature_request.raw_text)
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "parse_request")
         data = _parse_json_response(response.content)
         state.parsed_intent = ParsedIntent(**data)
         logger.info(f"[Stage1/Node1] Parsed. is_complete={state.parsed_intent.is_complete}")
@@ -83,7 +99,7 @@ def generate_prd(state: AgentState) -> AgentState:
     )
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "generate_prd")
         data = _parse_json_response(response.content)
         state.prd = PRDDocument(**data)
         state.prd_status = PRDStatus.PENDING
@@ -113,7 +129,7 @@ def revise_prd(state: AgentState) -> AgentState:
     )
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "revise_prd")
         data = _parse_json_response(response.content)
         state.prd = PRDDocument(**data)
         state.prd_status = PRDStatus.REVISED

@@ -9,6 +9,7 @@ class TaskType(str, Enum):
     SPIKE   = "spike"
     DOCS    = "docs"
     BUG     = "bug"
+    TESTING = "testing"
 
 
 class TaskPriority(str, Enum):

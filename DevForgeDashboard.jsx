@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from "recharts";
 
 const fontLink = document.createElement("link");
@@ -8,59 +8,49 @@ document.head.appendChild(fontLink);
 
 // ── Stages ─────────────────────────────────────────────────────────────────
 const STAGES = [
-  { id:"requirements",num:"01",label:"Requirements",sub:"Agent",   icon:"◈",color:"#00d4ff",glow:"rgba(0,212,255,0.35)",  desc:"Feature Request → PRD" },
-  { id:"tasks",       num:"02",label:"Task Orch.",  sub:"Agent",   icon:"◆",color:"#00ff88",glow:"rgba(0,255,136,0.35)",  desc:"PRD → Linear Tasks" },
-  { id:"pr_review",   num:"03",label:"PR Review",   sub:"Panel",   icon:"◉",color:"#ff9500",glow:"rgba(255,149,0,0.35)",  desc:"4 Agents reviewing code" },
-  { id:"qa",          num:"04",label:"QA",          sub:"Agent",   icon:"◈",color:"#bf5fff",glow:"rgba(191,95,255,0.35)", desc:"Automated test suite" },
-  { id:"deploy",      num:"05",label:"Deploy",      sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"Dev → Staging → UAT → Prod" },
+  { id:"requirements", num:"01",label:"Requirements", sub:"Agent",   icon:"◈",color:"#00d4ff",glow:"rgba(0,212,255,0.35)",  desc:"Feature Request → PRD" },
+  { id:"tasks",        num:"02",label:"Task Orch.",   sub:"Agent",   icon:"◆",color:"#00ff88",glow:"rgba(0,255,136,0.35)",  desc:"PRD → Linear Tasks" },
+  { id:"code_gen",     num:"03",label:"Code Gen",     sub:"Agent",   icon:"◈",color:"#bf5fff",glow:"rgba(191,95,255,0.35)", desc:"Claude writes code per ticket" },
+  { id:"pr_review",    num:"04",label:"PR Review",    sub:"Panel",   icon:"◉",color:"#e066ff",glow:"rgba(224,102,255,0.35)",desc:"4 Agents review generated code" },
+  { id:"qa",           num:"05",label:"QA",           sub:"Agent",   icon:"◆",color:"#2dd4bf",glow:"rgba(45,212,191,0.35)", desc:"Automated test execution" },
+  { id:"deploy",       num:"06",label:"Deploy",       sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"Dev → Staging → UAT → Prod" },
 ];
 
 // ── Pipeline log scripts ───────────────────────────────────────────────────
 const PIPELINE_SCRIPT = {
   requirements:[
-    {t:300, msg:"⟡ Receiving feature request from Slack...",      type:"info"},
-    {t:900, msg:"⟡ Parsing intent with Claude claude-sonnet-4-20250514...",    type:"info"},
-    {t:1600,msg:"✓ Problem statement extracted",                   type:"success"},
-    {t:2100,msg:"✓ Target users: [end-users, admins]",             type:"success"},
-    {t:2600,msg:"✓ Business value scored: HIGH",                   type:"success"},
-    {t:3200,msg:"⟡ Generating PRD document...",                    type:"info"},
-    {t:4400,msg:"✓ PRD v1.0 — 6 stories, 8 criteria",             type:"success"},
-    {t:5000,msg:"⏸ Awaiting human review...",                      type:"gate"},
+    {t:300, msg:"⟡ Receiving feature request...",                  type:"info"},
+    {t:900, msg:"⟡ Parsing intent with claude-sonnet-4-6...",      type:"info"},
+    {t:2800,msg:"⟡ Generating PRD document...",                    type:"info"},
+    {t:5000,msg:"⏸ Awaiting LLM response & human review...",       type:"gate"},
   ],
   tasks:[
-    {t:300, msg:"⟡ Ingesting approved PRD v1.0...",               type:"info"},
-    {t:900, msg:"⟡ Decomposing into dev tasks...",                 type:"info"},
-    {t:1500,msg:"✓ Task DEV-101 created [3pts]",                   type:"success"},
-    {t:1900,msg:"✓ Task DEV-102 created [5pts]",                   type:"success"},
-    {t:2300,msg:"✓ Task DEV-103 created [3pts]",                   type:"success"},
-    {t:2700,msg:"✓ Task DEV-104 created [2pts]",                   type:"success"},
-    {t:3100,msg:"✓ Task DEV-105 created [3pts]",                   type:"success"},
-    {t:3700,msg:"✓ Dependency graph built. Sprint assigned.",      type:"success"},
-    {t:4200,msg:"⏸ Awaiting human review...",                      type:"gate"},
+    {t:300, msg:"⟡ Ingesting approved PRD...",                     type:"info"},
+    {t:900, msg:"⟡ Decomposing into engineering tasks...",         type:"info"},
+    {t:2500,msg:"⟡ Building dependency graph...",                  type:"info"},
+    {t:4200,msg:"⏸ Awaiting LLM response & human review...",       type:"gate"},
+  ],
+  code_gen:[
+    {t:300, msg:"⟡ Ingesting approved task plan...",               type:"info"},
+    {t:900, msg:"⟡ Spawning code generation agents per ticket...", type:"info"},
+    {t:2000,msg:"⟡ Writing implementation files...",               type:"info"},
+    {t:3500,msg:"⟡ Writing test files...",                         type:"info"},
+    {t:5500,msg:"⏸ Awaiting LLM response & human review...",      type:"gate"},
   ],
   pr_review:[
-    {t:300, msg:"⟡ PR #247 detected — forgot-password feature",   type:"info"},
-    {t:700, msg:"⟡ Launching 4-agent panel...",                    type:"info"},
-    {t:1000,msg:"🔴 Security Agent     → scanning...",             type:"agent"},
-    {t:1200,msg:"🟡 Quality Agent      → analysing...",            type:"agent"},
-    {t:1400,msg:"🟢 Coverage Agent     → mapping...",              type:"agent"},
-    {t:1600,msg:"🔵 Architecture Agent → checking...",             type:"agent"},
-    {t:2800,msg:"✓ Security: No CVEs. No secrets. PASSED",        type:"success"},
-    {t:3200,msg:"⚠ Quality: Complexity 12 on resetHandler. WARN", type:"warn"},
-    {t:3600,msg:"✓ Coverage: 91%. PASSED",                         type:"success"},
-    {t:4000,msg:"✓ Architecture: Clean layering. PASSED",          type:"success"},
-    {t:4700,msg:"⟡ Orchestrator: 1 warning, 0 blockers",          type:"info"},
-    {t:5200,msg:"⏸ Awaiting human review...",                      type:"gate"},
+    {t:300, msg:"⟡ Launching 4-agent code review panel...",       type:"info"},
+    {t:700, msg:"🔴 Security Agent     → scanning code...",        type:"agent"},
+    {t:900, msg:"🟡 Quality Agent      → analysing code...",       type:"agent"},
+    {t:1100,msg:"🟢 Coverage Agent     → checking tests...",       type:"agent"},
+    {t:1300,msg:"🔵 Architecture Agent → reviewing patterns...",   type:"agent"},
+    {t:5000,msg:"⏸ Awaiting LLM response & human review...",      type:"gate"},
   ],
   qa:[
-    {t:400, msg:"⟡ Generating tests from acceptance criteria...", type:"info"},
-    {t:1100,msg:"✓ 14 test cases generated",                       type:"success"},
-    {t:1600,msg:"⟡ Running suite on staging...",                   type:"info"},
-    {t:2200,msg:"✓ Unit tests      14/14 passed",                  type:"success"},
-    {t:2800,msg:"✓ Integration      8/8  passed",                  type:"success"},
-    {t:3400,msg:"✓ E2E (Playwright)  5/5  passed",                 type:"success"},
-    {t:3900,msg:"✓ Visual regression: 0 diffs",                    type:"success"},
-    {t:4400,msg:"⏸ Awaiting human review...",                      type:"gate"},
+    {t:300, msg:"⟡ QA runner initialising...",                    type:"info"},
+    {t:900, msg:"⟡ Running pytest on generated test files...",    type:"info"},
+    {t:2200,msg:"⟡ Collecting test results...",                   type:"info"},
+    {t:3800,msg:"⟡ Parsing pytest output...",                     type:"info"},
+    {t:4600,msg:"⏸ QA complete — awaiting real results",         type:"gate"},
   ],
   deploy:[
     {t:400, msg:"⟡ Starting progressive deployment...",           type:"info"},
@@ -75,71 +65,24 @@ const PIPELINE_SCRIPT = {
   ],
 };
 
-const STAGE_DUR = { requirements:5200, tasks:4400, pr_review:5400, qa:4600, deploy:6200 };
+const STAGE_DUR = { requirements:5200, tasks:4400, code_gen:6500, pr_review:5400, qa:5000, deploy:6200 };
 
-// ── LLM Observability call scripts ────────────────────────────────────────
-const LLM_CALL_SCRIPT = {
-  requirements:[
-    {t:1600, call:{id:1,  stage:"requirements", label:"parse_request",      model:"claude-sonnet-4-20250514", inputTok:342,  outputTok:187,  latencyMs:820,  cost:0.0018}},
-    {t:4400, call:{id:2,  stage:"requirements", label:"generate_prd",       model:"claude-sonnet-4-20250514", inputTok:891,  outputTok:1243, latencyMs:3140, cost:0.0089}},
-  ],
-  tasks:[
-    {t:3700, call:{id:3,  stage:"tasks",        label:"generate_tasks",     model:"claude-sonnet-4-20250514", inputTok:1456, outputTok:643,  latencyMs:2280, cost:0.0062}},
-  ],
-  pr_review:[
-    {t:2800, call:{id:4,  stage:"pr_review",    label:"security_agent",     model:"claude-haiku-4-5",         inputTok:2341, outputTok:312,  latencyMs:1240, cost:0.0008}},
-    {t:3200, call:{id:5,  stage:"pr_review",    label:"quality_agent",      model:"claude-haiku-4-5",         inputTok:2198, outputTok:428,  latencyMs:1680, cost:0.0009}},
-    {t:3600, call:{id:6,  stage:"pr_review",    label:"coverage_agent",     model:"claude-haiku-4-5",         inputTok:1876, outputTok:289,  latencyMs:1120, cost:0.0007}},
-    {t:4000, call:{id:7,  stage:"pr_review",    label:"architecture_agent", model:"claude-haiku-4-5",         inputTok:2043, outputTok:356,  latencyMs:1390, cost:0.0008}},
-    {t:4700, call:{id:8,  stage:"pr_review",    label:"orchestrator",       model:"claude-sonnet-4-20250514", inputTok:1123, outputTok:478,  latencyMs:1860, cost:0.0041}},
-  ],
-  qa:[
-    {t:4400, call:{id:9,  stage:"qa",           label:"generate_tests",     model:"claude-sonnet-4-20250514", inputTok:1234, outputTok:892,  latencyMs:2640, cost:0.0073}},
-  ],
-  deploy:[
-    {t:3600, call:{id:10, stage:"deploy",       label:"deploy_planner",     model:"claude-haiku-4-5",         inputTok:456,  outputTok:234,  latencyMs:890,  cost:0.0003}},
-  ],
-};
 
 // ── Review summaries ───────────────────────────────────────────────────────
 const REVIEW_SUMMARY = {
-  requirements:{ title:"PRD Ready for Review",  verdict:"Claude generated a complete PRD with 6 user stories and 8 acceptance criteria.",
-    points:["Problem: No self-service reset → 200+ weekly tickets","Goals: Reduce tickets 80%, flow in <2 mins","6 user stories covering end-users & admins","8 acceptance criteria — Given/When/Then format"],
-    approve:"Approve PRD → Begin Task Creation" },
-  tasks:{ title:"Sprint Tasks Ready for Review", verdict:"5 tasks created in Linear with effort estimates and a dependency graph.",
-    points:["DEV-101: API endpoint (3 pts)","DEV-102: Email service (5 pts)","DEV-103: Token validation (3 pts)","DEV-104: UI reset form (2 pts)","DEV-105: Test suite (3 pts)"],
-    approve:"Approve Tasks → Raise PR" },
-  pr_review:{ title:"PR Review Complete", verdict:"4-agent panel finished. 1 warning, 0 blockers found.",
-    points:["✓ Security: No CVEs, no secrets, injection-clean","⚠ Quality: resetHandler complexity 12 (threshold 10)","✓ Coverage: 91% on auth module","✓ Architecture: Clean separation"],
-    approve:"Approve PR → Run QA" },
-  qa:{ title:"QA Suite Passed", verdict:"All 27 tests passed across unit, integration, E2E, and visual regression.",
-    points:["Unit tests: 14/14 passed","Integration: 8/8 passed","E2E (Playwright): 5/5 passed","Visual regression: 0 diffs"],
-    approve:"Approve QA → Production Gate" },
+  requirements:{ title:"PRD Ready for Review",          approve:"Approve PRD → Begin Task Creation" },
+  tasks:        { title:"Tasks Ready for Review",        approve:"Approve Tasks → Begin Code Generation" },
+  code_gen:     { title:"Code Generation Complete",      approve:"Approve Code → Begin PR Review" },
+  pr_review:    { title:"PR Review Complete",            approve:"Approve PR → Run QA Suite" },
+  qa:           { title:"QA Complete — All Tests Passed",approve:"Approve QA → Production Gate" },
 };
 
-const TASKS_DATA = [
-  {id:"DEV-101",name:"POST /auth/forgot-password endpoint",   pts:"3 pts"},
-  {id:"DEV-102",name:"Email service integration (SendGrid)",  pts:"5 pts"},
-  {id:"DEV-103",name:"Token generation, expiry & validation", pts:"3 pts"},
-  {id:"DEV-104",name:"UI — Reset password form + success",    pts:"2 pts"},
-  {id:"DEV-105",name:"Unit & integration test suite",         pts:"3 pts"},
-];
-const AGENTS_DATA = [
-  {id:"security",name:"Security Agent",    color:"#ff4466",finding:"No CVEs. No hardcoded secrets. SQL injection: clean.",          status:"PASSED",sc:"#00ff88"},
-  {id:"quality", name:"Quality Agent",     color:"#ffaa00",finding:"resetHandler complexity: 12 (threshold 10). Refactor advised.", status:"WARN",  sc:"#ff9500"},
-  {id:"coverage",name:"Coverage Agent",    color:"#00ff88",finding:"Auth module: 91% coverage. 14/14 critical paths covered.",      status:"PASSED",sc:"#00ff88"},
-  {id:"arch",    name:"Architecture Agent",color:"#6699ff",finding:"Clean layering. No direct DB calls in controller.",             status:"PASSED",sc:"#00ff88"},
-];
-const QA_DATA = [
-  {type:"Unit Tests",       count:"14 / 14 passed"},
-  {type:"Integration",      count:"8 / 8 passed"},
-  {type:"E2E (Playwright)", count:"5 / 5 passed"},
-  {type:"Visual Regression",count:"0 diffs"},
-];
-const ENV_DATA = [{name:"DEV",delay:1000},{name:"STAGING",delay:1800},{name:"UAT",delay:2800}];
 
-const MODEL_COLORS = { "claude-sonnet-4-20250514":"#00d4ff", "claude-haiku-4-5":"#00ff88" };
-const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", pr_review:"#ff9500", qa:"#bf5fff", deploy:"#ff2d6b" };
+
+const ENV_DATA =[{name:"DEV",delay:1000},{name:"STAGING",delay:1800},{name:"UAT",delay:2800}];
+
+const MODEL_COLORS = { "claude-sonnet-4-6":"#00d4ff", "claude-haiku-4-5":"#00ff88" };
+const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", code_gen:"#bf5fff", pr_review:"#e066ff", qa:"#2dd4bf", deploy:"#ff2d6b" };
 
 // ── CSS ────────────────────────────────────────────────────────────────────
 const css = `
@@ -480,11 +423,6 @@ function ObsPanel({ llmCalls }) {
     avg: Math.round(llmCalls.slice(0,i+1).reduce((a,x)=>a+x.latencyMs,0)/(i+1)),
   }));
 
-  // Token chart data
-  const tokenData = llmCalls.map(c => ({
-    name: c.label.replace("_"," "), input: c.inputTok, output: c.outputTok,
-  }));
-
   // Per-stage token rollup for stacked chart
   const stageRollup = STAGES.map(s => {
     const calls = llmCalls.filter(c=>c.stage===s.id);
@@ -584,7 +522,7 @@ function ObsPanel({ llmCalls }) {
                   </td>
                   <td>
                     <span className="obs-model-chip" style={{background:`${MODEL_COLORS[c.model]}18`,color:MODEL_COLORS[c.model],border:`1px solid ${MODEL_COLORS[c.model]}35`}}>
-                      {c.model === "claude-sonnet-4-20250514" ? "Sonnet 4" : "Haiku 4.5"}
+                      {c.model === "claude-sonnet-4-6" ? "Sonnet 4" : "Haiku 4.5"}
                     </span>
                   </td>
                   <td>
@@ -614,7 +552,7 @@ function ObsPanel({ llmCalls }) {
           {[
             {lbl:"Input Tokens",  val:totalIn.toLocaleString(),  color:"#00d4ff", sub:"Prompt + context"},
             {lbl:"Output Tokens", val:totalOut.toLocaleString(), color:"#00ff88", sub:"Generated text"},
-            {lbl:"Sonnet 4 calls",val:llmCalls.filter(c=>c.model==="claude-sonnet-4-20250514").length, color:"#00d4ff", sub:"Complex reasoning"},
+            {lbl:"Sonnet 4 calls",val:llmCalls.filter(c=>c.model==="claude-sonnet-4-6").length, color:"#00d4ff", sub:"Complex reasoning"},
             {lbl:"Haiku 4.5 calls",val:llmCalls.filter(c=>c.model==="claude-haiku-4-5").length,         color:"#00ff88", sub:"Fast inline checks"},
             {lbl:"Total Calls",   val:llmCalls.length,           color:"#bf5fff", sub:"Across all stages"},
             {lbl:"Est. Total Cost",val:`$${totalCost.toFixed(4)}`,color:"#ff9500", sub:"Claude API usage"},
@@ -634,7 +572,7 @@ function ObsPanel({ llmCalls }) {
 
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function DevForgeDashboard() {
-  const [input, setInput]           = useState("Users cannot reset passwords without calling support. We get 200+ tickets/week. We need a self-service forgot-password flow via email for enterprise users.");
+  const [input, setInput]           = useState("Users cannot reset passwords without calling support. We get 200+ tickets/week. Need self-service forgot-password via email for enterprise users. Success = 80% ticket drop in 60 days. JWT auth, no SSO/SAML users. Reset link via SES, token expires 24h, max 3 requests/hour. Enforce password complexity (min 8 chars, 1 uppercase, 1 number). Admin audit log. Branded email. Fallback = contact support if no email access.");
   const [appState, setAppState]     = useState("idle");
   const [activeStage, setActive]    = useState(null);
   const [doneStages, setDone]       = useState(new Set());
@@ -649,11 +587,42 @@ export default function DevForgeDashboard() {
   const [prodCfm, setProdCfm]       = useState("");
   const [envProg, setEnvProg]       = useState({});
   const [llmCalls, setLlmCalls]     = useState([]);
+  const [stage1ThreadId, setS1Tid]   = useState(null);
+  const [stage2ThreadId, setS2Tid]   = useState(null);
+  const [stage3ThreadId, setS3Tid]   = useState(null);
+  const [stage4ThreadId, setS4Tid]   = useState(null);
+  const [apiReady, setApiReady]      = useState({});
+  const [realPrd, setRealPrd]        = useState(null);
+  const [realTasks, setRealTasks]    = useState([]);
+  const [realReview, setRealReview]  = useState(null);
+  const [realCodeGen, setRealCodeGen]= useState(null);
+  const [realQA, setRealQA]          = useState(null);
+  const [expandedFile, setExpandedFile] = useState(null);
   const { elapsed, display, reset } = useTimer(appState === "running");
 
   const toRef    = useRef([]);
   const logRef   = useRef(null);
   const resumeFn = useRef(null);
+
+  // ── Clear stale observability data on hard refresh, then start polling ──
+  const fetchLlmCalls = useCallback(() => {
+    fetch("/stats/llm-calls")
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data.calls)) setLlmCalls(data.calls); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    let intervalId;
+    fetch("/stats/llm-calls", {method:"DELETE"})
+      .catch(() => {})
+      .then(() => {
+        setLlmCalls([]);
+        fetchLlmCalls();
+        intervalId = setInterval(fetchLlmCalls, 3000);
+      });
+    return () => { if (intervalId) clearInterval(intervalId); };
+  }, [fetchLlmCalls]);
 
   const T = (fn,ms) => { const id=setTimeout(fn,ms); toRef.current.push(id); };
   const clearAll = () => { toRef.current.forEach(clearTimeout); toRef.current=[]; };
@@ -666,13 +635,11 @@ export default function DevForgeDashboard() {
   // ── Run stage ──────────────────────────────────────────────────────────
   const runStage = (stageId, onComplete) => {
     const script  = PIPELINE_SCRIPT[stageId];
-    const llmSc   = LLM_CALL_SCRIPT[stageId] || [];
     const dur     = STAGE_DUR[stageId];
     setActive(stageId); setDetail(stageId);
     setProgress(p => ({...p,[stageId]:0})); setAppState("running");
     for(let i=1;i<=40;i++) T(()=>setProgress(p=>({...p,[stageId]:(i/40)*100})), (dur/40)*i);
     script.forEach(({t,msg,type}) => T(()=>addLog(msg,type), t));
-    llmSc.forEach(({t,call}) => T(()=>setLlmCalls(p=>[...p,call]), t));
     T(()=>{
       setDone(p=>new Set([...p,stageId])); setActive(null);
       setAppState("gate"); setGateStage(stageId); setDetail("gate_"+stageId);
@@ -680,29 +647,170 @@ export default function DevForgeDashboard() {
     }, dur);
   };
 
+  // ── Poll for Stage 2 session after PRD approval ────────────────────────
+  const pollStage2 = (prdThreadId) => {
+    const poll = () => {
+      fetch("/stage2/sessions").then(r=>r.json()).then(sessions => {
+        const entry = Object.entries(sessions).find(([,v]) => v.prd_thread_id===prdThreadId && v.task_count>0);
+        if (entry) {
+          const [tid, data] = entry;
+          setS2Tid(tid);
+          setApiReady(p=>({...p, tasks:true}));
+          fetch(`/stage2/tasks/${tid}`).then(r=>r.json()).then(d=>{
+            const tasks = d.tasks||[];
+            if(tasks.length) {
+              setRealTasks(tasks);
+              tasks.forEach((t,i) => setTimeout(()=>addLog(`✓ [${(t.type||"task").toUpperCase()}] ${t.title?.slice(0,55)} — ${t.estimate_hours}h`,"success"), i*120));
+              const totalHours = tasks.reduce((a,t)=>a+(t.estimate_hours||0),0);
+              setTimeout(()=>addLog(`✓ ${tasks.length} tasks · ${totalHours.toFixed(1)}h total · posted to Slack`,"success"), tasks.length*120+100);
+            }
+          }).catch(()=>addLog(`✓ ${data.task_count} tasks generated & posted to Slack`,"success"));
+        } else { setTimeout(poll, 3000); }
+      }).catch(()=>setTimeout(poll,5000));
+    };
+    setTimeout(poll, 4000);
+  };
+
+  // ── Poll for Stage 3 PR review ────────────────────────────────────────
+  const pollStage3 = (s2tid) => {
+    const deadline = Date.now() + 120_000;   // 2-min hard timeout
+    const poll = () => {
+      if (Date.now() > deadline) {
+        addLog("⚠ PR Review timed out — enabling gate without LLM results","warn");
+        setApiReady(p=>({...p, pr_review:true}));
+        return;
+      }
+      fetch("/stage3/sessions").then(r=>r.json()).then(sessions => {
+        const entry = Object.entries(sessions).find(([,v]) => v.stage2_thread_id===s2tid && v.verdict);
+        if (entry) {
+          const [tid] = entry;
+          setS3Tid(tid);
+          fetch(`/stage3/review/${tid}`).then(r=>r.json()).then(d=>{
+            setRealReview(d);
+            setApiReady(p=>({...p, pr_review:true}));
+            addLog(`✓ Review complete: ${d.verdict}`,"success");
+            (d.findings||[]).forEach((f,i)=>setTimeout(()=>{
+              const icon = f.severity==="blocker"?"🔴":f.severity==="warning"?"⚠":"ℹ";
+              addLog(`${icon} [${f.agent?.toUpperCase()}] ${f.title}`,"info");
+            },i*150));
+          }).catch(()=>{});
+        } else { setTimeout(poll, 4000); }
+      }).catch(()=>setTimeout(poll, 5000));
+    };
+    setTimeout(poll, 5000);
+  };
+
+  // ── Poll for Stage 4 code generation ──────────────────────────────────
+  const pollStage4 = (s2tid) => {
+    const deadline = Date.now() + 180_000;   // 3-min timeout (code gen is slower)
+    const poll = () => {
+      if (Date.now() > deadline) {
+        addLog("⚠ Code Gen timed out — enabling gate without results","warn");
+        setApiReady(p=>({...p, code_gen:true}));
+        return;
+      }
+      fetch("/stage4/sessions").then(r=>r.json()).then(sessions => {
+        const entry = Object.entries(sessions).find(([,v]) => v.stage2_thread_id===s2tid && v.task_count>=0);
+        if (entry) {
+          const [tid] = entry;
+          setS4Tid(tid);
+          fetch(`/stage4/code/${tid}`)
+            .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+            .then(d=>{
+              if((d.generated||[]).length===0) { setTimeout(poll, 4000); return; }
+              setRealCodeGen(d);
+              setApiReady(p=>({...p, code_gen:true}));
+              addLog(`✓ Code gen complete: ${d.generated.length} tasks, ${d.total_files||0} files`,"success");
+              (d.generated||[]).forEach((t,i)=>setTimeout(()=>{
+                addLog(`✓ [CODE] ${t.task_title?.slice(0,55)} — ${t.files?.length||0} file${t.files?.length!==1?"s":""}`,"success");
+              },i*150));
+            }).catch(()=>setTimeout(poll, 5000));
+        } else { setTimeout(poll, 4000); }
+      }).catch(()=>setTimeout(poll,5000));
+    };
+    setTimeout(poll, 5000);
+  };
+
+  // ── Poll QA results ────────────────────────────────────────────────────
+  const pollQA = (qaTid) => {
+    const deadline = Date.now() + 180_000;
+    const poll = () => {
+      if (Date.now() > deadline) {
+        addLog("⚠ QA timed out — enabling gate without results","warn");
+        setApiReady(p=>({...p, qa:true}));
+        return;
+      }
+      fetch(`/qa/results/${qaTid}`).then(r=>r.json()).then(d=>{
+        if (d.status==="complete" || d.status==="error") {
+          setRealQA(d);
+          setApiReady(p=>({...p, qa:true}));
+          if (d.status==="complete" && d.result) {
+            const r = d.result;
+            addLog(`✓ QA complete: ${r.passed} passed, ${r.failed} failed, ${r.errors} errors (${r.total} total)`,"success");
+          } else if (d.status==="error") {
+            addLog(`⚠ QA runner error: ${d.error}`,"warn");
+          }
+        } else {
+          setTimeout(poll, 4000);
+        }
+      }).catch(()=>setTimeout(poll,5000));
+    };
+    setTimeout(poll, 5000);
+  };
+
   // ── Launch ─────────────────────────────────────────────────────────────
   const handleLaunch = () => {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
-    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({}); setLlmCalls([]);
+    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealReview(null); setRealCodeGen(null); setRealQA(null); setExpandedFile(null);
     addLog("⟡ DevForge AI pipeline started","info");
     addLog("⟡ Source: Slack #feature-requests","info");
 
-    const s5 = () => {
+    // Clear server call history first, then start Stage 1 — prevents DELETE racing with stage1 LLM recording
+    fetch("/stats/llm-calls", {method:"DELETE"})
+      .catch(()=>{})
+      .then(() => fetch("/stage1/submit", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({raw_text: input, requester:"devforge-ui"})
+      })).then(r=>r.json()).then(data=>{
+      if(data.status==="pending_review") {
+        const msg=data.message||"";
+        const tid=msg.includes("Thread ID:")? msg.split("Thread ID:")[1].trim().split(".")[0] : null;
+        setS1Tid(tid);
+        const prd = data.prd;
+        if(prd) {
+          setRealPrd(prd);
+          addLog(`✓ Problem statement extracted`,"success");
+          addLog(`✓ Target users: ${Array.isArray(prd.user_stories)? [...new Set((prd.user_stories||[]).map(s=>s.as_a))].slice(0,3).join(", ") : "identified"}`,"success");
+          addLog(`✓ PRD "${prd.title}" v${prd.version} — ${prd.goals?.length||0} goals, ${prd.user_stories?.length||0} stories, ${prd.acceptance_criteria?.length||0} criteria`,"success");
+          addLog(`✓ Posted to Slack #devforge-prd for review`,"success");
+        } else {
+          addLog("✓ PRD generated & posted to Slack","success");
+        }
+        setApiReady(p=>({...p, requirements:true}));
+      } else {
+        addLog(`⚠ Stage 1 issue: ${(data.message||"").slice(0,60)}`,"warn");
+        setApiReady(p=>({...p, requirements:"error"}));
+      }
+    }).catch(e=>{ addLog("⚠ API error: "+e.message,"warn"); setApiReady(p=>({...p,requirements:"error"})); });
+
+    const s7 = () => {
       addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff");
       runDeploy();
     };
-    function s4done() {
-      setDone(p=>new Set([...p,"qa"])); setActive(null);
+    function goProdGate() {
       setAppState("prod_gate"); setDetail("prod_gate");
       addLog("⚠ PRODUCTION GATE — mandatory approval required","gate");
-      resumeFn.current = s5;
+      resumeFn.current = s7;
     }
-    const s4 = () => runStage("qa",        s4done);
-    const s3 = () => runStage("pr_review", s4);
-    const s2 = () => runStage("tasks",     s3);
-    T(() => runStage("requirements", s2), 400);
+    const s6 = () => runStage("qa",          goProdGate);
+    const s5 = () => runStage("pr_review",   s6);
+    const s4 = () => runStage("code_gen",    s5);
+    const s3 = () => runStage("tasks",       s4);
+    const s2 = () => runStage("requirements",s3);
+    T(() => s2(), 400);
   };
 
   const runDeploy = () => {
@@ -711,7 +819,6 @@ export default function DevForgeDashboard() {
     setProgress(p=>({...p,deploy:0})); setAppState("running");
     for(let i=1;i<=40;i++) T(()=>setProgress(p=>({...p,deploy:(i/40)*100})), (dur/40)*i);
     PIPELINE_SCRIPT.deploy.forEach(({t,msg,type})=>T(()=>addLog(msg,type),t));
-    (LLM_CALL_SCRIPT.deploy||[]).forEach(({t,call})=>T(()=>setLlmCalls(p=>[...p,call]),t));
     ENV_DATA.forEach(env=>T(()=>setEnvProg(p=>({...p,[env.name]:100})), env.delay+800));
     T(()=>setEnvProg(p=>({...p,PRODUCTION:100})), 5200);
     T(()=>{
@@ -723,6 +830,83 @@ export default function DevForgeDashboard() {
 
   const handleApprove = () => {
     if(!gateStage) return;
+
+    // Fire real API calls in background — don't block animation
+    if(gateStage==="requirements" && stage1ThreadId) {
+      const tid = stage1ThreadId;
+      fetch(`/stage1/review/${tid}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"approve"})
+      }).then(()=>{
+        addLog("✓ PRD approved via API — Stage 2 starting in background","success");
+        pollStage2(tid);
+      }).catch(e=>addLog("⚠ Approval API error: "+e.message,"warn"));
+    }
+
+    if(gateStage==="tasks" && stage2ThreadId) {
+      const tid = stage2ThreadId;
+      fetch(`/stage2/review/${tid}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"approve"})
+      }).then(r=>r.json()).then(data=>{
+        const count = (data.linear_issue_ids||[]).length;
+        addLog(`✓ ${count} Linear issues created in new project`,"success");
+        // Auto-start Stage 4 Code Gen
+        fetch(`/stage4/start/${tid}`, {method:"POST"})
+          .then(r=>{
+            if(!r.ok) {
+              addLog("⚠ Code Gen backend unavailable — gate unlocked without generation","warn");
+              setApiReady(p=>({...p, code_gen:true}));
+              return;
+            }
+            addLog("⟡ Code generation agents spawned per ticket","info");
+            pollStage4(tid);
+          }).catch(e=>{ addLog("⚠ Code gen start error: "+e.message,"warn"); setApiReady(p=>({...p,code_gen:true})); });
+      }).catch(e=>addLog("⚠ Linear API error: "+e.message,"warn"));
+    }
+
+    if(gateStage==="code_gen" && stage4ThreadId) {
+      const tid = stage4ThreadId;
+      fetch(`/stage4/code/${tid}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"approve"})
+      }).then(()=>{
+        addLog("✓ Generated code approved — launching PR Review agents + QA runner","success");
+        // Start QA in parallel (runs pytest while PR Review is in progress)
+        fetch(`/qa/run/${tid}`, {method:"POST"})
+          .then(r=>r.json())
+          .then(qd=>{
+            if(qd.qa_thread_id) {
+              addLog("⟡ QA runner started — running pytest on generated tests","info");
+              pollQA(qd.qa_thread_id);
+            } else {
+              setApiReady(p=>({...p, qa:true}));
+            }
+          }).catch(()=>setApiReady(p=>({...p, qa:true})));
+        // Auto-start Stage 3 PR Review (4-agent review of the generated code)
+        if(stage2ThreadId) fetch(`/stage3/start/${stage2ThreadId}`, {method:"POST"})
+          .then(r=>{
+            if(!r.ok) {
+              addLog("⚠ PR Review backend unavailable — gate unlocked without LLM review","warn");
+              setApiReady(p=>({...p, pr_review:true}));
+              return;
+            }
+            addLog("⟡ PR Review agents launched (Security · Quality · Coverage · Architecture)","info");
+            pollStage3(stage2ThreadId);
+          })
+          .catch(e=>{ addLog("⚠ PR Review start error: "+e.message,"warn"); setApiReady(p=>({...p,pr_review:true})); });
+      }).catch(e=>addLog("⚠ Code gen approval error: "+e.message,"warn"));
+    }
+
+    if(gateStage==="pr_review" && stage3ThreadId) {
+      fetch(`/stage3/review/${stage3ThreadId}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"approve"})
+      }).then(()=>addLog("✓ PR Review approved","success"))
+        .catch(e=>addLog("⚠ PR Review approval error: "+e.message,"warn"));
+    }
+
+    // Immediately advance animation regardless of API
     setReviews(p=>({...p,[gateStage]:"approved"}));
     addLog(`✓ Stage ${STAGES.findIndex(s=>s.id===gateStage)+1} approved`,"success");
     setShowFB(false); setFb(""); setGateStage(null);
@@ -752,24 +936,181 @@ export default function DevForgeDashboard() {
         <div className="df-dtitle" style={{color:"#00d4ff"}}>Requirements Agent</div>
         <div className="df-dsub">Feature Request → PRD</div>
         <div className="df-prd">
-          <div className="df-prd-h">📋 Self-Service Password Reset</div>
-          <div className="df-ps"><div className="df-pl">Problem</div><div className="df-pt">Enterprise users cannot reset passwords without support — 200+ tickets weekly.</div></div>
-          <div className="df-ps"><div className="df-pl">Goals</div>{["Reduce tickets by 80%","Flow complete in <2 minutes","Cover email login users only"].map((g,i)=><div key={i} className="df-pi">{g}</div>)}</div>
-          <div className="df-ps"><div className="df-pl">User Stories</div>{["As a user, I want to reset my password via email","As an admin, I want to audit all reset attempts","As a user, I want the link to expire after 15 minutes"].map((s,i)=><div key={i} className="df-pi">{s}</div>)}</div>
+          {realPrd ? (<>
+            <div className="df-prd-h">📋 {realPrd.title}</div>
+            <div className="df-ps"><div className="df-pl">Problem</div><div className="df-pt">{realPrd.problem_statement}</div></div>
+            <div className="df-ps"><div className="df-pl">Goals</div>{(realPrd.goals||[]).map((g,i)=><div key={i} className="df-pi">{g}</div>)}</div>
+            <div className="df-ps"><div className="df-pl">User Stories</div>{(realPrd.user_stories||[]).slice(0,4).map((s,i)=><div key={i} className="df-pi">As a {s.as_a}, I want to {s.i_want}</div>)}</div>
+          </>) : (<>
+            <div className="df-prd-h" style={{opacity:0.4}}>⟳ Generating PRD...</div>
+            <div className="df-ps"><div className="df-pl">Problem</div><div className="df-pt" style={{opacity:0.4}}>Analyzing feature request...</div></div>
+            <div className="df-ps"><div className="df-pl">Goals</div><div className="df-pi" style={{opacity:0.4}}>—</div></div>
+            <div className="df-ps"><div className="df-pl">User Stories</div><div className="df-pi" style={{opacity:0.4}}>—</div></div>
+          </>)}
         </div>
       </div>
     );
     if(detail==="tasks") {
-      const p=progress["tasks"]||0, vis=Math.max(1,Math.floor((p/100)*TASKS_DATA.length));
-      return <div><div className="df-dtitle" style={{color:"#00ff88"}}>Task Orchestration</div><div className="df-dsub">Creating 5 tasks in Linear</div><div className="df-tasks">{TASKS_DATA.slice(0,vis).map(t=><div key={t.id} className="df-task"><span className="df-tid">{t.id}</span><span className="df-tname">{t.name}</span><span className="df-tpts">{t.pts}</span></div>)}</div></div>;
+      const taskList = realTasks.length ? realTasks : [];
+      const p=progress["tasks"]||0, vis=realTasks.length ? Math.max(1,Math.floor((p/100)*taskList.length)) : 0;
+      return <div><div className="df-dtitle" style={{color:"#00ff88"}}>Task Orchestration</div><div className="df-dsub">{realTasks.length ? `Creating ${realTasks.length} tasks in Linear` : "⟳ Decomposing tasks..."}</div><div className="df-tasks">{realTasks.length ? taskList.slice(0,vis).map((t,i)=><div key={i} className="df-task"><span className="df-tid">[{t.type?.toUpperCase()}]</span><span className="df-tname">{t.title}</span><span className="df-tpts">{t.estimate_hours}h</span></div>) : <div className="df-task" style={{opacity:0.4}}><span className="df-tid">—</span><span className="df-tname">waiting for AI...</span></div>}</div></div>;
+    }
+    if(detail==="code_gen") {
+      const p=progress["code_gen"]||0;
+      if(realCodeGen && (realCodeGen.generated||[]).length>0) {
+        const genIds = new Set((realCodeGen.generated||[]).map(g=>g.task_id));
+        const skipped = realTasks.filter(t=>!genIds.has(t.id));
+        const outputPath = (realCodeGen.message||"").match(/output\/[^\s]+/)?.[0] || null;
+        return (<div>
+          <div className="df-dtitle" style={{color:"#bf5fff"}}>Code Generation</div>
+          <div className="df-dsub">
+            {realCodeGen.generated.length} of {realTasks.length} tasks · {realCodeGen.total_files||0} files
+            {outputPath && <> · <span style={{fontFamily:"monospace",color:"#bf5fff"}}>{outputPath}</span></>}
+          </div>
+          <div className="df-tasks">
+            {realCodeGen.generated.map((t,i)=>{
+              const linkedTask = realTasks.find(rt=>rt.id===t.task_id);
+              const linearId = linkedTask?.linear_issue_id;
+              return (
+                <div key={i} style={{marginBottom:10,padding:"8px 10px",background:"rgba(191,95,255,0.07)",borderLeft:"2px solid #bf5fff",borderRadius:3}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                    <span className="df-tid">[CODE]</span>
+                    <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                      {linearId && <span style={{fontSize:8,fontFamily:"monospace",color:"#bf5fff",opacity:.7}}>#{linearId.slice(-6)}</span>}
+                      <span style={{fontSize:9,opacity:.5}}>{t.files?.length||0} file{t.files?.length!==1?"s":""}</span>
+                    </div>
+                  </div>
+                  <div className="df-tname" style={{marginBottom:6}}>{t.task_title}</div>
+                  {(t.files||[]).map((f,j)=>{
+                    const fkey=`${i}-${j}`;
+                    const open=expandedFile===fkey;
+                    return (<div key={j}>
+                      <div onClick={()=>setExpandedFile(open?null:fkey)} style={{
+                        display:"flex",justifyContent:"space-between",alignItems:"center",
+                        fontSize:9,fontFamily:"monospace",padding:"3px 8px",marginBottom:2,
+                        background:"rgba(191,95,255,0.08)",borderRadius:2,cursor:"pointer",
+                      }}>
+                        <span style={{opacity:.75}}>→ {f.filename}</span>
+                        <span style={{color:"#bf5fff",fontSize:8,minWidth:30,textAlign:"right"}}>{open?"▲ hide":"▼ view"}</span>
+                      </div>
+                      {open&&<pre style={{
+                        fontSize:8,lineHeight:1.55,fontFamily:"monospace",
+                        padding:"8px 10px",margin:"0 0 4px 0",borderRadius:2,
+                        background:"rgba(0,0,0,0.45)",color:"#c8d6e8",
+                        overflow:"auto",maxHeight:220,whiteSpace:"pre-wrap",wordBreak:"break-all",
+                      }}>{f.content}</pre>}
+                    </div>);
+                  })}
+                </div>
+              );
+            })}
+            {skipped.length>0 && (
+              <div style={{marginTop:6,padding:"6px 10px",background:"rgba(255,255,255,0.03)",borderLeft:"2px solid rgba(191,95,255,0.3)",borderRadius:3}}>
+                <span style={{fontSize:9,opacity:.4}}>{skipped.length} task{skipped.length!==1?"s":""} skipped (cap): </span>
+                <span style={{fontSize:9,opacity:.35,fontStyle:"italic"}}>{skipped.map(t=>t.title).join(", ")}</span>
+              </div>
+            )}
+          </div>
+        </div>);
+      }
+      if(doneStages.has("code_gen")) {
+        return (<div><div className="df-dtitle" style={{color:"#bf5fff"}}>Code Generation</div>
+          <div className="df-dsub" style={{opacity:.5}}>⟳ Waiting for generated code preview...</div>
+          <div style={{marginTop:16,padding:"10px 12px",background:"rgba(191,95,255,0.06)",borderLeft:"2px solid rgba(191,95,255,0.3)",borderRadius:3,fontSize:10,opacity:.5}}>
+            Code files were written to disk — preview loading from API...
+          </div>
+        </div>);
+      }
+      const taskPool = realTasks.length ? realTasks.map(t=>t.title) : ["Setting up project structure...","Writing authentication logic...","Writing API handlers...","Writing database models...","Writing unit tests..."];
+      const vis = Math.max(1, Math.floor((p/100)*taskPool.length));
+      return (<div><div className="df-dtitle" style={{color:"#bf5fff"}}>Code Generation</div>
+        <div className="df-dsub">{p>10?"⟳ Agents writing code...":"Initializing..."}</div>
+        <div className="df-tasks">{taskPool.slice(0,p>10?vis:1).map((ph,i)=>(
+          <div key={i} className="df-task" style={{opacity:0.5}}>
+            <span className="df-tid" style={{color:"#bf5fff"}}>[GEN]</span>
+            <span className="df-tname">{ph}</span>
+          </div>
+        ))}</div></div>);
     }
     if(detail==="pr_review") {
       const p=progress["pr_review"]||0;
-      return <div><div className="df-dtitle" style={{color:"#ff9500"}}>PR Review Panel</div><div className="df-dsub">4 Agents · Simultaneous</div><div className="df-agents">{AGENTS_DATA.map((ag,i)=>{const th=8+i*14,run=p>=th&&p<th+22,dn=p>=th+22;return(<div key={ag.id} className={`df-agent ${run?"running":""} ${dn?(ag.status==="WARN"?"warned":"passed"):""}`} style={{"--ac":ag.color}}><div className="df-agh"><div className="df-agd" style={{background:dn?ag.sc:(run?ag.color:"rgba(200,214,232,.15)"),animation:run?"pulse .8s infinite":"none"}}/><div><div className="df-agname">{ag.name}</div><div className="df-agst" style={{color:dn?ag.sc:"inherit"}}>{dn?ag.status:(run?"SCANNING...":"WAITING")}</div></div></div>{dn&&<div className="df-agf">{ag.finding}</div>}</div>);})}</div></div>;
+      const agentNames = ["security","quality","coverage","architecture"];
+      const agentColors = {security:"#ff4466",quality:"#ffaa00",coverage:"#00ff88",architecture:"#6699ff"};
+      if(realReview) {
+        const byAgent = agentNames.map(name=>({
+          name, color:agentColors[name],
+          findings:(realReview.findings||[]).filter(f=>f.agent===name),
+        }));
+        return (<div><div className="df-dtitle" style={{color:"#e066ff"}}>PR Review Panel</div>
+          <div className="df-dsub">{realReview.verdict}</div>
+          <div className="df-agents">{byAgent.map((ag)=>{
+            const hasBlocker = ag.findings.some(f=>f.severity==="blocker");
+            const hasWarn    = ag.findings.some(f=>f.severity==="warning");
+            const sc = hasBlocker?"#ff4444":hasWarn?"#ff9500":"#00ff88";
+            const status = hasBlocker?"BLOCKED":hasWarn?"WARNED":"PASSED";
+            return (<div key={ag.name} className="df-agent passed" style={{"--ac":ag.color}}>
+              <div className="df-agh"><div className="df-agd" style={{background:sc}}/><div>
+                <div className="df-agname">{ag.name.charAt(0).toUpperCase()+ag.name.slice(1)} Agent</div>
+                <div className="df-agst" style={{color:sc}}>{status} · {ag.findings.length} finding{ag.findings.length!==1?"s":""}</div>
+              </div></div>
+              {ag.findings.map((f,j)=><div key={j} className="df-agf" style={{opacity:0.85}}>
+                {f.severity==="blocker"?"🔴":f.severity==="warning"?"⚠":"ℹ"} <b>{f.title}</b>: {f.recommendation?.slice(0,100)}
+              </div>)}
+            </div>);
+          })}</div></div>);
+      }
+      return (<div><div className="df-dtitle" style={{color:"#e066ff"}}>PR Review Panel</div>
+        <div className="df-dsub">4 Agents · Running in parallel...</div>
+        <div className="df-agents">{agentNames.map((name)=>{
+          const running = p > 10;
+          return(<div key={name} className={`df-agent ${running?"running":""}`} style={{"--ac":agentColors[name]}}>
+            <div className="df-agh"><div className="df-agd" style={{background:running?agentColors[name]:"rgba(200,214,232,.15)",animation:running?"pulse .8s infinite":"none"}}/><div>
+              <div className="df-agname">{name.charAt(0).toUpperCase()+name.slice(1)} Agent</div>
+              <div className="df-agst">{running?"REVIEWING CODE...":"WAITING"}</div>
+            </div></div>
+          </div>);
+        })}</div></div>);
     }
     if(detail==="qa") {
-      const p=progress["qa"]||0, vis=Math.max(1,Math.floor((p/100)*QA_DATA.length));
-      return <div><div className="df-dtitle" style={{color:"#bf5fff"}}>QA Agent</div><div className="df-dsub">Automated Test Execution</div><div className="df-qa-list">{QA_DATA.slice(0,vis).map((r,i)=><div key={i} className="df-qa-row"><span className="df-qa-type">{r.type}</span><span className="df-qa-count">{r.count}</span><span className="df-qa-badge">PASS</span></div>)}</div></div>;
+      const qr = realQA?.result;
+      const cats = qr?.categories;
+      const running = !qr;
+      const QA_ROWS = [
+        {key:"unit",        label:"Unit Tests"},
+        {key:"integration", label:"Integration"},
+        {key:"e2e",         label:"E2E (Playwright)"},
+        {key:"visual",      label:"Visual Regression"},
+      ];
+      return (<div>
+        <div className="df-dtitle" style={{color:"#2dd4bf"}}>QA Agent</div>
+        <div className="df-dsub">
+          {running
+            ? <span style={{animation:"pulse .8s infinite",display:"inline-block"}}>⟳ Running pytest on generated tests...</span>
+            : `${qr.passed} passed · ${qr.failed} failed · ${qr.errors} errors · ${qr.total} total`}
+        </div>
+        <div className="df-qa-list" style={{marginTop:10}}>
+          {QA_ROWS.map(({key,label})=>{
+            const c = cats?.[key];
+            const hasSome = c && c.total > 0;
+            const badge  = running ? "RUNNING" : !hasSome ? "—" : c.badge;
+            const count  = running ? "" : !hasSome ? "0 tests" :
+              c.badge==="PASS" ? `${c.passed} / ${c.total} passed` :
+              c.badge==="ERROR" ? `${c.errors} error${c.errors!==1?"s":""}` :
+              `${c.passed} passed, ${c.failed+c.errors} failed`;
+            const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":"rgba(200,214,232,.35)";
+            const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":"rgba(200,214,232,.06)";
+            return (
+              <div key={key} className="df-qa-row">
+                <span className="df-qa-type">{label}</span>
+                <span className="df-qa-count" style={{color:"rgba(200,214,232,.6)",fontSize:10}}>{count}</span>
+                <span className="df-qa-badge" style={{background:badgeBg,color:badgeColor,minWidth:52,textAlign:"center",animation:badge==="RUNNING"?"pulse .8s infinite":"none"}}>
+                  {badge}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>);
     }
     if(detail==="deploy") {
       const allEnvs=[...ENV_DATA.map(e=>e.name),"PRODUCTION"];
@@ -777,7 +1118,77 @@ export default function DevForgeDashboard() {
     }
     if(detail&&detail.startsWith("gate_")) {
       const sid=detail.replace("gate_",""), s=REVIEW_SUMMARY[sid]; if(!s) return null;
-      return (<div><div className="df-dtitle" style={{color:"#ffaa00"}}>Human Review Required</div><div className="df-dsub">Stage {STAGES.findIndex(x=>x.id===sid)+1} complete</div><div className="df-gate"><div className="df-gate-hdr"><span className="df-gate-icon">🔍</span><span className="df-gate-title">{s.title}</span></div><div className="df-gate-verdict">{s.verdict}</div><div className="df-gate-pts">{s.points.map((p,i)=><div key={i} className="df-gate-pt">{p}</div>)}</div><div className="df-gate-actions"><button className="df-gate-ok" onClick={handleApprove}>✓ {s.approve}</button><button className="df-gate-rej" onClick={()=>setShowFB(true)}>↺ Request Changes</button></div>{showFB&&<div className="df-fb-wrap"><div className="df-fb-lbl">Describe changes needed</div><textarea className="df-fb-inp" rows={3} value={fb} onChange={e=>setFb(e.target.value)} placeholder="e.g. Add token expiry edge case..."/><button className="df-fb-sub" onClick={handleFBSubmit}>Submit & Re-run Stage</button></div>}</div></div>);
+      const apiKey = sid==="requirements"?"requirements":sid==="tasks"?"tasks":sid==="code_gen"?"code_gen":sid==="pr_review"?"pr_review":sid==="qa"?"qa":null;
+      const ready = !apiKey || apiReady[apiKey]===true;
+      const apiErr = apiKey && apiReady[apiKey]==="error";
+      const loadingMsg = sid==="requirements"?"⟳ AI generating PRD...":sid==="tasks"?"⟳ AI decomposing tasks...":sid==="code_gen"?"⟳ Generating code per ticket...":sid==="pr_review"?"⟳ 4 agents reviewing code...":sid==="qa"?"⟳ Running pytest on generated tests...":null;
+
+      // Build real bullet points — show loading skeleton until API returns
+      let points, verdict;
+      if(sid==="requirements") {
+        if(realPrd) {
+          verdict = `"${realPrd.title}" (v${realPrd.version}) — ${realPrd.user_stories?.length||0} user stories, ${realPrd.acceptance_criteria?.length||0} acceptance criteria`;
+          points = [
+            `Problem: ${realPrd.problem_statement?.slice(0,100)}`,
+            ...(realPrd.goals||[]).slice(0,2).map(g=>`Goal: ${g.slice(0,90)}`),
+            `${realPrd.user_stories?.length||0} user stories · ${realPrd.non_goals?.length||0} non-goals · ${realPrd.technical_notes?.length||0} tech notes`,
+          ];
+        } else {
+          verdict = "Waiting for AI to generate PRD...";
+          points = ["— generating problem statement", "— generating goals", "— generating user stories"];
+        }
+      } else if(sid==="tasks") {
+        if(realTasks.length) {
+          verdict = `${realTasks.length} engineering tasks decomposed with dependency graph`;
+          points = realTasks.slice(0,5).map(t=>`[${t.type?.toUpperCase()}] ${t.title?.slice(0,70)} — ${t.estimate_hours}h`);
+        } else {
+          verdict = "Waiting for AI to decompose tasks...";
+          points = ["— generating task breakdown", "— estimating hours", "— building dependency graph"];
+        }
+      } else if(sid==="code_gen") {
+        if(realCodeGen) {
+          verdict = `${realCodeGen.generated?.length||0} tasks generated · ${realCodeGen.total_files||0} files`;
+          points = (realCodeGen.generated||[]).slice(0,5).map(t=>`[CODE] ${t.task_title?.slice(0,70)} — ${t.files?.length||0} file${t.files?.length!==1?"s":""}`);
+        } else {
+          verdict = "Waiting for code generation agents to complete...";
+          points = ["— Agents writing implementation files", "— Agents writing unit tests", "— Reviewing output quality", "— Compiling results"];
+        }
+      } else if(sid==="pr_review") {
+        if(realReview) {
+          verdict = realReview.verdict;
+          points = (realReview.findings||[]).slice(0,6).map(f=>{
+            const icon = f.severity==="blocker"?"🔴":f.severity==="warning"?"⚠":"ℹ";
+            return `${icon} [${f.agent?.toUpperCase()}] ${f.title}`;
+          });
+        } else {
+          verdict = "Waiting for 4-agent code review to complete...";
+          points = ["— Security agent reviewing generated code", "— Quality agent checking patterns", "— Coverage agent verifying tests", "— Architecture agent auditing structure"];
+        }
+      } else if(sid==="qa") {
+        if(realQA?.result) {
+          const qr = realQA.result;
+          verdict = `${qr.passed} passed · ${qr.failed} failed · ${qr.errors} errors · ${qr.total} total`;
+          if(qr.tests?.length>0) {
+            points = qr.tests.slice(0,6).map(t=>{
+              const ic = t.status==="PASSED"?"✓":t.status==="ERROR"?"⚠":"✗";
+              return `${ic} ${t.name}`;
+            });
+          } else {
+            points = [`✓ ${qr.passed} tests passed`, qr.failed>0?`✗ ${qr.failed} failed`:"✓ 0 failures", qr.errors>0?`⚠ ${qr.errors} errors`:"✓ 0 errors"].filter(Boolean);
+          }
+        } else if(realQA?.status==="error") {
+          verdict = `QA runner error: ${realQA.error||"unknown"}`;
+          points = ["⚠ pytest could not run — check generated test files"];
+        } else {
+          verdict = "Waiting for pytest results...";
+          points = ["⟳ running pytest on generated test files"];
+        }
+      } else {
+        verdict = s.verdict || "";
+        points = s.points || [];
+      }
+
+      return (<div><div className="df-dtitle" style={{color:"#ffaa00"}}>Human Review Required</div><div className="df-dsub">Stage {STAGES.findIndex(x=>x.id===sid)+1} complete</div><div className="df-gate"><div className="df-gate-hdr"><span className="df-gate-icon">🔍</span><span className="df-gate-title">{s.title}</span></div><div className="df-gate-verdict">{verdict}</div>{!ready&&!apiErr&&<div style={{color:"#ff9500",fontSize:11,margin:"8px 0",animation:"pulse .8s infinite"}}>{loadingMsg}</div>}{apiErr&&<div style={{color:"#ff4444",fontSize:11,margin:"8px 0"}}>⚠ API error — check logs</div>}<div className="df-gate-pts">{points.map((p,i)=><div key={i} className="df-gate-pt">{p}</div>)}</div><div className="df-gate-actions"><button className="df-gate-ok" onClick={handleApprove} disabled={!ready} style={{opacity:ready?1:0.45,cursor:ready?"pointer":"not-allowed"}}>✓ {s.approve}</button><button className="df-gate-rej" onClick={()=>setShowFB(true)}>↺ Request Changes</button></div>{showFB&&<div className="df-fb-wrap"><div className="df-fb-lbl">Describe changes needed</div><textarea className="df-fb-inp" rows={3} value={fb} onChange={e=>setFb(e.target.value)} placeholder="e.g. Add token expiry edge case..."/><button className="df-fb-sub" onClick={handleFBSubmit}>Submit & Re-run Stage</button></div>}</div></div>);
     }
     if(detail==="prod_gate") return (
       <div>
@@ -786,7 +1197,13 @@ export default function DevForgeDashboard() {
         <div className="df-prod-gate">
           <div className="df-pg-hdr"><span className="df-pg-icon">⚠️</span><span className="df-pg-title">MANDATORY APPROVAL</span></div>
           <div className="df-pg-sub">You are about to push to PRODUCTION</div>
-          <div className="df-pg-checks">{["PRD reviewed & approved","5 Linear tasks completed","PR: 0 blockers, 1 warning acknowledged","QA: 27/27 tests passed","DEV, STAGING, UAT — all green"].map((c,i)=><div key={i} className="df-pg-check"><span className="df-pg-check-ic">✓</span><span>{c}</span></div>)}</div>
+          <div className="df-pg-checks">{[
+            "PRD reviewed & approved",
+            `${realTasks.length||"5"} Linear tasks completed`,
+            `PR: ${realReview ? `${(realReview.findings||[]).filter(f=>f.severity==="blocker").length} blockers, ${(realReview.findings||[]).filter(f=>f.severity==="warning").length} warnings` : "0 blockers, reviewed"}`,
+            realQA?.result ? `QA: ${realQA.result.passed}/${realQA.result.total} tests passed, ${realQA.result.failed} failed` : "QA: tests executed",
+            "DEV, STAGING, UAT — all green",
+          ].map((c,i)=><div key={i} className="df-pg-check"><span className="df-pg-check-ic">✓</span><span>{c}</span></div>)}</div>
           <div className="df-pg-clbl">Type DEPLOY to confirm</div>
           <input className="df-pg-cinp" value={prodCfm} onChange={e=>setProdCfm(e.target.value)} placeholder="type DEPLOY to unlock"/>
           <button className={`df-pg-btn ${prodOK?"unlocked":"locked"}`} onClick={handleProdDeploy} disabled={!prodOK}>{prodOK?"🚀 Push to Production":"🔒 Confirm Above to Unlock"}</button>

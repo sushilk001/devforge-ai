@@ -17,10 +17,12 @@ Extract the following and respond ONLY with valid JSON matching this structure:
   "missing_info": ["list any critical missing details needed to write a PRD"]
 }}
 
-Be strict about is_complete — set it to false if any of these are missing:
-- Who the users are
-- What the core problem is
-- What success looks like
+Set is_complete to FALSE only if the request is truly unusable — missing ALL of:
+- who the users are, AND
+- what the core problem is, AND
+- any notion of success or goal
+
+If the request has a problem statement, target users, and at least one goal or success metric — set is_complete to TRUE and leave missing_info empty. Do not block reasonable requests.
 """
 
 

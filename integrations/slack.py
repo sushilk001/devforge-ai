@@ -11,6 +11,8 @@ from agents.stage1.schemas import PRDDocument, AgentState
 
 if TYPE_CHECKING:
     from agents.stage2.schemas import Stage2State
+    from agents.stage3.schemas import Stage3State
+    from agents.stage4.schemas import Stage4State
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -20,24 +22,33 @@ client = WebClient(token=settings.slack_bot_token)
 
 # ── Stage 1: PRD notifications ────────────────────────────────────────────────
 
+def _trunc(text: str, limit: int = 2900) -> str:
+    return text if len(text) <= limit else text[:limit - 3] + "..."
+
+
 def _prd_blocks(prd: PRDDocument, thread_id: str) -> list:
-    goals_text     = "\n".join(f"• {g}" for g in prd.goals)
-    non_goals_text = "\n".join(f"• {g}" for g in prd.non_goals)
-    stories_text   = "\n".join(
-        f"• As a *{s.as_a}*, I want {s.i_want}, so that {s.so_that}"
+    goals_text = _trunc("\n".join(f"• {g}" for g in prd.goals), 1800)
+    non_goals_text = _trunc("\n".join(f"• {g}" for g in prd.non_goals[:4]), 1800)
+
+    stories_text = _trunc("\n".join(
+        f"• *{s.as_a}:* {s.i_want[:120]}{'...' if len(s.i_want) > 120 else ''}"
         for s in prd.user_stories
-    )
-    criteria_text  = "\n".join(
-        f"• *Given* {c.given} *when* {c.when} *then* {c.then}"
+    ), 2900)
+
+    criteria_text = _trunc("\n".join(
+        f"• {c.given[:80]}{'...' if len(c.given) > 80 else ''} → {c.then[:100]}{'...' if len(c.then) > 100 else ''}"
         for c in prd.acceptance_criteria
-    )
-    tech_text      = "\n".join(f"• {t}" for t in prd.technical_notes)
-    questions_text = "\n".join(f"• {q}" for q in prd.open_questions)
+    ), 2900)
+
+    open_q_text = _trunc("\n".join(f"• {q[:120]}{'...' if len(q) > 120 else ''}" for q in prd.open_questions[:4]), 1800)
+    tech_count = len(prd.technical_notes)
+
+    header_text = f"📋 PRD: {prd.title} (v{prd.version})"[:150]
 
     return [
-        {"type": "header", "text": {"type": "plain_text", "text": f"📋 PRD: {prd.title}  (v{prd.version})"}},
+        {"type": "header", "text": {"type": "plain_text", "text": header_text}},
         {"type": "divider"},
-        {"type": "section", "text": {"type": "mrkdwn", "text": f"*Problem Statement*\n{prd.problem_statement}"}},
+        {"type": "section", "text": {"type": "mrkdwn", "text": _trunc(f"*Problem Statement*\n{prd.problem_statement}")}},
         {"type": "section", "fields": [
             {"type": "mrkdwn", "text": f"*Goals*\n{goals_text}"},
             {"type": "mrkdwn", "text": f"*Non-Goals*\n{non_goals_text}"},
@@ -45,8 +56,8 @@ def _prd_blocks(prd: PRDDocument, thread_id: str) -> list:
         {"type": "section", "text": {"type": "mrkdwn", "text": f"*User Stories*\n{stories_text}"}},
         {"type": "section", "text": {"type": "mrkdwn", "text": f"*Acceptance Criteria*\n{criteria_text}"}},
         {"type": "section", "fields": [
-            {"type": "mrkdwn", "text": f"*Technical Notes*\n{tech_text}"},
-            {"type": "mrkdwn", "text": f"*Open Questions*\n{questions_text}"},
+            {"type": "mrkdwn", "text": f"*Technical Notes*\n_{tech_count} notes — see full PRD in API_"},
+            {"type": "mrkdwn", "text": f"*Open Questions*\n{open_q_text}"},
         ]},
         {"type": "divider"},
         {
@@ -118,7 +129,7 @@ def post_incomplete_request(channel: str, missing_info: list[str], ts: str = Non
 # ── Stage 2: Task notifications ───────────────────────────────────────────────
 
 _PRIORITY_EMOJI = {"urgent": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}
-_TYPE_EMOJI     = {"feature": "✨", "chore": "🔧", "spike": "🔬", "docs": "📝", "bug": "🐛"}
+_TYPE_EMOJI     = {"feature": "✨", "chore": "🔧", "spike": "🔬", "docs": "📝", "bug": "🐛", "testing": "🧪"}
 
 
 def post_tasks_for_review(state: Stage2State) -> str | None:
@@ -189,6 +200,125 @@ def post_tasks_for_review(state: Stage2State) -> str | None:
         return ts
     except SlackApiError as e:
         logger.error(f"[Slack] post_tasks_for_review failed: {e.response['error']}")
+        return None
+
+
+def notify_review_complete(state: Stage3State) -> str | None:
+    """Post Stage 3 PR review results to Slack. Returns the message ts."""
+    _VERDICT_EMOJI = {
+        "BLOCKED": "🚫",
+        "APPROVED WITH WARNINGS": "⚠️",
+        "APPROVED": "✅",
+    }
+    verdict_prefix = next((k for k in _VERDICT_EMOJI if state.verdict.startswith(k)), "")
+    verdict_emoji = _VERDICT_EMOJI.get(verdict_prefix, "🔍")
+
+    prd_title = (state.prd or {}).get("title", "PRD")
+
+    # Build findings lines (up to 5)
+    finding_lines = []
+    for f in state.findings[:5]:
+        sev = f.get("severity", "info")
+        sev_emoji = {"blocker": "🚫", "warning": "⚠️", "info": "ℹ️"}.get(sev, "•")
+        agent = f.get("agent", "")
+        title = _trunc(f.get("title", ""), 80)
+        finding_lines.append(f"{sev_emoji} *[{agent}]* {title}")
+    if len(state.findings) > 5:
+        finding_lines.append(f"_...and {len(state.findings) - 5} more findings_")
+
+    findings_text = _trunc("\n".join(finding_lines), 2900) if finding_lines else "_No findings_"
+
+    blocks = [
+        {"type": "header", "text": {"type": "plain_text",
+            "text": f"{verdict_emoji} PR Review: {prd_title}"[:150]}},
+        {"type": "divider"},
+        {"type": "section", "fields": [
+            {"type": "mrkdwn", "text": f"*Verdict*\n{_trunc(state.verdict, 200)}"},
+            {"type": "mrkdwn", "text": f"*Summary*\n🚫 {state.blockers} blocker{'s' if state.blockers != 1 else ''}  "
+                                       f"⚠️ {state.warnings} warning{'s' if state.warnings != 1 else ''}  "
+                                       f"ℹ️ {len(state.findings) - state.blockers - state.warnings} info"},
+        ]},
+        {"type": "section", "text": {"type": "mrkdwn", "text": f"*Findings*\n{findings_text}"}},
+        {"type": "divider"},
+        {
+            "type": "actions",
+            "block_id": f"pr_review_{state.stage2_thread_id or 'unknown'}",
+            "elements": [
+                {"type": "button", "text": {"type": "plain_text", "text": "✅ Approve Review"},
+                 "style": "primary", "action_id": "approve_review",
+                 "value": state.stage2_thread_id or ""},
+                {"type": "button", "text": {"type": "plain_text", "text": "✏️ Request Changes"},
+                 "style": "danger", "action_id": "request_changes_review",
+                 "value": state.stage2_thread_id or ""},
+            ],
+        },
+    ]
+
+    try:
+        response = client.chat_postMessage(
+            channel=settings.slack_prd_channel,
+            text=f"{verdict_emoji} PR Review complete for *{prd_title}*: {state.verdict}",
+            blocks=blocks,
+        )
+        ts = response["ts"]
+        logger.info(f"[Slack] PR Review posted. ts={ts} verdict={state.verdict}")
+        return ts
+    except SlackApiError as e:
+        logger.error(f"[Slack] notify_review_complete failed: {e.response['error']}")
+        return None
+
+
+def notify_code_generated(state: Stage4State) -> str | None:
+    """Post Stage 4 code generation summary to Slack. Returns the message ts."""
+    prd_title = (state.prd or {}).get("title", "PRD")
+    generated = state.generated or []
+    total_files = state.total_files
+
+    task_lines = []
+    for gt in generated[:4]:
+        title = _trunc(gt.get("task_title", ""), 60)
+        file_count = len(gt.get("files", []))
+        task_lines.append(f"• *{gt.get('task_id', '?')}* {title} — {file_count} file{'s' if file_count != 1 else ''}")
+    if len(generated) > 4:
+        task_lines.append(f"_...and {len(generated) - 4} more tasks_")
+
+    tasks_text = _trunc("\n".join(task_lines), 2900) if task_lines else "_No tasks generated_"
+
+    blocks = [
+        {"type": "header", "text": {"type": "plain_text",
+            "text": f"💻 Code Generated: {prd_title}"[:150]}},
+        {"type": "divider"},
+        {"type": "section", "fields": [
+            {"type": "mrkdwn", "text": f"*Tasks*\n{len(generated)}"},
+            {"type": "mrkdwn", "text": f"*Total Files*\n{total_files}"},
+        ]},
+        {"type": "section", "text": {"type": "mrkdwn", "text": f"*Generated Tasks*\n{tasks_text}"}},
+        {"type": "divider"},
+        {
+            "type": "actions",
+            "block_id": f"code_review_{state.stage2_thread_id or 'unknown'}",
+            "elements": [
+                {"type": "button", "text": {"type": "plain_text", "text": "✅ Approve Code"},
+                 "style": "primary", "action_id": "approve_code",
+                 "value": state.stage2_thread_id or ""},
+                {"type": "button", "text": {"type": "plain_text", "text": "✏️ Request Changes"},
+                 "style": "danger", "action_id": "request_changes_code",
+                 "value": state.stage2_thread_id or ""},
+            ],
+        },
+    ]
+
+    try:
+        response = client.chat_postMessage(
+            channel=settings.slack_prd_channel,
+            text=f"💻 Code generated for *{prd_title}*: {len(generated)} tasks, {total_files} files",
+            blocks=blocks,
+        )
+        ts = response["ts"]
+        logger.info(f"[Slack] Code generation posted. ts={ts}")
+        return ts
+    except SlackApiError as e:
+        logger.error(f"[Slack] notify_code_generated failed: {e.response['error']}")
         return None
 
 
