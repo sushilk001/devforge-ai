@@ -16,6 +16,9 @@ router = APIRouter(prefix="/stage1", tags=["Stage 1 — Requirements Agent"])
 # Production: swap for Redis or a DB
 _sessions: dict[str, AgentState] = {}
 
+# Tracks Slack threads awaiting rejection feedback: channel_ts → stage1 thread_id
+_awaiting_slack_feedback: dict[str, str] = {}
+
 
 def _coerce_state(result, cls):
     """LangGraph 1.x returns dict from invoke(); coerce to Pydantic model."""
@@ -173,10 +176,24 @@ async def slack_events(payload: dict):
 
     event = payload.get("event", {})
     if event.get("type") == "message" and not event.get("subtype"):
-        text    = event.get("text", "").strip()
-        user    = event.get("user", "unknown")
-        channel = event.get("channel")
-        ts      = event.get("ts")
+        text       = event.get("text", "").strip()
+        user       = event.get("user", "unknown")
+        channel    = event.get("channel")
+        ts         = event.get("ts")
+        thread_ts  = event.get("thread_ts")
+
+        # Thread reply = feedback on a rejected PRD
+        if thread_ts and not text.lower().startswith("devforge:"):
+            key = f"{channel}:{thread_ts}"
+            s1_tid = _awaiting_slack_feedback.pop(key, None)
+            if s1_tid:
+                from fastapi import BackgroundTasks as BT
+                try:
+                    await review_prd(s1_tid, ReviewAction(action="reject", feedback=text), BT())
+                    logger.info(f"[Slack] PRD {s1_tid} rejected with feedback via thread reply")
+                except Exception as e:
+                    logger.warning(f"[Slack] thread feedback failed: {e}")
+                return {"ok": True}
 
         if text.lower().startswith("devforge:"):
             raw_text  = text[len("devforge:"):].strip()
@@ -216,6 +233,19 @@ async def slack_actions(payload: dict, background_tasks: BackgroundTasks):
     if action_id == "approve_prd":
         await review_prd(thread_id, ReviewAction(action="approve"), background_tasks)
     elif action_id == "reject_prd":
-        pass  # Opens a modal or thread reply to collect feedback
+        from integrations.slack import client as slack_client
+        from config import get_settings
+        state = _sessions.get(thread_id)
+        if state and state.slack_message_ts:
+            channel = get_settings().slack_prd_channel
+            try:
+                slack_client.chat_postMessage(
+                    channel=channel,
+                    thread_ts=state.slack_message_ts,
+                    text="↺ *Changes requested.* Reply in this thread with your feedback to regenerate the PRD.",
+                )
+                _awaiting_slack_feedback[f"{channel}:{state.slack_message_ts}"] = thread_id
+            except Exception as e:
+                logger.warning(f"[Slack] reject reply failed: {e}")
 
     return {"ok": True}

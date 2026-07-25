@@ -142,10 +142,40 @@ async def approve_code(thread_id: str, body: dict):
         )
     else:
         feedback = body.get("feedback", "")
-        _stage4_sessions[thread_id].human_feedback = feedback
+        # Re-run code generation with feedback injected into each task prompt
+        from agents.stage4.nodes import generate_code_for_tasks
+
+        state.human_feedback = feedback
+        state.generated      = []
+        state.total_files    = 0
+        state.approved       = False
+        _stage4_sessions[thread_id] = state
+
+        def _rerun():
+            try:
+                s = generate_code_for_tasks(state)
+                _stage4_sessions[thread_id] = s
+                slug = _project_slug(s.prd or {})
+                out  = OUTPUT_DIR / slug / thread_id
+                _stage4_output_paths[thread_id] = out
+                for gen_task in s.generated:
+                    task_data = gen_task if isinstance(gen_task, dict) else gen_task.model_dump()
+                    for file_data in task_data.get("files", []):
+                        fname = file_data.get("filename", "")
+                        if fname:
+                            fp = out / fname
+                            fp.parent.mkdir(parents=True, exist_ok=True)
+                            fp.write_text(file_data.get("content", ""), encoding="utf-8")
+                logger.info(f"[Stage4] Re-run complete with feedback. files={s.total_files}")
+            except Exception as e:
+                logger.error(f"[Stage4] Re-run failed: {e}")
+
+        import threading
+        threading.Thread(target=_rerun, daemon=True).start()
+
         return CodeGenResponse(
-            status="changes_requested",
-            generated=state.generated,
-            total_files=state.total_files,
-            message=f"Changes requested: {feedback}",
+            status="rerunning",
+            generated=[],
+            total_files=0,
+            message=f"Re-running code generation with feedback: {feedback}",
         )

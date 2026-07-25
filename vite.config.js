@@ -12,6 +12,7 @@ export default defineConfig({
       "/stage4": "http://localhost:8000",
       "/stats":  "http://localhost:8000",
       "/qa":     "http://localhost:8000",
+      "/stage6": "http://localhost:8000",
       "/prd":    "http://localhost:8000",
       "/health": "http://localhost:8000",
     },

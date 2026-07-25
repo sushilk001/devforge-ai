@@ -52,6 +52,10 @@ def run_reviews(state: Stage3State) -> Stage3State:
     """Run 4 review agents in parallel using ThreadPoolExecutor."""
     prd_json = json.dumps(state.prd, indent=2)
     tasks_json = json.dumps(state.tasks, indent=2)
+    feedback_suffix = (
+        f"\n\n## Human Feedback (address this in your review)\n{state.human_feedback}"
+        if state.human_feedback else ""
+    )
 
     agent_configs = [
         ("security",     SECURITY_PROMPT),
@@ -62,7 +66,7 @@ def run_reviews(state: Stage3State) -> Stage3State:
 
     def run_one(agent_name, prompt_template):
         llm = get_llm()
-        prompt = prompt_template.format(prd_json=prd_json, tasks_json=tasks_json)
+        prompt = prompt_template.format(prd_json=prd_json, tasks_json=tasks_json) + feedback_suffix
         try:
             response = _llm_invoke(llm, [HumanMessage(content=prompt)], "pr_review", agent_name)
             data = _parse_json(response.content)

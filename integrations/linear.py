@@ -59,8 +59,14 @@ def create_issue(title: str, description: str) -> str | None:
 
 # ── Stage 2: Engineering tasks ────────────────────────────────────────────────
 
-def create_project(name: str, description: str = "") -> dict | None:
+def create_project(name: str, description: str = "",
+                   total_estimate_hours: float = 0) -> dict | None:
     """Create a new Linear project for a pipeline run. Returns {id, name, url}."""
+    from datetime import date, timedelta
+    today = date.today()
+    working_days = max(1, int((total_estimate_hours or 0) / 6) + 1)
+    target = today + timedelta(days=working_days)
+
     query = """
     mutation ProjectCreate($input: ProjectCreateInput!) {
       projectCreate(input: $input) {
@@ -73,11 +79,13 @@ def create_project(name: str, description: str = "") -> dict | None:
         "name":        name[:255],
         "teamIds":     [settings.linear_team_id],
         "description": description[:255] if description else "",
+        "startDate":   today.isoformat(),
+        "targetDate":  target.isoformat(),
     }})
     inner = (data or {}).get("data") or {}
     if inner.get("projectCreate", {}).get("success"):
         project = inner["projectCreate"]["project"]
-        logger.info(f"[Linear] Project created: {project['name']} — {project['url']}")
+        logger.info(f"[Linear] Project created: {project['name']} — target {target} — {project['url']}")
         return project
     logger.error(f"[Linear] create_project failed: {data}")
     return None
@@ -243,6 +251,20 @@ def mark_code_generated(issue_id: str, files: list[dict], summary: str) -> None:
     state_id = _find_state_id(["in progress", "in-progress", "started"], "started")
     if state_id:
         update_issue_state(issue_id, state_id)
+
+
+def mark_issues_done(issue_ids: list[str]) -> int:
+    """Move all issues to Done state. Returns count of successes."""
+    state_id = _find_state_id(["done", "completed", "closed"], "completed")
+    if not state_id:
+        logger.warning("[Linear] Could not find a Done state — skipping close")
+        return 0
+    closed = 0
+    for issue_id in issue_ids:
+        if update_issue_state(issue_id, state_id):
+            closed += 1
+    logger.info(f"[Linear] Closed {closed}/{len(issue_ids)} issues as Done")
+    return closed
 
 
 # ── Shared ────────────────────────────────────────────────────────────────────

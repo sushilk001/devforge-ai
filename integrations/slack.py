@@ -322,6 +322,38 @@ def notify_code_generated(state: Stage4State) -> str | None:
         return None
 
 
+def notify_deploy_complete(
+    prd_title: str, pr_url: str, pr_number: int,
+    branch: str, files_pushed: int,
+    qa_summary: dict, issues_closed: int,
+) -> str | None:
+    """Post a deploy-complete notification to the Slack channel. Returns message ts."""
+    qa_line = (
+        f"{qa_summary.get('passed', 0)} passed · "
+        f"{qa_summary.get('failed', 0)} failed · "
+        f"{qa_summary.get('total', 0)} total"
+    ) if qa_summary else "not run"
+
+    try:
+        resp = client.chat_postMessage(
+            channel=settings.slack_prd_channel,
+            text=f"🚀 PR #{pr_number} created for *{prd_title}*",
+            blocks=[{"type": "section", "text": {"type": "mrkdwn",
+                "text": (
+                    f"🚀 *DevForge AI — Deploy Complete*\n"
+                    f"*{prd_title}*\n\n"
+                    f"• Branch: `{branch}` → `main` ({files_pushed} files)\n"
+                    f"• <{pr_url}|View Pull Request #{pr_number}>\n"
+                    f"• QA: {qa_line}\n"
+                    f"• Linear: {issues_closed} issue{'s' if issues_closed!=1 else ''} closed as Done"
+                )}}],
+        )
+        return resp.get("ts")
+    except SlackApiError as e:
+        logger.error(f"[Slack] notify_deploy_complete failed: {e.response['error']}")
+        return None
+
+
 def notify_tasks_approved(state: Stage2State) -> None:
     """Update the Slack task message to confirmed-created state."""
     if not state.slack_message_ts:
