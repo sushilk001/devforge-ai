@@ -7,6 +7,7 @@ from api.stage2_routes import router_stage2
 from api.stage3_routes import router_stage3
 from api.stage4_routes import router_stage4
 from api.qa_routes import router_qa
+from api.stage6_routes import router_stage6
 from api.observability import router as router_obs
 from config import get_settings
 
@@ -43,12 +44,13 @@ app.include_router(router_stage2)
 app.include_router(router_stage3)
 app.include_router(router_stage4)
 app.include_router(router_qa)
+app.include_router(router_stage6)
 app.include_router(router_obs)
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "DevForge AI", "stages": ["1 — Requirements Agent", "2 — Task Orchestration", "3 — PR Review Agent", "4 — Code Generation Agent"]}
+    return {"status": "ok", "service": "DevForge AI", "stages": ["1 — Requirements Agent", "2 — Task Orchestration", "3 — PR Review Agent", "4 — Code Generation Agent", "5 — QA Runner", "6 — Deploy"]}
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────

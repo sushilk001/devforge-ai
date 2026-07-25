@@ -107,12 +107,34 @@ async def approve_review(thread_id: str, body: dict):
         )
     else:
         feedback = body.get("feedback", "")
-        _stage3_sessions[thread_id].human_feedback = feedback
+        # Re-run all 4 review agents with feedback injected into prompts
+        from agents.stage3.nodes import run_reviews, build_verdict
+
+        state.human_feedback = feedback
+        state.findings = []
+        state.blockers = 0
+        state.warnings = 0
+        state.verdict  = ""
+        state.approved = False
+        _stage3_sessions[thread_id] = state
+
+        def _rerun():
+            try:
+                s = run_reviews(state)
+                s = build_verdict(s)
+                _stage3_sessions[thread_id] = s
+                logger.info(f"[Stage3] Re-run complete with feedback. findings={len(s.findings)}")
+            except Exception as e:
+                logger.error(f"[Stage3] Re-run failed: {e}")
+
+        import threading
+        threading.Thread(target=_rerun, daemon=True).start()
+
         return ReviewResponse(
-            status="changes_requested",
-            findings=state.findings,
-            verdict=state.verdict,
-            blockers=state.blockers,
-            warnings=state.warnings,
-            message=f"Changes requested: {feedback}",
+            status="rerunning",
+            findings=[],
+            verdict="Re-running review with your feedback...",
+            blockers=0,
+            warnings=0,
+            message=f"Re-running 4 agents with feedback: {feedback}",
         )

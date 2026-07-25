@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # GitHub
     github_token: str = ""
     github_org: str = ""
+    github_repo: str = ""          # "owner/repo" to push generated code to
 
     # App
     app_env: str = "development"

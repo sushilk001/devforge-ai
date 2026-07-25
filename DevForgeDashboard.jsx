@@ -53,15 +53,12 @@ const PIPELINE_SCRIPT = {
     {t:4600,msg:"⏸ QA complete — awaiting real results",         type:"gate"},
   ],
   deploy:[
-    {t:400, msg:"⟡ Starting progressive deployment...",           type:"info"},
-    {t:1000,msg:"✓ DEV — deployed ✓",                              type:"success"},
-    {t:1800,msg:"✓ STAGING — deployed ✓",                          type:"success"},
-    {t:2800,msg:"✓ UAT — deployed ✓",                              type:"success"},
-    {t:3600,msg:"⟡ All pre-prod gates passed.",                    type:"info"},
-    {t:4200,msg:"✓ PRODUCTION — deployed ✓",                      type:"success"},
-    {t:4800,msg:"⟡ Monitoring error rate post-deploy...",          type:"info"},
-    {t:5400,msg:"✓ Error rate: 0.01% — within threshold",          type:"success"},
-    {t:5900,msg:"🎉 FEATURE SHIPPED TO PRODUCTION",                type:"done"},
+    {t:400, msg:"⟡ Pushing generated code to GitHub...",           type:"info"},
+    {t:1400,msg:"⟡ Claude writing PR description...",               type:"info"},
+    {t:2600,msg:"⟡ Creating GitHub Pull Request...",               type:"info"},
+    {t:3600,msg:"⟡ Notifying Slack #devforge-prd...",              type:"info"},
+    {t:4400,msg:"⟡ Closing Linear issues as Done...",              type:"info"},
+    {t:5900,msg:"🎉 PR CREATED — FEATURE DELIVERED",               type:"done"},
   ],
 };
 
@@ -99,19 +96,26 @@ const css = `
   @keyframes tokenIn  {from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 
   .df*{box-sizing:border-box;margin:0;padding:0}
-  .df{font-family:'Space Mono',monospace;background:#060810;min-height:100vh;color:#c8d6e8;overflow:hidden;position:relative}
+  .df{font-family:'Space Mono',monospace;background:#060810;height:100vh;color:#c8d6e8;overflow:hidden;position:relative;display:flex;flex-direction:column}
   .df-scan{position:fixed;top:0;left:0;width:100%;height:2px;pointer-events:none;z-index:999;
     background:linear-gradient(to bottom,transparent,rgba(0,212,255,.05),transparent);animation:scanline 8s linear infinite}
 
   /* Header */
   .df-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;
     border-bottom:1px solid rgba(0,212,255,.1);background:rgba(0,6,20,.9);backdrop-filter:blur(12px)}
-  .df-logo{display:flex;align-items:center;gap:10px}
-  .df-hex{width:32px;height:32px;background:rgba(0,212,255,.1);border:1.5px solid #00d4ff;display:flex;align-items:center;justify-content:center;
-    font-size:14px;color:#00d4ff;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
-  .df-lname{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#fff}
-  .df-lname span{color:#00d4ff}
-  .df-ltag{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.5);text-transform:uppercase;margin-top:2px}
+  .df-logo{display:flex;align-items:center;gap:13px}
+  .df-hex{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .df-hex::before{content:'';position:absolute;inset:-5px;border-radius:50%;z-index:0;
+    background:radial-gradient(circle,rgba(0,212,255,.4),transparent 68%);animation:logoGlow 2.8s ease-in-out infinite}
+  .df-hex svg{position:relative;z-index:1;filter:drop-shadow(0 0 5px rgba(0,212,255,.5))}
+  @keyframes logoGlow{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.12)}}
+  .df-lname{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:.4px;line-height:1}
+  .df-lname span{background:linear-gradient(90deg,#00e5ff,#3aa0ff);-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 9px rgba(0,212,255,.55))}
+  .df-ltag{display:flex;align-items:center;gap:6px;font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);
+    text-transform:uppercase;margin-top:5px}
+  .df-ltag::before{content:'';width:5px;height:5px;border-radius:50%;background:#00ff88;flex-shrink:0;
+    box-shadow:0 0 7px #00ff88;animation:pulse 1.6s infinite}
   .df-timer{font-size:24px;font-weight:700;letter-spacing:2px;font-variant-numeric:tabular-nums}
   .df-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:5px 13px;border:1px solid;border-radius:2px}
   .df-badge.idle   {color:rgba(200,214,232,.35);border-color:rgba(200,214,232,.15)}
@@ -120,13 +124,15 @@ const css = `
   .df-badge.done   {color:#00d4ff;border-color:rgba(0,212,255,.4)}
 
   /* Input */
-  .df-inp-area{display:flex;gap:10px;align-items:flex-end;padding:14px 22px;
+  .df-inp-area{display:flex;gap:10px;align-items:flex-end;padding:14px 22px;flex-shrink:0;
     border-bottom:1px solid rgba(0,212,255,.07);background:rgba(0,6,20,.6)}
-  .df-inp-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);text-transform:uppercase;margin-bottom:5px}
-  .df-inp-w{flex:1}
+  .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+  .df-inp-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);text-transform:uppercase}
+  .df-inp-w{flex:1;min-width:0}
   .df-inp{width:100%;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
-    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:12px;padding:9px 13px;outline:none;resize:none;
-    line-height:1.6;transition:border-color .2s}
+    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:12px;padding:9px 13px;outline:none;resize:vertical;
+    min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s}
+  .df-inp::-webkit-resizer{border-width:0 6px 6px 0;border-style:solid;border-color:transparent rgba(0,212,255,.4)}
   .df-inp:focus{border-color:rgba(0,212,255,.45)}
   .df-inp::placeholder{color:rgba(200,214,232,.2)}
   .df-launch{background:#00d4ff;color:#060810;border:none;cursor:pointer;font-family:'Syne',sans-serif;
@@ -136,12 +142,27 @@ const css = `
   .df-launch:disabled{background:rgba(0,212,255,.15);color:rgba(0,212,255,.35);cursor:not-allowed}
 
   /* Main layout */
-  .df-main{display:flex;height:calc(100vh - 168px);overflow:hidden}
+  .df-main{display:flex;flex:1;min-height:0;overflow:hidden}
 
   /* Pipeline sidebar */
-  .df-pipe{width:286px;flex-shrink:0;overflow-y:auto;padding:14px 12px;border-right:1px solid rgba(0,212,255,.07)}
+  .df-pipe{width:286px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;padding:14px 12px;border-right:1px solid rgba(0,212,255,.07);transition:width .25s ease}
+  .df-pipe.collapsed{width:58px;padding:14px 7px}
   .df-pipe::-webkit-scrollbar{width:2px}
   .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
+  .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;min-height:24px}
+  .df-pipe-hdr-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.5);text-transform:uppercase}
+  .df-pipe-btn{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:#00d4ff;cursor:pointer;
+    width:24px;height:24px;border-radius:3px;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;flex-shrink:0;font-family:'Space Mono',monospace}
+  .df-pipe-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.4)}
+  .df-rail{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0;border-radius:4px;
+    margin-bottom:5px;border:1px solid rgba(200,214,232,.07);background:rgba(255,255,255,.015);transition:all .2s}
+  .df-rail:hover{background:rgba(255,255,255,.045)}
+  .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.4)}
+  .df-rail.done{border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.025)}
+  .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.05)}
+  .df-rail-num{font-size:7px;letter-spacing:1px;opacity:.4}
+  .df-rail-dot{width:6px;height:6px;border-radius:50%}
   .df-card{border:1px solid rgba(200,214,232,.07);border-radius:4px;padding:11px;margin-bottom:5px;
     background:rgba(255,255,255,.015);transition:all .3s;position:relative;overflow:hidden}
   .df-card.active{border-color:var(--c);background:rgba(0,0,0,.45);animation:glow 2s ease-in-out infinite}
@@ -345,9 +366,12 @@ const css = `
   .obs-empty{text-align:center;padding:60px 20px;opacity:.25;font-size:11px;line-height:2}
 
   /* Log */
-  .df-log    {width:248px;flex-shrink:0;display:flex;flex-direction:column}
+  .df-log    {width:248px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
+  .df-log.wide     {width:460px}
+  .df-log.collapsed{width:44px}
   .df-log-hdr{padding:13px;border-bottom:1px solid rgba(0,212,255,.07);font-size:8px;letter-spacing:3px;
     color:rgba(0,212,255,.55);text-transform:uppercase;display:flex;align-items:center;gap:7px}
+  .df-log.collapsed .df-log-hdr{flex-direction:column;gap:9px;padding:11px 0}
   .df-log-dot{width:6px;height:6px;border-radius:50%}
   .df-log-bd {flex:1;overflow-y:auto;padding:9px}
   .df-log-bd::-webkit-scrollbar{width:2px}
@@ -597,12 +621,27 @@ export default function DevForgeDashboard() {
   const [realReview, setRealReview]  = useState(null);
   const [realCodeGen, setRealCodeGen]= useState(null);
   const [realQA, setRealQA]          = useState(null);
+  const [qaThreadId, setQaTid]       = useState(null);
+  const [realDeploy, setRealDeploy]  = useState(null);
   const [expandedFile, setExpandedFile] = useState(null);
+  const [pipeCollapsed, setPipeCollapsed] = useState(false);
+  const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
+  const [inputBig, setInputBig] = useState(false);
   const { elapsed, display, reset } = useTimer(appState === "running");
 
   const toRef    = useRef([]);
   const logRef   = useRef(null);
   const resumeFn = useRef(null);
+  const inputRef = useRef(null);
+
+  // Feature Request expand/shrink — set height on the DOM node directly so it
+  // survives re-renders (typing) and coexists with native drag-to-resize.
+  const toggleInputSize = () => {
+    const el = inputRef.current;
+    const next = !inputBig;
+    setInputBig(next);
+    if (el) el.style.height = next ? "220px" : "";
+  };
 
   // ── Clear stale observability data on hard refresh, then start polling ──
   const fetchLlmCalls = useCallback(() => {
@@ -758,13 +797,35 @@ export default function DevForgeDashboard() {
     setTimeout(poll, 5000);
   };
 
+  const pollDeploy = (deployTid) => {
+    const deadline = Date.now() + 300_000;
+    const poll = () => {
+      if (Date.now() > deadline) {
+        addLog("⚠ Deploy polling timed out","warn");
+        return;
+      }
+      fetch(`/stage6/status/${deployTid}`).then(r=>r.json()).then(d=>{
+        setRealDeploy(d);
+        if (d.status==="complete") {
+          addLog(`✓ PR #${d.pr_number} created: ${d.pr_url}`,"success");
+          if (d.linear_issues_closed>0) addLog(`✓ ${d.linear_issues_closed} Linear issues closed`,"success");
+        } else if (d.status==="error") {
+          addLog(`⚠ Deploy error: ${d.error}`,"warn");
+        } else {
+          setTimeout(poll, 3000);
+        }
+      }).catch(()=>setTimeout(poll,5000));
+    };
+    setTimeout(poll, 4000);
+  };
+
   // ── Launch ─────────────────────────────────────────────────────────────
   const handleLaunch = () => {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
-    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealReview(null); setRealCodeGen(null); setRealQA(null); setExpandedFile(null);
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setRealDeploy(null); setExpandedFile(null);
     addLog("⟡ DevForge AI pipeline started","info");
     addLog("⟡ Source: Slack #feature-requests","info");
 
@@ -817,16 +878,25 @@ export default function DevForgeDashboard() {
     const dur = STAGE_DUR.deploy;
     setActive("deploy"); setDetail("deploy");
     setProgress(p=>({...p,deploy:0})); setAppState("running");
-    for(let i=1;i<=40;i++) T(()=>setProgress(p=>({...p,deploy:(i/40)*100})), (dur/40)*i);
+    // Animate to 85% — final 100% fires when real deploy completes
+    for(let i=1;i<=34;i++) T(()=>setProgress(p=>({...p,deploy:(i/34)*85})), (dur/34)*i);
     PIPELINE_SCRIPT.deploy.forEach(({t,msg,type})=>T(()=>addLog(msg,type),t));
-    ENV_DATA.forEach(env=>T(()=>setEnvProg(p=>({...p,[env.name]:100})), env.delay+800));
-    T(()=>setEnvProg(p=>({...p,PRODUCTION:100})), 5200);
-    T(()=>{
-      setDone(p=>new Set([...p,"deploy"])); setActive(null);
-      setAppState("done"); setDetail("done");
-      addLog("🎉 Feature shipped to production","done");
-    }, dur);
   };
+
+  // Drive deploy completion from real API result — not a fixed timer
+  useEffect(() => {
+    if(realDeploy?.status === "complete") {
+      setProgress(p=>({...p,deploy:100}));
+      setDone(p=>new Set([...p,"deploy"]));
+      setActive(null); setAppState("done"); setDetail("done");
+      addLog("🎉 Feature shipped — PR created on GitHub","done");
+    } else if(realDeploy?.status === "error") {
+      setProgress(p=>({...p,deploy:100}));
+      setDone(p=>new Set([...p,"deploy"]));
+      setActive(null); setAppState("done"); setDetail("done");
+      addLog(`⚠ Deploy failed: ${realDeploy.error}`,"warn");
+    }
+  }, [realDeploy?.status]);
 
   const handleApprove = () => {
     if(!gateStage) return;
@@ -877,6 +947,7 @@ export default function DevForgeDashboard() {
           .then(r=>r.json())
           .then(qd=>{
             if(qd.qa_thread_id) {
+              setQaTid(qd.qa_thread_id);
               addLog("⟡ QA runner started — running pytest on generated tests","info");
               pollQA(qd.qa_thread_id);
             } else {
@@ -914,17 +985,92 @@ export default function DevForgeDashboard() {
   };
   const handleFBSubmit = () => {
     if(!fb.trim()) return;
-    setReviews(p=>({...p,[gateStage]:"changes"}));
-    addLog(`⚠ Changes requested: "${fb.slice(0,45)}..."`,"warn");
-    setShowFB(false); setFb(""); const sid=gateStage; setGateStage(null);
+    const sid = gateStage;
+    const feedback = fb.trim();
+    setReviews(p=>({...p,[sid]:"changes"}));
+    addLog(`⚠ Changes requested: "${feedback.slice(0,55)}..."`, "warn");
+    setShowFB(false); setFb(""); setGateStage(null);
     setDone(p=>{const n=new Set(p); n.delete(sid); return n;});
-    const fn=resumeFn.current; T(()=>runStage(sid,fn),500);
+    const fn = resumeFn.current;
+
+    // Send feedback to backend — all stages now have LLM re-run with feedback
+    if(sid==="requirements" && stage1ThreadId) {
+      setApiReady(p=>({...p, requirements:false}));
+      setRealPrd(null);
+      fetch(`/stage1/review/${stage1ThreadId}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"reject", feedback})
+      }).then(r=>r.json()).then(data=>{
+        if(data.prd) {
+          setRealPrd(data.prd);
+          addLog(`✓ PRD revised (v${data.prd.version}) with your feedback`,"success");
+        }
+        setApiReady(p=>({...p, requirements:true}));
+      }).catch(e=>{ addLog("⚠ Feedback API error: "+e.message,"warn"); setApiReady(p=>({...p,requirements:true})); });
+    }
+
+    if(sid==="tasks" && stage2ThreadId) {
+      setApiReady(p=>({...p, tasks:false}));
+      setRealTasks([]);
+      fetch(`/stage2/review/${stage2ThreadId}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"reject", feedback})
+      }).then(r=>r.json()).then(data=>{
+        if(data.tasks?.length) {
+          setRealTasks(data.tasks);
+          addLog(`✓ Tasks revised (${data.tasks.length} tasks) with your feedback`,"success");
+        }
+        setApiReady(p=>({...p, tasks:true}));
+      }).catch(e=>{ addLog("⚠ Feedback API error: "+e.message,"warn"); setApiReady(p=>({...p,tasks:true})); });
+    }
+
+    if(sid==="code_gen" && stage4ThreadId) {
+      setApiReady(p=>({...p, code_gen:false}));
+      setRealCodeGen(null);
+      fetch(`/stage4/code/${stage4ThreadId}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"changes_requested", feedback})
+      }).then(()=>{
+        addLog("⟡ Code regenerating with your feedback...","info");
+        pollStage4(stage4ThreadId);
+      }).catch(e=>{ addLog("⚠ Feedback API error: "+e.message,"warn"); setApiReady(p=>({...p,code_gen:true})); });
+    }
+
+    if(sid==="pr_review" && stage3ThreadId) {
+      setApiReady(p=>({...p, pr_review:false}));
+      setRealReview(null);
+      fetch(`/stage3/review/${stage3ThreadId}`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action:"changes_requested", feedback})
+      }).then(()=>{
+        addLog("⟡ PR review re-running with your feedback...","info");
+        pollStage3(stage3ThreadId);
+      }).catch(e=>{ addLog("⚠ Feedback API error: "+e.message,"warn"); setApiReady(p=>({...p,pr_review:true})); });
+    }
+
+    T(()=>runStage(sid, fn), 500);
   };
 
   const prodOK = prodCfm.toUpperCase()==="DEPLOY";
   const handleProdDeploy = () => {
     if(!prodOK) return;
     addLog("✓ Production approved by Sushil","success");
+    if(stage4ThreadId && stage2ThreadId) {
+      fetch("/stage6/deploy", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          stage4_thread_id: stage4ThreadId,
+          stage2_thread_id: stage2ThreadId,
+          ...(qaThreadId    ? {qa_thread_id:     qaThreadId}    : {}),
+          ...(stage3ThreadId? {stage3_thread_id: stage3ThreadId}: {}),
+        })
+      }).then(r=>r.json()).then(d=>{
+        if(d.deploy_thread_id) {
+          addLog("⟡ Deploy job started — pushing to GitHub","info");
+          pollDeploy(d.deploy_thread_id);
+        }
+      }).catch(e=>addLog("⚠ Deploy API error: "+e.message,"warn"));
+    }
     setGateStage(null); const fn=resumeFn.current; resumeFn.current=null; T(fn,400);
   };
 
@@ -1113,8 +1259,36 @@ export default function DevForgeDashboard() {
       </div>);
     }
     if(detail==="deploy") {
-      const allEnvs=[...ENV_DATA.map(e=>e.name),"PRODUCTION"];
-      return <div><div className="df-dtitle" style={{color:"#ff2d6b"}}>Deploy Pipeline</div><div className="df-dsub">Progressive Promotion</div><div className="df-envs">{allEnvs.map(name=>{const p=envProg[name]||0,live=p>=100;return(<div key={name} className={`df-env ${live?"live":""}`}><span className="df-env-name">{name}</span><div className="df-env-bar"><div className="df-env-fill" style={{width:`${p}%`}}/></div><span className="df-env-st" style={{color:live?"#00ff88":"rgba(200,214,232,.35)"}}>{live?"✓ LIVE":p>0?"DEPLOYING...":"WAITING"}</span></div>);})}</div></div>;
+      const deploySteps = [
+        {key:"pushing", label:"Push to GitHub",       done: !!(realDeploy?.branch)},
+        {key:"pr",      label:"Create Pull Request",  done: !!(realDeploy?.pr_url)},
+        {key:"slack",   label:"Slack Notification",   done: realDeploy?.status==="complete"||realDeploy?.step==="linear"||realDeploy?.step==="done"},
+        {key:"linear",  label:"Close Linear Issues",  done: realDeploy?.status==="complete"},
+      ];
+      const curStep = realDeploy?.step;
+      return (
+        <div>
+          <div className="df-dtitle" style={{color:"#ff2d6b"}}>Deploy Pipeline</div>
+          <div className="df-dsub">{realDeploy?.status==="complete"?"PR Created & Issues Closed":realDeploy?.status==="error"?"Deploy Failed":"Deploying..."}</div>
+          <div className="df-envs">
+            {deploySteps.map(s=>(
+              <div key={s.key} className={`df-env ${s.done?"live":""}`}>
+                <span className="df-env-name" style={{fontSize:10,minWidth:140}}>{s.label}</span>
+                <div className="df-env-bar"><div className="df-env-fill" style={{width:s.done?"100%":curStep===s.key?"55%":"0%"}}/></div>
+                <span className="df-env-st" style={{color:s.done?"#00ff88":curStep===s.key?"#ffaa00":"rgba(200,214,232,.35)"}}>{s.done?"✓ DONE":curStep===s.key?"IN PROGRESS":"WAITING"}</span>
+              </div>
+            ))}
+          </div>
+          {realDeploy?.pr_url && (
+            <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,212,255,.2)",background:"rgba(0,212,255,.04)",marginTop:10}}>
+              <div style={{fontSize:8,color:"#00d4ff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Pull Request</div>
+              <a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,wordBreak:"break-all",display:"block"}}>🔗 {realDeploy.pr_url}</a>
+              <div style={{fontSize:9,opacity:.5,marginTop:4}}>{realDeploy.branch} · {realDeploy.files_pushed} files pushed{realDeploy.linear_issues_closed>0?` · ${realDeploy.linear_issues_closed} issues closed`:""}</div>
+            </div>
+          )}
+          {realDeploy?.status==="error" && <div style={{color:"#ff4444",fontSize:11,marginTop:8,padding:"8px 12px",border:"1px solid rgba(255,68,68,.2)",borderRadius:3}}>⚠ {realDeploy.error}</div>}
+        </div>
+      );
     }
     if(detail&&detail.startsWith("gate_")) {
       const sid=detail.replace("gate_",""), s=REVIEW_SUMMARY[sid]; if(!s) return null;
@@ -1212,7 +1386,7 @@ export default function DevForgeDashboard() {
     );
     if(detail==="done") {
       const s=Math.floor(elapsed/1000),m=Math.floor(s/60);
-      return <div className="df-done"><div className="df-done-ic">🎉</div><div className="df-done-t">Feature Shipped to Production</div><div className="df-done-s">5 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div></div>;
+      return <div className="df-done"><div className="df-done-ic">🎉</div><div className="df-done-t">Feature Shipped to Production</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:12,marginTop:14,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
     }
     return null;
   };
@@ -1229,8 +1403,21 @@ export default function DevForgeDashboard() {
       {/* Header */}
       <div className="df-hdr">
         <div className="df-logo">
-          <div className="df-hex">⬡</div>
-          <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Ghost Engineer · Autonomous SDLC</div></div>
+          <div className="df-hex">
+            <svg viewBox="0 0 40 44" width="30" height="33" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="dfHexStroke" x1="0" y1="0" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stopColor="#00e5ff"/><stop offset="1" stopColor="#0077ff"/>
+                </linearGradient>
+                <linearGradient id="dfBolt" x1="14" y1="9" x2="27" y2="35" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stopColor="#eafcff"/><stop offset="1" stopColor="#00d4ff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="20,2 37,12 37,32 20,42 3,32 3,12" fill="rgba(0,212,255,0.08)" stroke="url(#dfHexStroke)" strokeWidth="1.8" strokeLinejoin="round"/>
+              <path d="M23 9 L14 24.5 L19.4 24.5 L17 35 L27 19 L21.2 19 Z" fill="url(#dfBolt)"/>
+            </svg>
+          </div>
+          <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autopilot Engineer · Autonomous SDLC</div></div>
         </div>
         <div className="df-timer" style={{color:timerColor}}>{display}</div>
         <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
@@ -1239,8 +1426,11 @@ export default function DevForgeDashboard() {
       {/* Input */}
       <div className="df-inp-area">
         <div className="df-inp-w">
-          <div className="df-inp-lbl">Feature Request</div>
-          <textarea className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder="Describe the feature..."/>
+          <div className="df-inp-lblrow">
+            <span className="df-inp-lbl">Feature Request</span>
+            <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
+          </div>
+          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder="Describe the feature... (drag the bottom-right corner to resize)"/>
         </div>
         <button className="df-launch" onClick={handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||!input.trim()}>
           {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":"▶ LAUNCH")}
@@ -1251,10 +1441,23 @@ export default function DevForgeDashboard() {
       <div className="df-main">
 
         {/* Pipeline sidebar */}
-        <div className="df-pipe">
+        <div className={`df-pipe ${pipeCollapsed?"collapsed":""}`}>
+          <div className="df-pipe-toggle">
+            {!pipeCollapsed&&<span className="df-pipe-hdr-lbl">Pipeline</span>}
+            <button className="df-pipe-btn" onClick={()=>setPipeCollapsed(c=>!c)} title={pipeCollapsed?"Expand pipeline":"Collapse pipeline"}>{pipeCollapsed?"»":"«"}</button>
+          </div>
           {STAGES.map((stage,i)=>{
             const isActive=activeStage===stage.id, isDone=doneStages.has(stage.id), isGate=gateStage===stage.id;
             const rev=stageReviews[stage.id], p=progress[stage.id]||0;
+            const clickable=isDone||isActive||isGate;
+            const goDetail=()=>{ if(isGate) setDetail("gate_"+stage.id); else if(isDone||isActive) setDetail(stage.id); };
+            if(pipeCollapsed) return (
+              <div key={stage.id} className={`df-rail ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,cursor:clickable?"pointer":"default"}} title={`${stage.num} · ${stage.label} — ${stage.desc}`} onClick={goDetail}>
+                <span className="df-rail-num">{stage.num}</span>
+                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):"rgba(200,214,232,.25)"}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
+                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":"rgba(200,214,232,.12)",animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+              </div>
+            );
             return <div key={stage.id}>
               <div className={`df-card ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.3)":stage.glow,cursor:(isDone||isActive||isGate)?"pointer":"default"}} onClick={()=>{ if(isGate) setDetail("gate_"+stage.id); else if(isDone||isActive) setDetail(stage.id); }}>
                 <div className="df-crow">
@@ -1294,15 +1497,25 @@ export default function DevForgeDashboard() {
         </div>
 
         {/* Log */}
-        <div className="df-log">
-          <div className="df-log-hdr">
-            <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":"rgba(200,214,232,.25)",animation:appState==="running"?"pulse 1s infinite":"none"}}/>
-            Live Stream
+        <div className={`df-log ${logView==="wide"?"wide":""} ${logView==="collapsed"?"collapsed":""}`}>
+          <div className="df-log-hdr" style={logView==="collapsed"?undefined:{justifyContent:"space-between"}}>
+            <div style={{display:"flex",alignItems:"center",gap:7}}>
+              <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":"rgba(200,214,232,.25)",animation:appState==="running"?"pulse 1s infinite":"none"}}/>
+              {logView!=="collapsed"&&<span>Live Stream</span>}
+            </div>
+            <div style={{display:"flex",gap:5}}>
+              {logView!=="collapsed"&&(
+                <button className="df-pipe-btn" onClick={()=>setLogView(v=>v==="wide"?"normal":"wide")} title={logView==="wide"?"Shrink log":"Widen log"}>{logView==="wide"?"−":"+"}</button>
+              )}
+              <button className="df-pipe-btn" onClick={()=>setLogView(v=>v==="collapsed"?"normal":"collapsed")} title={logView==="collapsed"?"Expand log":"Collapse log"}>{logView==="collapsed"?"«":"»"}</button>
+            </div>
           </div>
-          <div className="df-log-bd" ref={logRef}>
-            {logs.length===0&&<div style={{opacity:.25,fontSize:10,textAlign:"center",marginTop:36}}>Awaiting pipeline...</div>}
-            {logs.map(e=><div key={e.id} className="df-log-row"><span className="df-log-ts">{e.ts}</span><span className={`df-log-msg ${e.type}`}>{e.msg}</span></div>)}
-          </div>
+          {logView!=="collapsed"&&(
+            <div className="df-log-bd" ref={logRef}>
+              {logs.length===0&&<div style={{opacity:.25,fontSize:10,textAlign:"center",marginTop:36}}>Awaiting pipeline...</div>}
+              {logs.map(e=><div key={e.id} className="df-log-row"><span className="df-log-ts">{e.ts}</span><span className={`df-log-msg ${e.type}`}>{e.msg}</span></div>)}
+            </div>
+          )}
         </div>
 
       </div>

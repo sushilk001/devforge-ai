@@ -200,9 +200,11 @@ def create_linear_issues(state: Stage2State) -> Stage2State:
     from integrations.linear import create_task_issue, create_project
 
     prd_title = (state.prd or {}).get("title", "DevForge Run")
+    total_hours = sum(t.estimate_hours or 0 for t in state.tasks)
     project = create_project(
         name=prd_title,
         description=(state.prd or {}).get("problem_statement", ""),
+        total_estimate_hours=total_hours,
     )
     project_id = project["id"] if project else None
     if project_id:

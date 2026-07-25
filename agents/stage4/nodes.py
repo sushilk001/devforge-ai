@@ -48,7 +48,7 @@ def _parse_json(content: str) -> dict:
     return json.loads(content.strip())
 
 
-def _generate_for_task(task: dict, prd: dict) -> dict:
+def _generate_for_task(task: dict, prd: dict, human_feedback: str = "") -> dict:
     """Generate code files for a single task. Returns a GeneratedTask dict."""
     task_id    = task.get("id", "unknown")
     task_title = task.get("title", "")
@@ -61,12 +61,16 @@ def _generate_for_task(task: dict, prd: dict) -> dict:
     }, indent=2)
 
     llm = get_llm()
+    feedback_suffix = (
+        f"\n\n## Human Feedback (incorporate this into the generated code)\n{human_feedback}"
+        if human_feedback else ""
+    )
     prompt = CODE_GEN_PROMPT.format(
         task_title=task_title,
         task_description=task_desc,
         task_type=task_type,
         prd_context=prd_context,
-    )
+    ) + feedback_suffix
     try:
         response = _llm_invoke(
             llm,
@@ -108,11 +112,12 @@ def generate_code_for_tasks(state: Stage4State) -> Stage4State:
         for t in state.tasks[:5]
     ]
     prd = state.prd or {}
+    feedback = state.human_feedback or ""
 
     results: list[dict] = []
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {
-            executor.submit(_generate_for_task, task, prd): task.get("id", idx)
+            executor.submit(_generate_for_task, task, prd, feedback): task.get("id", idx)
             for idx, task in enumerate(tasks)
         }
         for future in as_completed(futures):
