@@ -1,6 +1,8 @@
 import asyncio
+import re
 import uuid
 import logging
+import httpx
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 
 from agents.stage1.schemas import (
@@ -28,6 +30,58 @@ def _coerce_state(result, cls):
     return result
 
 
+async def _fetch_github_context(github_url: str) -> str:
+    """Fetch README and file tree from a GitHub repo URL. Returns a formatted context string."""
+    # Normalise: https://github.com/owner/repo[/...] → owner/repo
+    match = re.search(r"github\.com/([^/]+/[^/]+)", github_url)
+    if not match:
+        return ""
+    repo_slug = match.group(1).rstrip("/").split("/")[0] + "/" + match.group(1).rstrip("/").split("/")[1]
+    parts: list[str] = [f"## GitHub Repository: {repo_slug}"]
+
+    async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
+        # Try README variants
+        for branch in ("main", "master"):
+            for readme in ("README.md", "readme.md", "README.rst", "README"):
+                url = f"https://raw.githubusercontent.com/{repo_slug}/{branch}/{readme}"
+                try:
+                    r = await client.get(url)
+                    if r.status_code == 200:
+                        text = r.text[:4000]  # cap at 4k chars
+                        parts.append(f"### README\n{text}")
+                        break
+                except Exception:
+                    pass
+            else:
+                continue
+            break
+
+        # Try GitHub API for top-level file tree
+        try:
+            r = await client.get(
+                f"https://api.github.com/repos/{repo_slug}/git/trees/HEAD?recursive=0",
+                headers={"Accept": "application/vnd.github+json"},
+            )
+            if r.status_code == 200:
+                tree = r.json().get("tree", [])
+                files = [t["path"] for t in tree if t.get("type") == "blob"][:30]
+                parts.append("### Top-level files\n" + "\n".join(files))
+        except Exception:
+            pass
+
+    return "\n\n".join(parts) if len(parts) > 1 else ""
+
+
+def _build_additional_context(body: SubmitFeatureRequest) -> str | None:
+    """Combine GitHub fetch result (sync wrapper) + attached files into one context string."""
+    parts: list[str] = []
+    for f in body.attachments:
+        # Truncate very large files to avoid blowing the prompt
+        snippet = f.content[:3000] + ("\n...(truncated)" if len(f.content) > 3000 else "")
+        parts.append(f"### Attached file: {f.name}\n```\n{snippet}\n```")
+    return "\n\n".join(parts) if parts else None
+
+
 # ── POST /submit ──────────────────────────────────────────────────────────────
 
 @router.post("/submit", response_model=PRDResponse)
@@ -46,6 +100,17 @@ async def submit_feature_request(
     """
     thread_id = str(uuid.uuid4())
 
+    # Gather additional context from GitHub and attached files
+    ctx_parts: list[str] = []
+    if body.github_url:
+        gh = await _fetch_github_context(body.github_url)
+        if gh:
+            ctx_parts.append(gh)
+    file_ctx = _build_additional_context(body)
+    if file_ctx:
+        ctx_parts.append(file_ctx)
+    additional_context = "\n\n".join(ctx_parts) or None
+
     initial_state = AgentState(
         feature_request=FeatureRequest(
             raw_text=body.raw_text,
@@ -53,6 +118,7 @@ async def submit_feature_request(
             source_id=thread_id,
             requester=body.requester,
             request_type=body.request_type,
+            additional_context=additional_context,
         )
     )
 

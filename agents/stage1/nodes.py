@@ -48,6 +48,13 @@ def _parse_json_response(content: str) -> dict:
     return json.loads(content.strip())
 
 
+def _context_suffix(state: AgentState) -> str:
+    ctx = state.feature_request.additional_context
+    if not ctx:
+        return ""
+    return f"\n\n## Additional Context (files / GitHub repo)\nUse this to inform your understanding — treat it as supplementary reference material.\n\n{ctx}"
+
+
 def parse_request(state: AgentState) -> AgentState:
     logger.info("[Stage1/Node1] Parsing feature request...")
     llm = get_llm()
@@ -56,6 +63,7 @@ def parse_request(state: AgentState) -> AgentState:
         prompt = NEW_SOFTWARE_PARSE_PROMPT.format(raw_text=state.feature_request.raw_text)
     else:
         prompt = PARSE_REQUEST_PROMPT.format(raw_text=state.feature_request.raw_text)
+    prompt += _context_suffix(state)
 
     try:
         response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "parse_request")
@@ -116,6 +124,7 @@ def generate_prd(state: AgentState) -> AgentState:
             target_users=", ".join(intent.target_users),
             business_value=intent.business_value,
         )
+    prompt += _context_suffix(state)
 
     try:
         response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "generate_prd")
