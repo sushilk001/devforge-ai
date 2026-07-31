@@ -20,8 +20,8 @@ Generate 1 implementation file and 1 test file for this task. Rules:
 - Keep each file under 80 lines for demo clarity
 - Use the PRD context to infer correct domain models, field names, and logic
 - CRITICAL: Both files must be fully self-contained — ZERO cross-module imports to other generated files.
-  * Implementation: define any external dependencies (DB session, config, email client) as simple inline stubs or typed Protocol classes at the top of the file. Never import from src.db, src.config, src.main, or any other src.* module.
-  * Tests: only import from the implementation file generated alongside them. Use unittest.mock.patch or monkeypatch for any external calls. Never import from src.main or app fixtures.
+  * Implementation: ALWAYS import real third-party packages (httpx, whois, requests, ssl, certifi, etc.) — do NOT stub them. Only stub OTHER generated src.* modules: if your logic needs a DB session, config object, or another src.* class, define it as an inline Protocol/TypedDict stub. Never import from src.db, src.config, src.main, or any other src.* module.
+  * Tests: only import from the implementation file generated alongside them. Use unittest.mock.patch or monkeypatch for external HTTP calls. Never import from src.main or app fixtures.
 
 Return ONLY a JSON object with this exact structure:
 {{

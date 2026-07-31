@@ -746,7 +746,7 @@ export default function DevForgeDashboard() {
 
   // ── Poll for Stage 4 code generation ──────────────────────────────────
   const pollStage4 = (s2tid) => {
-    const deadline = Date.now() + 180_000;   // 3-min timeout (code gen is slower)
+    const deadline = Date.now() + 600_000;   // 10-min timeout (5 parallel LLM calls + entrypoint synthesis)
     const poll = () => {
       if (Date.now() > deadline) {
         addLog("⚠ Code Gen timed out — enabling gate without results","warn");

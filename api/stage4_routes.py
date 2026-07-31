@@ -16,6 +16,8 @@ OUTPUT_DIR = Path(__file__).parent.parent / "output"
 _stage4_sessions: dict[str, Stage4State] = {}
 # Maps thread_id → absolute output path (set as soon as files are written)
 _stage4_output_paths: dict[str, Path] = {}
+# Tracks in-flight runs: thread_id → stage2_thread_id
+_stage4_running: dict[str, str] = {}
 
 
 def _coerce(result, cls):
@@ -40,6 +42,8 @@ async def start_code_gen(stage2_thread_id: str, background_tasks: BackgroundTask
 
     thread_id = str(uuid.uuid4())
 
+    _stage4_running[thread_id] = stage2_thread_id
+
     async def _run():
         initial = Stage4State(
             stage2_thread_id=stage2_thread_id,
@@ -54,6 +58,7 @@ async def start_code_gen(stage2_thread_id: str, background_tasks: BackgroundTask
             result = await asyncio.to_thread(stage4_graph.invoke, initial, config=config)
             final = _coerce(result, Stage4State)
             _stage4_sessions[thread_id] = final
+            _stage4_running.pop(thread_id, None)
 
             # output/  {linear-project-slug}  /  {thread_id}  /
             slug = _project_slug(final.prd)
@@ -76,6 +81,7 @@ async def start_code_gen(stage2_thread_id: str, background_tasks: BackgroundTask
                 f"tasks={len(final.generated)} files={final.total_files} written={written}"
             )
         except Exception as e:
+            _stage4_running.pop(thread_id, None)
             logger.error(f"[Stage4] Failed: {e}")
 
     background_tasks.add_task(_run)
@@ -84,16 +90,45 @@ async def start_code_gen(stage2_thread_id: str, background_tasks: BackgroundTask
 
 @router_stage4.get("/sessions")
 def list_sessions():
-    """List all active Stage 4 code generation sessions."""
-    return {
+    """List all active Stage 4 code generation sessions (completed + in-flight)."""
+    result = {
         tid: {
             "task_count":        len(s.generated),
             "file_count":        s.total_files,
             "stage2_thread_id":  s.stage2_thread_id,
+            "status":            "complete",
             "output_path":       str(_stage4_output_paths[tid]) if tid in _stage4_output_paths else None,
         }
         for tid, s in _stage4_sessions.items()
     }
+    # Include in-flight sessions so the dashboard can discover the thread_id immediately
+    for tid, s2tid in _stage4_running.items():
+        if tid not in result:
+            result[tid] = {
+                "task_count":       0,
+                "file_count":       0,
+                "stage2_thread_id": s2tid,
+                "status":           "running",
+                "output_path":      None,
+            }
+    return result
+
+
+@router_stage4.get("/status/{thread_id}")
+def get_status(thread_id: str):
+    """Poll Stage 4 status — returns running/complete/not_found."""
+    if thread_id in _stage4_sessions:
+        s = _stage4_sessions[thread_id]
+        out = _stage4_output_paths.get(thread_id)
+        return {
+            "status":     "complete",
+            "task_count": len(s.generated),
+            "total_files": s.total_files,
+            "output_path": str(out) if out else None,
+        }
+    if thread_id in _stage4_running:
+        return {"status": "running", "task_count": 0, "total_files": 0, "output_path": None}
+    return {"status": "not_found", "task_count": 0, "total_files": 0, "output_path": None}
 
 
 @router_stage4.get("/code/{thread_id}", response_model=CodeGenResponse)
