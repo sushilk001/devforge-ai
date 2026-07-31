@@ -11,6 +11,11 @@ class RequestSource(str, Enum):
     API     = "api"
 
 
+class RequestType(str, Enum):
+    NEW_SOFTWARE = "new_software"
+    ADD_FEATURE  = "add_feature"
+
+
 class PRDStatus(str, Enum):
     DRAFT    = "draft"
     PENDING  = "pending_review"
@@ -22,10 +27,11 @@ class PRDStatus(str, Enum):
 # ── Input ────────────────────────────────────────────────────────────────────
 
 class FeatureRequest(BaseModel):
-    raw_text: str            = Field(..., description="The raw feature request text")
-    source:   RequestSource  = Field(default=RequestSource.API)
-    source_id: Optional[str] = Field(None, description="Slack message TS or Linear issue ID")
-    requester: Optional[str] = Field(None, description="Name or user ID of the requester")
+    raw_text:     str            = Field(..., description="The raw feature request text")
+    source:       RequestSource  = Field(default=RequestSource.API)
+    source_id:    Optional[str]  = Field(None, description="Slack message TS or Linear issue ID")
+    requester:    Optional[str]  = Field(None, description="Name or user ID of the requester")
+    request_type: RequestType    = Field(default=RequestType.ADD_FEATURE)
 
 
 # ── Intermediate ─────────────────────────────────────────────────────────────
@@ -35,8 +41,10 @@ class ParsedIntent(BaseModel):
     proposed_solution:  str
     target_users:       list[str]
     business_value:     str
-    is_complete:        bool       = Field(description="True if enough info to write PRD")
-    missing_info:       list[str]  = Field(default_factory=list)
+    is_complete:        bool             = Field(description="True if enough info to write PRD")
+    missing_info:       list[str]        = Field(default_factory=list)
+    tech_stack_hints:   list[str]        = Field(default_factory=list)
+    project_type:       Optional[str]    = None
 
 
 class UserStory(BaseModel):
@@ -82,8 +90,9 @@ class AgentState(BaseModel):
 # ── API Request/Response ─────────────────────────────────────────────────────
 
 class SubmitFeatureRequest(BaseModel):
-    raw_text:  str
-    requester: Optional[str] = None
+    raw_text:     str
+    requester:    Optional[str] = None
+    request_type: RequestType   = RequestType.ADD_FEATURE
 
 
 class PRDResponse(BaseModel):

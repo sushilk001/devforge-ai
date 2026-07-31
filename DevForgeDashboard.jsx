@@ -128,6 +128,10 @@ const css = `
     border-bottom:1px solid rgba(0,212,255,.07);background:rgba(0,6,20,.6)}
   .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
   .df-inp-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);text-transform:uppercase}
+  .df-mode-row{display:flex;gap:6px;margin-bottom:7px}
+  .df-mode-btn{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;padding:4px 10px;border-radius:2px;cursor:pointer;border:1px solid rgba(0,212,255,.22);background:transparent;color:rgba(200,214,232,.45);transition:all .15s;text-transform:uppercase}
+  .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.55);color:#00d4ff}
+  .df-mode-btn:disabled{opacity:.35;cursor:not-allowed}
   .df-inp-w{flex:1;min-width:0}
   .df-inp{width:100%;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
     color:#e8f4ff;font-family:'Space Mono',monospace;font-size:12px;padding:9px 13px;outline:none;resize:vertical;
@@ -627,6 +631,7 @@ export default function DevForgeDashboard() {
   const [pipeCollapsed, setPipeCollapsed] = useState(false);
   const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
   const [inputBig, setInputBig] = useState(false);
+  const [requestMode, setRequestMode] = useState("add_feature");
   const { elapsed, display, reset } = useTimer(appState === "running");
 
   const toRef    = useRef([]);
@@ -826,15 +831,15 @@ export default function DevForgeDashboard() {
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
     setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setRealDeploy(null); setExpandedFile(null);
-    addLog("⟡ DevForge AI pipeline started","info");
-    addLog("⟡ Source: Slack #feature-requests","info");
+    addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
+    addLog("⟡ Source: Slack #devforge-requests","info");
 
     // Clear server call history first, then start Stage 1 — prevents DELETE racing with stage1 LLM recording
     fetch("/stats/llm-calls", {method:"DELETE"})
       .catch(()=>{})
       .then(() => fetch("/stage1/submit", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({raw_text: input, requester:"devforge-ui"})
+        body: JSON.stringify({raw_text: input, requester:"devforge-ui", request_type: requestMode})
       })).then(r=>r.json()).then(data=>{
       if(data.status==="pending_review") {
         const msg=data.message||"";
@@ -1055,32 +1060,70 @@ export default function DevForgeDashboard() {
   const handleProdDeploy = () => {
     if(!prodOK) return;
     addLog("✓ Production approved by Sushil","success");
-    if(stage4ThreadId && stage2ThreadId) {
+
+    // If thread IDs aren't in state (e.g. after page refresh), recover from sessions API
+    const doFire = (s4tid, s2tid, s3tid, qtid, attempt=0) => {
+      if(attempt >= 4) {
+        addLog("⚠ Deploy failed after 4 attempts — check backend logs","warn");
+        return;
+      }
       fetch("/stage6/deploy", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          stage4_thread_id: stage4ThreadId,
-          stage2_thread_id: stage2ThreadId,
-          ...(qaThreadId    ? {qa_thread_id:     qaThreadId}    : {}),
-          ...(stage3ThreadId? {stage3_thread_id: stage3ThreadId}: {}),
+          stage4_thread_id: s4tid,
+          stage2_thread_id: s2tid,
+          ...(qtid  ? {qa_thread_id:     qtid}  : {}),
+          ...(s3tid ? {stage3_thread_id: s3tid} : {}),
         })
-      }).then(r=>r.json()).then(d=>{
-        if(d.deploy_thread_id) {
-          addLog("⟡ Deploy job started — pushing to GitHub","info");
-          pollDeploy(d.deploy_thread_id);
+      }).then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+        .then(txt=>{ if(!txt.trim()) throw new Error("Empty response — server may be reloading"); return JSON.parse(txt); })
+        .then(d=>{
+          if(d.deploy_thread_id) {
+            addLog("⟡ Deploy job started — pushing to GitHub","info");
+            pollDeploy(d.deploy_thread_id);
+          } else {
+            addLog(`⚠ Deploy start failed: ${JSON.stringify(d)}`,"warn");
+          }
+        }).catch(e=>{
+          const delay = (attempt+1) * 3000;
+          addLog(`⚠ Deploy API error: ${e.message} — retry ${attempt+1}/4 in ${delay/1000}s...`,"warn");
+          setTimeout(()=>doFire(s4tid, s2tid, s3tid, qtid, attempt+1), delay);
+        });
+    };
+
+    if(stage4ThreadId && stage2ThreadId) {
+      doFire(stage4ThreadId, stage2ThreadId, stage3ThreadId, qaThreadId);
+    } else {
+      // Recover thread IDs from sessions endpoints
+      addLog("⟡ Recovering session IDs from backend...","info");
+      Promise.all([
+        fetch("/stage4/sessions").then(r=>r.json()),
+        fetch("/stage2/sessions").then(r=>r.json()),
+      ]).then(([s4sessions, s2sessions]) => {
+        const s4entry = Object.entries(s4sessions).sort((a,b)=>b[1].file_count-a[1].file_count)[0];
+        const s2entry = Object.entries(s2sessions).sort((a,b)=>b[1].task_count-a[1].task_count)[0];
+        if(s4entry && s2entry) {
+          const s4tid = s4entry[0], s2tid = s2entry[0];
+          const s3tid = stage3ThreadId || null;
+          const qtid  = qaThreadId || null;
+          addLog(`⟡ Recovered: stage4=${s4tid.slice(0,8)}... stage2=${s2tid.slice(0,8)}...`,"info");
+          doFire(s4tid, s2tid, s3tid, qtid);
+        } else {
+          addLog("⚠ Could not recover session IDs — no sessions found","warn");
         }
-      }).catch(e=>addLog("⚠ Deploy API error: "+e.message,"warn"));
+      }).catch(e=>addLog("⚠ Session recovery failed: "+e.message,"warn"));
     }
+
     setGateStage(null); const fn=resumeFn.current; resumeFn.current=null; T(fn,400);
   };
 
   // ── Detail renderer ────────────────────────────────────────────────────
   const renderDetail = () => {
-    if(!detail) return <div className="df-idle-hint">⟡ Enter a feature request<br/>and hit ▶ LAUNCH<br/><br/><span className="df-cursor">_</span></div>;
+    if(!detail) return <div className="df-idle-hint">⟡ {requestMode==="new_software"?"Describe what you want to build":"Enter a feature request"}<br/>and hit ▶ LAUNCH<br/><br/><span className="df-cursor">_</span></div>;
     if(detail==="requirements") return (
       <div>
         <div className="df-dtitle" style={{color:"#00d4ff"}}>Requirements Agent</div>
-        <div className="df-dsub">Feature Request → PRD</div>
+        <div className="df-dsub">{requestMode==="new_software"?"New Software → PRD":"Feature Request → PRD"}</div>
         <div className="df-prd">
           {realPrd ? (<>
             <div className="df-prd-h">📋 {realPrd.title}</div>
@@ -1260,16 +1303,17 @@ export default function DevForgeDashboard() {
     }
     if(detail==="deploy") {
       const deploySteps = [
-        {key:"pushing", label:"Push to GitHub",       done: !!(realDeploy?.branch)},
-        {key:"pr",      label:"Create Pull Request",  done: !!(realDeploy?.pr_url)},
-        {key:"slack",   label:"Slack Notification",   done: realDeploy?.status==="complete"||realDeploy?.step==="linear"||realDeploy?.step==="done"},
-        {key:"linear",  label:"Close Linear Issues",  done: realDeploy?.status==="complete"},
+        {key:"pushing",   label:"Push to GitHub",       done: !!(realDeploy?.branch)},
+        {key:"pr",        label:"Create Pull Request",  done: !!(realDeploy?.pr_url)},
+        {key:"slack",     label:"Slack Notification",   done: realDeploy?.status==="complete"||realDeploy?.step==="linear"||realDeploy?.step==="launching"||realDeploy?.step==="done"},
+        {key:"linear",    label:"Close Linear Issues",  done: realDeploy?.status==="complete"||realDeploy?.step==="launching"||realDeploy?.step==="done"},
+        {key:"launching", label:"Launch App",           done: !!(realDeploy?.app_url)},
       ];
       const curStep = realDeploy?.step;
       return (
         <div>
           <div className="df-dtitle" style={{color:"#ff2d6b"}}>Deploy Pipeline</div>
-          <div className="df-dsub">{realDeploy?.status==="complete"?"PR Created & Issues Closed":realDeploy?.status==="error"?"Deploy Failed":"Deploying..."}</div>
+          <div className="df-dsub">{realDeploy?.status==="complete"?"Deployed & Live":realDeploy?.status==="error"?"Deploy Failed":"Deploying..."}</div>
           <div className="df-envs">
             {deploySteps.map(s=>(
               <div key={s.key} className={`df-env ${s.done?"live":""}`}>
@@ -1286,7 +1330,32 @@ export default function DevForgeDashboard() {
               <div style={{fontSize:9,opacity:.5,marginTop:4}}>{realDeploy.branch} · {realDeploy.files_pushed} files pushed{realDeploy.linear_issues_closed>0?` · ${realDeploy.linear_issues_closed} issues closed`:""}</div>
             </div>
           )}
+          {realDeploy?.app_url && (
+            <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,255,136,.25)",background:"rgba(0,255,136,.06)",marginTop:8}}>
+              <div style={{fontSize:8,color:"#00ff88",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>🟢 App Running</div>
+              <a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:12,fontWeight:"bold",display:"block",marginBottom:4}}>🚀 {realDeploy.app_url}</a>
+              {realDeploy.app_docs_url && <a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.7)",fontSize:10,display:"block"}}>📖 API Docs — {realDeploy.app_docs_url}</a>}
+            </div>
+          )}
           {realDeploy?.status==="error" && <div style={{color:"#ff4444",fontSize:11,marginTop:8,padding:"8px 12px",border:"1px solid rgba(255,68,68,.2)",borderRadius:3}}>⚠ {realDeploy.error}</div>}
+          {!realDeploy && (
+            <div style={{marginTop:12}}>
+              <button onClick={()=>{
+                fetch("/stage4/sessions").then(r=>r.json()).then(s4s=>{
+                  fetch("/stage2/sessions").then(r=>r.json()).then(s2s=>{
+                    const s4e=Object.entries(s4s).sort((a,b)=>b[1].file_count-a[1].file_count)[0];
+                    const s2e=Object.entries(s2s).sort((a,b)=>b[1].task_count-a[1].task_count)[0];
+                    if(!s4e||!s2e){addLog("⚠ No sessions found","warn");return;}
+                    fetch("/stage6/deploy",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stage4_thread_id:s4e[0],stage2_thread_id:s2e[0]})})
+                      .then(r=>r.json()).then(d=>{if(d.deploy_thread_id){addLog("⟡ Deploy retriggered","info");pollDeploy(d.deploy_thread_id);}})
+                      .catch(e=>addLog("⚠ "+e.message,"warn"));
+                  });
+                });
+              }} style={{fontSize:9,letterSpacing:1.5,padding:"5px 12px",border:"1px solid rgba(255,170,0,.4)",borderRadius:2,background:"rgba(255,170,0,.08)",color:"#ffaa00",cursor:"pointer",fontFamily:"'Space Mono',monospace",textTransform:"uppercase"}}>
+                ↺ Retrigger Deploy
+              </button>
+            </div>
+          )}
         </div>
       );
     }
@@ -1386,7 +1455,7 @@ export default function DevForgeDashboard() {
     );
     if(detail==="done") {
       const s=Math.floor(elapsed/1000),m=Math.floor(s/60);
-      return <div className="df-done"><div className="df-done-ic">🎉</div><div className="df-done-t">Feature Shipped to Production</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:12,marginTop:14,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
+      return <div className="df-done"><div className="df-done-ic">🎉</div><div className="df-done-t">{requestMode==="new_software"?"Software Built & Deployed":"Feature Shipped to Production"}</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.app_url&&<a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:13,fontWeight:"bold",marginTop:16,display:"block",textAlign:"center",letterSpacing:1,padding:"10px 0",border:"1px solid rgba(0,255,136,.3)",borderRadius:4,background:"rgba(0,255,136,.07)"}}>🚀 Open App — {realDeploy.app_url}</a>}{realDeploy?.app_docs_url&&<a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.6)",fontSize:10,marginTop:6,display:"block",textAlign:"center",letterSpacing:1}}>📖 API Docs — {realDeploy.app_docs_url}</a>}{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,marginTop:8,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
     }
     return null;
   };
@@ -1426,11 +1495,15 @@ export default function DevForgeDashboard() {
       {/* Input */}
       <div className="df-inp-area">
         <div className="df-inp-w">
+          <div className="df-mode-row">
+            <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>setRequestMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
+            <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>setRequestMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
+          </div>
           <div className="df-inp-lblrow">
-            <span className="df-inp-lbl">Feature Request</span>
+            <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
           </div>
-          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder="Describe the feature... (drag the bottom-right corner to resize)"/>
+          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
         </div>
         <button className="df-launch" onClick={handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||!input.trim()}>
           {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":"▶ LAUNCH")}

@@ -1,10 +1,11 @@
+import asyncio
 import uuid
 import logging
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 
 from agents.stage1.schemas import (
     SubmitFeatureRequest, PRDResponse, ReviewAction,
-    AgentState, FeatureRequest, RequestSource, PRDStatus
+    AgentState, FeatureRequest, RequestSource, PRDStatus, RequestType
 )
 from agents.stage1.graph import stage1_graph
 from integrations.slack import post_prd_for_review, notify_prd_approved, post_incomplete_request
@@ -51,13 +52,17 @@ async def submit_feature_request(
             source=RequestSource.API,
             source_id=thread_id,
             requester=body.requester,
+            request_type=body.request_type,
         )
     )
 
     config = {"configurable": {"thread_id": thread_id}}
 
     try:
-        final_state = _coerce_state(stage1_graph.invoke(initial_state, config=config), AgentState)
+        final_state = _coerce_state(
+            await asyncio.to_thread(stage1_graph.invoke, initial_state, config=config),
+            AgentState,
+        )
         _sessions[thread_id] = final_state
 
         if final_state.error:
@@ -120,7 +125,10 @@ async def review_prd(thread_id: str, body: ReviewAction, background_tasks: Backg
 
     if body.action == "approve":
         stage1_graph.update_state(config, {"prd_status": PRDStatus.APPROVED, "human_feedback": None})
-        final_state = _coerce_state(stage1_graph.invoke(None, config=config), AgentState)
+        final_state = _coerce_state(
+            await asyncio.to_thread(stage1_graph.invoke, None, config=config),
+            AgentState,
+        )
         _sessions[thread_id] = final_state
         notify_prd_approved(final_state)
 
@@ -141,7 +149,15 @@ async def review_prd(thread_id: str, body: ReviewAction, background_tasks: Backg
             raise HTTPException(status_code=400, detail="Feedback is required when rejecting a PRD.")
 
         stage1_graph.update_state(config, {"prd_status": PRDStatus.REJECTED, "human_feedback": body.feedback})
-        final_state = _coerce_state(stage1_graph.invoke(None, config=config), AgentState)
+        final_state = _coerce_state(
+            await asyncio.to_thread(stage1_graph.invoke, None, config=config),
+            AgentState,
+        )
+        # LangGraph invoke() returns the pre-node checkpoint state (REJECTED), not the node's
+        # output state (REVISED). Force-set both the status and version bump manually.
+        if final_state.prd and final_state.revision_count > 0:
+            final_state.prd.version = f"1.{final_state.revision_count}"
+            final_state.prd_status = PRDStatus.REVISED
         _sessions[thread_id] = final_state
 
         slack_ts = post_prd_for_review(final_state)

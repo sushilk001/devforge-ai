@@ -80,6 +80,95 @@ Write at least 3 user stories and 3 acceptance criteria. Be specific and actiona
 """
 
 
+NEW_SOFTWARE_PARSE_PROMPT = """
+You are a senior product manager at a software startup.
+Someone wants to build new software from scratch. Your job is to understand what they want to build.
+
+Request:
+\"\"\"
+{raw_text}
+\"\"\"
+
+Extract the following and respond ONLY with valid JSON matching this structure:
+{{
+  "problem_statement": "What problem does this software solve? Be specific.",
+  "proposed_solution": "What is the software being built?",
+  "target_users": ["list", "of", "user", "types"],
+  "business_value": "Why does this software matter?",
+  "tech_stack_hints": ["any mentioned or implied technologies, frameworks, languages"],
+  "project_type": "one of: web_app | mobile_app | api_service | cli_tool | library | desktop_app | other",
+  "is_complete": true or false,
+  "missing_info": ["list any critical missing details needed to write a PRD"]
+}}
+
+Set is_complete to FALSE only if the request is truly unusable — missing ALL of:
+- what the software does, AND
+- who it is for, AND
+- any notion of success or goal
+
+If the request has a purpose, target users, and at least one goal — set is_complete to TRUE.
+"""
+
+
+NEW_SOFTWARE_PRD_PROMPT = """
+You are a senior product manager at a software startup. Write a complete Product Requirements Document (PRD) for a new software product being built from scratch.
+
+Original Request:
+\"\"\"
+{raw_text}
+\"\"\"
+
+Parsed Understanding:
+- Problem: {problem_statement}
+- Proposed Solution: {proposed_solution}
+- Target Users: {target_users}
+- Business Value: {business_value}
+- Tech Stack Hints: {tech_stack_hints}
+- Project Type: {project_type}
+
+Respond ONLY with valid JSON matching this exact structure:
+{{
+  "title": "Short, clear product title",
+  "version": "1.0",
+  "problem_statement": "2-3 sentence clear problem description",
+  "goals": [
+    "Specific, measurable goal 1",
+    "Specific, measurable goal 2",
+    "Specific, measurable goal 3"
+  ],
+  "non_goals": [
+    "What this product will NOT do (out of MVP scope)",
+    "Explicit out-of-scope item"
+  ],
+  "user_stories": [
+    {{
+      "as_a": "user role",
+      "i_want": "specific action or feature",
+      "so_that": "the benefit or outcome"
+    }}
+  ],
+  "acceptance_criteria": [
+    {{
+      "given": "a specific starting state",
+      "when": "the user takes this action",
+      "then": "this is the expected result"
+    }}
+  ],
+  "technical_notes": [
+    "Architecture overview: describe the high-level system design",
+    "Tech stack: list recommended technologies and why",
+    "MVP scope: what is the minimum viable product for v1",
+    "Any relevant technical consideration or constraint"
+  ],
+  "open_questions": [
+    "Any unresolved question that needs stakeholder input"
+  ]
+}}
+
+Write at least 3 user stories and 3 acceptance criteria. Include architecture overview, tech stack recommendation, and MVP scope in technical_notes. Be specific and actionable.
+"""
+
+
 REVISE_PRD_PROMPT = """
 You are a senior product manager revising a PRD based on stakeholder feedback.
 

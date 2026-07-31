@@ -43,3 +43,43 @@ Return ONLY a JSON object with this exact structure:
 }}
 
 Return valid JSON only — no markdown fences, no explanation outside the JSON."""
+
+ENTRYPOINT_PROMPT = """You are an expert software engineer. The following files have been generated for a project.
+Your job is to produce exactly 2 files that make the project launchable:
+
+1. `main.py` — a FastAPI entry point that imports every route module below as an APIRouter and registers it.
+   - Create a FastAPI app instance.
+   - For EACH Python implementation file listed, import its router (assume each exposes `router = APIRouter()`).
+     If the file does not export a router (e.g. it is a utility or model file), skip it.
+   - Mount all routers with appropriate prefixes derived from their paths.
+   - Include a `/health` GET endpoint returning {{"status": "ok"}}.
+   - No stubs, no TODO comments.
+
+2. `requirements.txt` — list every third-party package actually used across all files below.
+   Always include: fastapi, uvicorn[standard], pydantic. Add others only if actually imported.
+
+PRD title: {prd_title}
+
+Generated implementation files (filename → first 30 lines of content):
+{file_summaries}
+
+Return ONLY a JSON object:
+{{
+  "files": [
+    {{
+      "filename": "main.py",
+      "language": "python",
+      "content": "full main.py content here",
+      "description": "FastAPI entry point wiring all generated routers"
+    }},
+    {{
+      "filename": "requirements.txt",
+      "language": "text",
+      "content": "fastapi\\nuvicorn[standard]\\npydantic\\n...",
+      "description": "Third-party dependencies for this project"
+    }}
+  ],
+  "summary": "Entry point and requirements generated"
+}}
+
+Return valid JSON only — no markdown fences."""
