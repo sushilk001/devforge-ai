@@ -218,18 +218,35 @@ def _find_free_port(start: int = 8001, end: int = 8030) -> int | None:
 
 
 def _find_entrypoint(output_dir: Path) -> tuple[str, str] | None:
-    """Return (module_path, app_var) for the first FastAPI app found, e.g. ('src.api.main', 'app')."""
-    for candidate in sorted(output_dir.rglob("*.py")):
+    """Return (module_path, app_var) for the best FastAPI entrypoint.
+
+    Preference order:
+    1. Root-level main.py with FastAPI app (the synthesised entrypoint)
+    2. Any other .py file with FastAPI app, shallowest depth first
+    """
+    def _is_fastapi(text: str) -> bool:
+        return "FastAPI(" in text and ("app = create_app" in text or "app = FastAPI" in text)
+
+    candidates = []
+    for p in output_dir.rglob("*.py"):
+        if "__pycache__" in p.parts:
+            continue
         try:
-            text = candidate.read_text(encoding="utf-8")
+            text = p.read_text(encoding="utf-8")
         except Exception:
             continue
-        if "FastAPI(" in text and ("app = create_app" in text or "app = FastAPI" in text):
-            rel = candidate.relative_to(output_dir)
-            module = str(rel.with_suffix("")).replace("/", ".").replace("\\", ".")
-            app_var = "app"
-            return module, app_var
-    return None
+        if _is_fastapi(text):
+            rel = p.relative_to(output_dir)
+            depth = len(rel.parts)
+            is_main = rel.name == "main.py"
+            candidates.append((not is_main, depth, rel))  # sort: main.py first, then shallowest
+
+    if not candidates:
+        return None
+    candidates.sort()
+    rel = candidates[0][2]
+    module = str(rel.with_suffix("")).replace("/", ".").replace("\\", ".")
+    return module, "app"
 
 
 def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | None:
@@ -244,6 +261,18 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | No
     if not port:
         logger.warning("[Stage6] No free port found for app launch")
         return None
+
+    # Install dependencies if requirements.txt is present
+    req_file = output_dir / "requirements.txt"
+    if req_file.exists():
+        try:
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "-q", "-r", str(req_file)],
+                timeout=60, check=True, capture_output=True,
+            )
+            logger.info(f"[Stage6] Installed requirements from {req_file}")
+        except Exception as e:
+            logger.warning(f"[Stage6] pip install failed (continuing anyway): {e}")
 
     cmd = [sys.executable, "-m", "uvicorn", f"{module}:{app_var}",
            "--host", "0.0.0.0", "--port", str(port)]
