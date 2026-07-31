@@ -27,11 +27,12 @@ class PRDStatus(str, Enum):
 # ── Input ────────────────────────────────────────────────────────────────────
 
 class FeatureRequest(BaseModel):
-    raw_text:     str            = Field(..., description="The raw feature request text")
-    source:       RequestSource  = Field(default=RequestSource.API)
-    source_id:    Optional[str]  = Field(None, description="Slack message TS or Linear issue ID")
-    requester:    Optional[str]  = Field(None, description="Name or user ID of the requester")
-    request_type: RequestType    = Field(default=RequestType.ADD_FEATURE)
+    raw_text:           str            = Field(..., description="The raw feature request text")
+    source:             RequestSource  = Field(default=RequestSource.API)
+    source_id:          Optional[str]  = Field(None, description="Slack message TS or Linear issue ID")
+    requester:          Optional[str]  = Field(None, description="Name or user ID of the requester")
+    request_type:       RequestType    = Field(default=RequestType.ADD_FEATURE)
+    additional_context: Optional[str]  = Field(None, description="Extra context from uploaded files or GitHub")
 
 
 # ── Intermediate ─────────────────────────────────────────────────────────────
@@ -89,10 +90,17 @@ class AgentState(BaseModel):
 
 # ── API Request/Response ─────────────────────────────────────────────────────
 
+class AttachedFile(BaseModel):
+    name:    str
+    content: str  # plain text content read on the client side
+
+
 class SubmitFeatureRequest(BaseModel):
     raw_text:     str
-    requester:    Optional[str] = None
-    request_type: RequestType   = RequestType.ADD_FEATURE
+    requester:    Optional[str]        = None
+    request_type: RequestType          = RequestType.ADD_FEATURE
+    github_url:   Optional[str]        = None
+    attachments:  list[AttachedFile]   = []
 
 
 class PRDResponse(BaseModel):

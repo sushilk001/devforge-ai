@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from "recharts";
+import DependencyGraph from "./DependencyGraph.jsx";
+import Confetti from "./Confetti.jsx";
+import { DEMO_DATA } from "./demoData.js";
 
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -132,7 +135,21 @@ const css = `
   .df-mode-btn{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;padding:4px 10px;border-radius:2px;cursor:pointer;border:1px solid rgba(0,212,255,.22);background:transparent;color:rgba(200,214,232,.45);transition:all .15s;text-transform:uppercase}
   .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.55);color:#00d4ff}
   .df-mode-btn:disabled{opacity:.35;cursor:not-allowed}
+  .df-mode-btn.demo{margin-left:auto;border-color:rgba(255,170,0,.4);color:rgba(255,170,0,.75)}
+  .df-mode-btn.demo.on{background:rgba(255,170,0,.14);border-color:rgba(255,170,0,.6);color:#ffaa00;animation:pulse 2s infinite}
   .df-inp-w{flex:1;min-width:0}
+  .df-ctx-row{display:flex;gap:7px;margin-top:7px;align-items:center;flex-wrap:wrap}
+  .df-ctx-gh{flex:1;min-width:160px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:2px;color:#c8d6e8;font-family:'Space Mono',monospace;font-size:10px;padding:5px 9px;outline:none}
+  .df-ctx-gh::placeholder{color:rgba(200,214,232,.22)}
+  .df-ctx-gh:focus{border-color:rgba(0,212,255,.38)}
+  .df-ctx-attach{font-size:9px;letter-spacing:1px;padding:5px 10px;border-radius:2px;cursor:pointer;border:1px dashed rgba(0,212,255,.28);background:transparent;color:rgba(0,212,255,.55);text-transform:uppercase;white-space:nowrap}
+  .df-ctx-attach:hover{border-color:rgba(0,212,255,.5);color:#00d4ff}
+  .df-ctx-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+  .df-ctx-chip{display:flex;align-items:center;gap:4px;font-size:9px;padding:3px 7px;border-radius:10px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.22);color:rgba(200,214,232,.7);max-width:180px}
+  .df-ctx-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .df-ctx-chip button{background:none;border:none;color:rgba(200,214,232,.45);cursor:pointer;padding:0;font-size:10px;line-height:1;flex-shrink:0}
+  .df-ctx-chip button:hover{color:#ff4444}
+  .df-ctx-chip.gh{background:rgba(170,255,0,.07);border-color:rgba(170,255,0,.25);color:rgba(170,255,0,.8)}
   .df-inp{width:100%;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
     color:#e8f4ff;font-family:'Space Mono',monospace;font-size:12px;padding:9px 13px;outline:none;resize:vertical;
     min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s}
@@ -632,12 +649,36 @@ export default function DevForgeDashboard() {
   const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
   const [inputBig, setInputBig] = useState(false);
   const [requestMode, setRequestMode] = useState("add_feature");
+  const [githubUrl, setGithubUrl]       = useState("");
+  const [attachments, setAttachments]   = useState([]); // [{name, content}]
+  const [realDepGraph, setRealDepGraph] = useState(null);
+  const [demoMode, setDemoMode] = useState(false);
   const { elapsed, display, reset } = useTimer(appState === "running");
 
-  const toRef    = useRef([]);
-  const logRef   = useRef(null);
-  const resumeFn = useRef(null);
-  const inputRef = useRef(null);
+  const toRef       = useRef([]);
+  const logRef      = useRef(null);
+  const resumeFn    = useRef(null);
+  const inputRef    = useRef(null);
+  const fileInputRef = useRef(null);
+  const demoModeRef = useRef(false); // gates the observability poller during Demo Mode
+
+  const handleFileAttach = (e) => {
+    const files = Array.from(e.target.files || []);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const content = ev.target.result;
+        setAttachments(prev => {
+          if (prev.some(a => a.name === file.name)) return prev; // dedupe
+          return [...prev, { name: file.name, content }];
+        });
+      };
+      reader.readAsText(file);
+    });
+    e.target.value = ""; // reset so same file can be re-added after removal
+  };
+
+  const removeAttachment = (name) => setAttachments(prev => prev.filter(a => a.name !== name));
 
   // Feature Request expand/shrink — set height on the DOM node directly so it
   // survives re-renders (typing) and coexists with native drag-to-resize.
@@ -650,9 +691,10 @@ export default function DevForgeDashboard() {
 
   // ── Clear stale observability data on hard refresh, then start polling ──
   const fetchLlmCalls = useCallback(() => {
+    if (demoModeRef.current) return; // Demo Mode drives llmCalls locally
     fetch("/stats/llm-calls")
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data.calls)) setLlmCalls(data.calls); })
+      .then(data => { if (!demoModeRef.current && Array.isArray(data.calls)) setLlmCalls(data.calls); })
       .catch(() => {});
   }, []);
 
@@ -702,6 +744,7 @@ export default function DevForgeDashboard() {
           setApiReady(p=>({...p, tasks:true}));
           fetch(`/stage2/tasks/${tid}`).then(r=>r.json()).then(d=>{
             const tasks = d.tasks||[];
+            if(d.dependency_graph) setRealDepGraph(d.dependency_graph);
             if(tasks.length) {
               setRealTasks(tasks);
               tasks.forEach((t,i) => setTimeout(()=>addLog(`✓ [${(t.type||"task").toUpperCase()}] ${t.title?.slice(0,55)} — ${t.estimate_hours}h`,"success"), i*120));
@@ -826,11 +869,13 @@ export default function DevForgeDashboard() {
 
   // ── Launch ─────────────────────────────────────────────────────────────
   const handleLaunch = () => {
+    demoModeRef.current = false; // real run — re-enable the observability poller
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
-    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setRealDeploy(null); setExpandedFile(null);
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setRealDeploy(null); setExpandedFile(null);
+    setGithubUrl(""); setAttachments([]);
     addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
     addLog("⟡ Source: Slack #devforge-requests","info");
 
@@ -839,7 +884,7 @@ export default function DevForgeDashboard() {
       .catch(()=>{})
       .then(() => fetch("/stage1/submit", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({raw_text: input, requester:"devforge-ui", request_type: requestMode})
+        body: JSON.stringify({raw_text: input, requester:"devforge-ui", request_type: requestMode, github_url: githubUrl||undefined, attachments})
       })).then(r=>r.json()).then(data=>{
       if(data.status==="pending_review") {
         const msg=data.message||"";
@@ -876,6 +921,43 @@ export default function DevForgeDashboard() {
     const s4 = () => runStage("code_gen",    s5);
     const s3 = () => runStage("tasks",       s4);
     const s2 = () => runStage("requirements",s3);
+    T(() => s2(), 400);
+  };
+
+  // ── Demo Mode ────────────────────────────────────────────────────────────
+  // Replays DEMO_DATA through the exact same runStage/gate machinery, with zero
+  // network calls, so a live demo can't be broken by LLM latency or a flaky API.
+  const handleDemoLaunch = () => {
+    demoModeRef.current = true;
+    clearAll(); reset();
+    setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
+    setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
+    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setQaTid(null); setExpandedFile(null);
+    setApiReady({ requirements:true, tasks:true, code_gen:true, pr_review:true, qa:true });
+    setLlmCalls([]);
+
+    const D = DEMO_DATA;
+    // Pre-load captured artifacts so every stage panel + gate is populated on arrival.
+    setRealPrd(D.prd); setRealTasks(D.tasks); setRealDepGraph(D.depGraph);
+    setRealReview(D.review); setRealCodeGen(D.codeGen); setRealQA(D.qa); setRealDeploy(null);
+
+    addLog("⟡ DEMO MODE — replaying a captured production run","gate");
+    addLog("⟡ Feature: Self-Service Password Reset","info");
+
+    const pushCalls = (stage) => setLlmCalls(prev => {
+      const have = new Set(prev.map(c=>c.id));
+      return [...prev, ...D.llmCalls.filter(c=>c.stage===stage && !have.has(c.id))];
+    });
+
+    const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); setRealDeploy(D.deploy); pushCalls("deploy"); runDeploy(); };
+    function goProdGate(){ setAppState("prod_gate"); setDetail("prod_gate"); addLog("⚠ PRODUCTION GATE — mandatory approval required","gate"); resumeFn.current = s7; }
+    const demoStage = (id, onComplete) => { pushCalls(id); runStage(id, onComplete); };
+    const s6 = () => demoStage("qa",           goProdGate);
+    const s5 = () => demoStage("pr_review",    s6);
+    const s4 = () => demoStage("code_gen",     s5);
+    const s3 = () => demoStage("tasks",        s4);
+    const s2 = () => demoStage("requirements", s3);
     T(() => s2(), 400);
   };
 
@@ -1142,7 +1224,12 @@ export default function DevForgeDashboard() {
     if(detail==="tasks") {
       const taskList = realTasks.length ? realTasks : [];
       const p=progress["tasks"]||0, vis=realTasks.length ? Math.max(1,Math.floor((p/100)*taskList.length)) : 0;
-      return <div><div className="df-dtitle" style={{color:"#00ff88"}}>Task Orchestration</div><div className="df-dsub">{realTasks.length ? `Creating ${realTasks.length} tasks in Linear` : "⟳ Decomposing tasks..."}</div><div className="df-tasks">{realTasks.length ? taskList.slice(0,vis).map((t,i)=><div key={i} className="df-task"><span className="df-tid">[{t.type?.toUpperCase()}]</span><span className="df-tname">{t.title}</span><span className="df-tpts">{t.estimate_hours}h</span></div>) : <div className="df-task" style={{opacity:0.4}}><span className="df-tid">—</span><span className="df-tname">waiting for AI...</span></div>}</div></div>;
+      return <div>
+        <div className="df-dtitle" style={{color:"#00ff88"}}>Task Orchestration</div>
+        <div className="df-dsub">{realTasks.length ? `${realTasks.length} tasks · dependency-mapped → Linear` : "⟳ Decomposing tasks..."}</div>
+        {realDepGraph && realTasks.length>0 && <div style={{margin:"4px 0 14px"}}><DependencyGraph tasks={realTasks} graph={realDepGraph}/></div>}
+        <div className="df-tasks">{realTasks.length ? taskList.slice(0,vis).map((t,i)=><div key={i} className="df-task"><span className="df-tid">[{t.type?.toUpperCase()}]</span><span className="df-tname">{t.title}</span><span className="df-tpts">{t.estimate_hours}h</span></div>) : <div className="df-task" style={{opacity:0.4}}><span className="df-tid">—</span><span className="df-tname">waiting for AI...</span></div>}</div>
+      </div>;
     }
     if(detail==="code_gen") {
       const p=progress["code_gen"]||0;
@@ -1455,7 +1542,7 @@ export default function DevForgeDashboard() {
     );
     if(detail==="done") {
       const s=Math.floor(elapsed/1000),m=Math.floor(s/60);
-      return <div className="df-done"><div className="df-done-ic">🎉</div><div className="df-done-t">{requestMode==="new_software"?"Software Built & Deployed":"Feature Shipped to Production"}</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.app_url&&<a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:13,fontWeight:"bold",marginTop:16,display:"block",textAlign:"center",letterSpacing:1,padding:"10px 0",border:"1px solid rgba(0,255,136,.3)",borderRadius:4,background:"rgba(0,255,136,.07)"}}>🚀 Open App — {realDeploy.app_url}</a>}{realDeploy?.app_docs_url&&<a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.6)",fontSize:10,marginTop:6,display:"block",textAlign:"center",letterSpacing:1}}>📖 API Docs — {realDeploy.app_docs_url}</a>}{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,marginTop:8,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
+      return <div className="df-done"><Confetti/><div className="df-done-ic">🎉</div><div className="df-done-t">{requestMode==="new_software"?"Software Built & Deployed":"Feature Shipped to Production"}</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.app_url&&<a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:13,fontWeight:"bold",marginTop:16,display:"block",textAlign:"center",letterSpacing:1,padding:"10px 0",border:"1px solid rgba(0,255,136,.3)",borderRadius:4,background:"rgba(0,255,136,.07)"}}>🚀 Open App — {realDeploy.app_url}</a>}{realDeploy?.app_docs_url&&<a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.6)",fontSize:10,marginTop:6,display:"block",textAlign:"center",letterSpacing:1}}>📖 API Docs — {realDeploy.app_docs_url}</a>}{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,marginTop:8,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
     }
     return null;
   };
@@ -1498,15 +1585,57 @@ export default function DevForgeDashboard() {
           <div className="df-mode-row">
             <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>setRequestMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
             <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>setRequestMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
+            <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
           </div>
           <div className="df-inp-lblrow">
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
           </div>
           <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
+          {/* Context attachments row */}
+          <div className="df-ctx-row">
+            <input
+              className="df-ctx-gh"
+              value={githubUrl}
+              onChange={e=>setGithubUrl(e.target.value)}
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              placeholder="github.com/owner/repo  (optional)"
+            />
+            <button
+              className="df-ctx-attach"
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              onClick={()=>fileInputRef.current?.click()}
+              title="Attach files (.md, .txt, .py, .ts, .json, …)"
+            >+ Files</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept=".md,.txt,.py,.ts,.tsx,.js,.jsx,.json,.yaml,.yml,.env,.toml,.rst,.csv,.sql"
+              style={{display:"none"}}
+              onChange={handleFileAttach}
+            />
+          </div>
+          {/* Chips for attached files + github */}
+          {(githubUrl || attachments.length > 0) && (
+            <div className="df-ctx-chips">
+              {githubUrl && (
+                <div className="df-ctx-chip gh">
+                  <span>⎇ {githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//,"")}</span>
+                  <button onClick={()=>setGithubUrl("")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                </div>
+              )}
+              {attachments.map(a=>(
+                <div key={a.name} className="df-ctx-chip">
+                  <span>📄 {a.name}</span>
+                  <button onClick={()=>removeAttachment(a.name)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <button className="df-launch" onClick={handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||!input.trim()}>
-          {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":"▶ LAUNCH")}
+        <button className="df-launch" onClick={demoMode?handleDemoLaunch:handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||(!demoMode&&!input.trim())}>
+          {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":(demoMode?"▶ DEMO RUN":"▶ LAUNCH"))}
         </button>
       </div>
 
