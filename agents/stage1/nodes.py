@@ -4,8 +4,11 @@ import logging
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
 
-from .schemas import AgentState, ParsedIntent, PRDDocument, PRDStatus
-from .prompts import PARSE_REQUEST_PROMPT, GENERATE_PRD_PROMPT, REVISE_PRD_PROMPT
+from .schemas import AgentState, ParsedIntent, PRDDocument, PRDStatus, RequestType
+from .prompts import (
+    PARSE_REQUEST_PROMPT, GENERATE_PRD_PROMPT, REVISE_PRD_PROMPT,
+    NEW_SOFTWARE_PARSE_PROMPT, NEW_SOFTWARE_PRD_PROMPT,
+)
 from config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -48,12 +51,16 @@ def _parse_json_response(content: str) -> dict:
 def parse_request(state: AgentState) -> AgentState:
     logger.info("[Stage1/Node1] Parsing feature request...")
     llm = get_llm()
-    prompt = PARSE_REQUEST_PROMPT.format(raw_text=state.feature_request.raw_text)
+    is_new = state.feature_request.request_type == RequestType.NEW_SOFTWARE
+    if is_new:
+        prompt = NEW_SOFTWARE_PARSE_PROMPT.format(raw_text=state.feature_request.raw_text)
+    else:
+        prompt = PARSE_REQUEST_PROMPT.format(raw_text=state.feature_request.raw_text)
 
     try:
         response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "parse_request")
         data = _parse_json_response(response.content)
-        state.parsed_intent = ParsedIntent(**data)
+        state.parsed_intent = ParsedIntent(**{k: v for k, v in data.items() if k in ParsedIntent.model_fields})
         logger.info(f"[Stage1/Node1] Parsed. is_complete={state.parsed_intent.is_complete}")
     except Exception as e:
         logger.error(f"[Stage1/Node1] Failed: {e}")
@@ -89,14 +96,26 @@ def generate_prd(state: AgentState) -> AgentState:
     logger.info("[Stage1/Node4] Generating PRD...")
     llm = get_llm()
     intent = state.parsed_intent
+    is_new = state.feature_request.request_type == RequestType.NEW_SOFTWARE
 
-    prompt = GENERATE_PRD_PROMPT.format(
-        raw_text=state.feature_request.raw_text,
-        problem_statement=intent.problem_statement,
-        proposed_solution=intent.proposed_solution,
-        target_users=", ".join(intent.target_users),
-        business_value=intent.business_value,
-    )
+    if is_new:
+        prompt = NEW_SOFTWARE_PRD_PROMPT.format(
+            raw_text=state.feature_request.raw_text,
+            problem_statement=intent.problem_statement,
+            proposed_solution=intent.proposed_solution,
+            target_users=", ".join(intent.target_users),
+            business_value=intent.business_value,
+            tech_stack_hints=intent.tech_stack_hints,
+            project_type=intent.project_type or "other",
+        )
+    else:
+        prompt = GENERATE_PRD_PROMPT.format(
+            raw_text=state.feature_request.raw_text,
+            problem_statement=intent.problem_statement,
+            proposed_solution=intent.proposed_solution,
+            target_users=", ".join(intent.target_users),
+            business_value=intent.business_value,
+        )
 
     try:
         response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "generate_prd")
@@ -131,6 +150,7 @@ def revise_prd(state: AgentState) -> AgentState:
     try:
         response = _llm_invoke(llm, [HumanMessage(content=prompt)], "requirements", "revise_prd")
         data = _parse_json_response(response.content)
+        data["version"] = new_version  # force-bump before model construction
         state.prd = PRDDocument(**data)
         state.prd_status = PRDStatus.REVISED
         state.human_feedback = None

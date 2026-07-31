@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import logging
 from fastapi import APIRouter, BackgroundTasks, HTTPException
@@ -35,7 +36,7 @@ async def start_review(stage2_thread_id: str, background_tasks: BackgroundTasks)
         )
         config = {"configurable": {"thread_id": thread_id}}
         try:
-            result = stage3_graph.invoke(initial, config=config)
+            result = await asyncio.to_thread(stage3_graph.invoke, initial, config=config)
             final = _coerce(result, Stage3State)
             _stage3_sessions[thread_id] = final
             logger.info(f"[Stage3] Complete. thread={thread_id} findings={len(final.findings)}")
@@ -94,7 +95,7 @@ async def approve_review(thread_id: str, body: dict):
 
     if action == "approve":
         stage3_graph.update_state(config, {"approved": True, "human_feedback": None})
-        result = stage3_graph.invoke(None, config)
+        result = await asyncio.to_thread(stage3_graph.invoke, None, config)
         final = _coerce(result, Stage3State)
         _stage3_sessions[thread_id] = final
         return ReviewResponse(

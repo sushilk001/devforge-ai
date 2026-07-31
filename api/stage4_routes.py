@@ -1,3 +1,4 @@
+import asyncio
 import re
 import uuid
 import logging
@@ -50,7 +51,7 @@ async def start_code_gen(stage2_thread_id: str, background_tasks: BackgroundTask
         )
         config = {"configurable": {"thread_id": thread_id}}
         try:
-            result = stage4_graph.invoke(initial, config=config)
+            result = await asyncio.to_thread(stage4_graph.invoke, initial, config=config)
             final = _coerce(result, Stage4State)
             _stage4_sessions[thread_id] = final
 
@@ -128,7 +129,7 @@ async def approve_code(thread_id: str, body: dict):
 
     if action == "approve":
         stage4_graph.update_state(config, {"approved": True, "human_feedback": None})
-        result = stage4_graph.invoke(None, config)
+        result = await asyncio.to_thread(stage4_graph.invoke, None, config)
         final = _coerce(result, Stage4State)
         _stage4_sessions[thread_id] = final
         out = _stage4_output_paths.get(thread_id)

@@ -84,8 +84,8 @@ def run_reviews(state: Stage3State) -> Stage3State:
             agent_name, findings = future.result()
             all_findings.extend(findings)
             logger.info(f"[Stage3] {agent_name}: {len(findings)} findings")
-    except TimeoutError:
-        logger.error("[Stage3] Review agents timed out after 90s — using partial results")
+    except Exception as _te:
+        logger.error(f"[Stage3] Review agents timed out or errored after 90s — using partial results: {_te}")
     finally:
         executor.shutdown(wait=False)
 

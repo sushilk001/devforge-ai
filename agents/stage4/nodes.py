@@ -7,7 +7,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
 
 from .schemas import Stage4State, GeneratedTask, GeneratedFile
-from .prompts import CODE_GEN_PROMPT
+from .prompts import CODE_GEN_PROMPT, ENTRYPOINT_PROMPT
 from config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -143,10 +143,61 @@ def generate_code_for_tasks(state: Stage4State) -> Stage4State:
                 except Exception as e:
                     logger.warning(f"[Stage4] Linear update failed for {task_label}: {e}")
 
+    # Synthesize main.py + requirements.txt from all generated files
+    entrypoint = _synthesize_entrypoint(results, prd if isinstance(prd, dict) else prd.model_dump())
+    if entrypoint:
+        results.append(entrypoint)
+        logger.info(f"[Stage4] Entrypoint synthesized: {[f['filename'] for f in entrypoint.get('files', [])]}")
+
     state.generated = results
     state.total_files = sum(len(r.get("files", [])) for r in results)
     logger.info(f"[Stage4] Total files generated: {state.total_files}")
     return state
+
+
+def _synthesize_entrypoint(results: list[dict], prd: dict) -> dict | None:
+    """Generate main.py + requirements.txt from all produced implementation files."""
+    # Collect only Python implementation files (not tests, not .tsx/.ts)
+    impl_files = [
+        f for r in results
+        for f in r.get("files", [])
+        if f.get("language") == "python"
+        and not f.get("filename", "").startswith("tests/")
+        and not f.get("filename", "").startswith("test_")
+    ]
+    if not impl_files:
+        return None
+
+    file_summaries = "\n\n".join(
+        f"--- {f['filename']} ---\n" + "\n".join(f["content"].splitlines()[:30])
+        for f in impl_files
+    )
+    prompt = ENTRYPOINT_PROMPT.format(
+        prd_title=prd.get("title", "Generated API"),
+        file_summaries=file_summaries,
+    )
+    llm = get_llm()
+    try:
+        response = _llm_invoke(llm, [HumanMessage(content=prompt)], stage="code_gen", label="entrypoint")
+        data = _parse_json(response.content)
+        files = [
+            GeneratedFile(
+                filename=f.get("filename", ""),
+                language=f.get("language", "python"),
+                content=f.get("content", ""),
+                description=f.get("description", ""),
+            )
+            for f in data.get("files", [])
+        ]
+        return GeneratedTask(
+            task_id="entrypoint",
+            task_title="App entry point + requirements",
+            files=files,
+            summary=data.get("summary", ""),
+        ).model_dump()
+    except Exception as e:
+        logger.error(f"[Stage4] Entrypoint synthesis failed: {e}")
+        return None
 
 
 def notify_slack_node(state: Stage4State) -> Stage4State:

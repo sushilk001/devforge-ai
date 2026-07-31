@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import logging
 from fastapi import APIRouter, HTTPException
@@ -53,7 +54,7 @@ async def start_task_orchestration(prd_thread_id: str):
     config = {"configurable": {"thread_id": stage2_thread_id}}
 
     try:
-        final_state = _coerce_s2(stage2_graph.invoke(initial_state, config=config))
+        final_state = _coerce_s2(await asyncio.to_thread(stage2_graph.invoke, initial_state, config=config))
         _stage2_sessions[stage2_thread_id] = final_state
 
         if final_state.error:
@@ -108,7 +109,7 @@ async def _start_stage2_internal(prd_thread_id: str) -> Stage2State | None:
             prd=prd_state.prd.model_dump(),
         )
         config = {"configurable": {"thread_id": stage2_thread_id}}
-        final_state = _coerce_s2(stage2_graph.invoke(initial_state, config=config))
+        final_state = _coerce_s2(await asyncio.to_thread(stage2_graph.invoke, initial_state, config=config))
         _stage2_sessions[stage2_thread_id] = final_state
 
         slack_ts = post_tasks_for_review(final_state)
@@ -165,7 +166,7 @@ async def review_tasks(stage2_thread_id: str, body: TaskReviewAction):
 
     if body.action == "approve":
         stage2_graph.update_state(config, {"task_status": TaskStatus.APPROVED, "human_feedback": None})
-        final_state = _coerce_s2(stage2_graph.invoke(None, config=config))
+        final_state = _coerce_s2(await asyncio.to_thread(stage2_graph.invoke, None, config=config))
         _stage2_sessions[stage2_thread_id] = final_state
 
         return TasksResponse(
@@ -185,7 +186,7 @@ async def review_tasks(stage2_thread_id: str, body: TaskReviewAction):
             raise HTTPException(status_code=400, detail="Feedback is required when rejecting tasks.")
 
         stage2_graph.update_state(config, {"task_status": TaskStatus.REJECTED, "human_feedback": body.feedback})
-        final_state = _coerce_s2(stage2_graph.invoke(None, config=config))
+        final_state = _coerce_s2(await asyncio.to_thread(stage2_graph.invoke, None, config=config))
         _stage2_sessions[stage2_thread_id] = final_state
 
         slack_ts = post_tasks_for_review(final_state)
