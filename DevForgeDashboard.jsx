@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from "recharts";
 import DependencyGraph from "./DependencyGraph.jsx";
 import Confetti from "./Confetti.jsx";
-import { DEMO_DATA } from "./demoData.js";
+import CodeBlock from "./CodeBlock.jsx";
+import AgentThinking from "./AgentThinking.jsx";
+import { DEMO_RUNS } from "./demoData.js";
 
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -160,6 +162,43 @@ const css = `
     font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:0 22px;
     border-radius:3px;height:42px;transition:all .2s;white-space:nowrap}
   .df-launch:hover:not(:disabled){background:#33ddff;transform:translateY(-1px)}
+  .df-stop{background:transparent;border:1px solid rgba(255,60,60,.5);color:#ff4444;cursor:pointer;
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+    padding:0 14px;border-radius:3px;height:42px;transition:all .2s;white-space:nowrap}
+  .df-stop:hover{background:rgba(255,60,60,.1);border-color:#ff4444}
+  .df-rerun-btn{display:flex;align-items:center;gap:4px;margin-top:7px;padding:4px 8px;
+    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;
+    background:transparent;border:1px solid rgba(200,214,232,.15);border-radius:2px;
+    color:rgba(200,214,232,.4);cursor:pointer;transition:all .15s;width:100%}
+  .df-rerun-btn:hover{border-color:rgba(0,212,255,.4);color:#00d4ff;background:rgba(0,212,255,.06)}
+  .df-dbg-btn{background:transparent;border:1px solid rgba(170,255,0,.3);color:rgba(170,255,0,.7);
+    cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;
+    text-transform:uppercase;padding:0 12px;border-radius:3px;height:42px;transition:all .2s}
+  .df-dbg-btn:hover{background:rgba(170,255,0,.08);border-color:rgba(170,255,0,.6);color:#aaff00}
+  .df-dbg-panel{position:fixed;bottom:0;right:0;width:380px;max-height:60vh;
+    background:rgba(4,10,24,.97);border:1px solid rgba(170,255,0,.25);border-radius:6px 0 0 0;
+    display:flex;flex-direction:column;z-index:1000;animation:fadeUp .2s ease-out}
+  .df-dbg-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
+    border-bottom:1px solid rgba(170,255,0,.12);flex-shrink:0}
+  .df-dbg-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(170,255,0,.8)}
+  .df-dbg-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:16px;line-height:1}
+  .df-dbg-close:hover{color:#ff4444}
+  .df-dbg-body{padding:12px 14px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+  .df-dbg-ctx{font-size:9px;color:rgba(200,214,232,.35);background:rgba(0,0,0,.3);
+    border-radius:2px;padding:6px 8px;max-height:80px;overflow-y:auto;font-family:'Space Mono',monospace}
+  .df-dbg-inp{background:rgba(170,255,0,.04);border:1px solid rgba(170,255,0,.2);border-radius:2px;
+    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:11px;padding:8px 10px;
+    resize:none;outline:none;width:100%}
+  .df-dbg-inp::placeholder{color:rgba(200,214,232,.2)}
+  .df-dbg-inp:focus{border-color:rgba(170,255,0,.45)}
+  .df-dbg-send{align-self:flex-end;background:#aaff00;color:#060810;border:none;cursor:pointer;
+    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+    padding:6px 14px;border-radius:2px;font-weight:700;transition:all .15s}
+  .df-dbg-send:hover:not(:disabled){background:#c4ff33}
+  .df-dbg-send:disabled{opacity:.4;cursor:not-allowed}
+  .df-dbg-answer{font-size:11px;color:rgba(200,214,232,.85);line-height:1.65;
+    background:rgba(170,255,0,.04);border:1px solid rgba(170,255,0,.12);border-radius:2px;padding:10px;
+    white-space:pre-wrap}
   .df-launch:disabled{background:rgba(0,212,255,.15);color:rgba(0,212,255,.35);cursor:not-allowed}
 
   /* Main layout */
@@ -649,9 +688,14 @@ export default function DevForgeDashboard() {
   const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
   const [inputBig, setInputBig] = useState(false);
   const [requestMode, setRequestMode] = useState("add_feature");
+  const [inputTouched, setInputTouched] = useState(false);
   const [githubUrl, setGithubUrl]       = useState("");
   const [attachments, setAttachments]   = useState([]); // [{name, content}]
   const [realDepGraph, setRealDepGraph] = useState(null);
+  const [debugOpen, setDebugOpen]       = useState(false);
+  const [debugQ, setDebugQ]             = useState("");
+  const [debugAns, setDebugAns]         = useState("");
+  const [debugLoading, setDebugLoading] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const { elapsed, display, reset } = useTimer(appState === "running");
 
@@ -680,6 +724,93 @@ export default function DevForgeDashboard() {
 
   const removeAttachment = (name) => setAttachments(prev => prev.filter(a => a.name !== name));
 
+  // ── Stop pipeline ─────────────────────────────────────────────────────────
+  const handleStop = () => {
+    clearAll();
+    setAppState("idle");
+    setActive(null);
+    setGateStage(null);
+    resumeFn.current = null;
+    addLog("■ Pipeline stopped by user","warn");
+  };
+
+  // ── Re-run pipeline from a specific stage onwards ─────────────────────────
+  const rerunFromStage = (fromStageId) => {
+    const stageOrder = ["requirements","tasks","code_gen","pr_review","qa","deploy"];
+    const idx = stageOrder.indexOf(fromStageId);
+    if (idx < 0) return;
+
+    // Clear done + data for stages from idx onwards
+    setDone(prev => { const n=new Set(prev); stageOrder.slice(idx).forEach(s=>n.delete(s)); return n; });
+    if (idx <= stageOrder.indexOf("code_gen"))  { setRealCodeGen(null); setS4Tid(null);  setApiReady(p=>({...p,code_gen:false})); }
+    if (idx <= stageOrder.indexOf("pr_review")) { setRealReview(null);  setS3Tid(null);  setApiReady(p=>({...p,pr_review:false})); }
+    if (idx <= stageOrder.indexOf("qa"))        { setRealQA(null);      setQaTid(null);  setApiReady(p=>({...p,qa:false})); }
+    setRealDeploy(null);
+    clearAll();
+    setShowFB(false); setFb(""); setGateStage(null);
+    setAppState("running");
+    addLog(`↺ Re-running pipeline from Stage ${String(idx+1).padStart(2,"0")} (${fromStageId.replace(/_/g," ")})...`,"info");
+
+    // Shared continuation builders
+    const goProdGate = () => {
+      setAppState("prod_gate"); setDetail("prod_gate");
+      addLog("⚠ PRODUCTION GATE — mandatory approval required","gate");
+      resumeFn.current = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); runDeploy(); };
+    };
+
+    if (fromStageId === "code_gen") {
+      if (!stage2ThreadId) { addLog("⚠ No Stage 2 session found — cannot re-run Code Gen","warn"); setAppState("idle"); return; }
+      fetch(`/stage4/start/${stage2ThreadId}`, {method:"POST"})
+        .then(r=>r.json())
+        .then(d=>{ setS4Tid(d.thread_id); pollStage4(stage2ThreadId); addLog("⟡ Code generation agents re-spawned per ticket","info"); })
+        .catch(e=>addLog("⚠ Code gen restart error: "+e.message,"warn"));
+      T(() => runStage("code_gen", () => runStage("pr_review", () => runStage("qa", goProdGate))), 200);
+    } else if (fromStageId === "pr_review") {
+      if (!stage2ThreadId) { addLog("⚠ No Stage 2 session found — cannot re-run PR Review","warn"); setAppState("idle"); return; }
+      // Start QA in parallel (same as normal code_gen approval flow)
+      if (stage4ThreadId) {
+        fetch(`/qa/run/${stage4ThreadId}`, {method:"POST"})
+          .then(r=>r.json())
+          .then(qd=>{ if(qd.qa_thread_id){ setQaTid(qd.qa_thread_id); pollQA(qd.qa_thread_id); addLog("⟡ QA runner re-started","info"); } })
+          .catch(()=>{});
+      }
+      fetch(`/stage3/start/${stage2ThreadId}`, {method:"POST"})
+        .then(()=>{ pollStage3(stage2ThreadId); addLog("⟡ PR Review agents re-launched","info"); })
+        .catch(e=>addLog("⚠ PR Review restart error: "+e.message,"warn"));
+      T(() => runStage("pr_review", () => runStage("qa", goProdGate)), 200);
+    } else if (fromStageId === "qa") {
+      if (!stage4ThreadId) { addLog("⚠ No Stage 4 session found — cannot re-run QA","warn"); setAppState("idle"); return; }
+      fetch(`/qa/run/${stage4ThreadId}`, {method:"POST"})
+        .then(r=>r.json())
+        .then(qd=>{ if(qd.qa_thread_id){ setQaTid(qd.qa_thread_id); pollQA(qd.qa_thread_id); addLog("⟡ QA runner re-started","info"); } })
+        .catch(e=>addLog("⚠ QA restart error: "+e.message,"warn"));
+      T(() => runStage("qa", goProdGate), 200);
+    } else if (fromStageId === "deploy") {
+      T(() => runDeploy(), 200);
+    } else {
+      addLog("⚠ Re-run not supported for this stage — use Request Changes instead","warn");
+      setAppState("idle");
+    }
+  };
+
+  // ── Debug help ─────────────────────────────────────────────────────────────
+  const sendDebugHelp = () => {
+    if (!debugQ.trim()) return;
+    setDebugLoading(true); setDebugAns("");
+    const currentStage = activeStage || gateStage || "unknown";
+    fetch("/debug/help", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        stage: currentStage,
+        question: debugQ,
+        logs: logs.slice(-20).map(l=>l.msg),
+        error: logs.filter(l=>l.type==="warn"||l.type==="error").slice(-3).map(l=>l.msg).join(" | "),
+      })
+    }).then(r=>r.json())
+      .then(d=>{ setDebugAns(d.answer||"No response"); setDebugLoading(false); })
+      .catch(e=>{ setDebugAns("Error: "+e.message); setDebugLoading(false); });
+  };
+
   // Feature Request expand/shrink — set height on the DOM node directly so it
   // survives re-renders (typing) and coexists with native drag-to-resize.
   const toggleInputSize = () => {
@@ -687,6 +818,14 @@ export default function DevForgeDashboard() {
     const next = !inputBig;
     setInputBig(next);
     if (el) el.style.height = next ? "220px" : "";
+  };
+
+  // Switch request mode; swap the starter example to match, unless the user has
+  // typed their own request (then their text is preserved).
+  const pickMode = (mode) => {
+    if (mode === requestMode) return;
+    setRequestMode(mode);
+    if (!inputTouched) setInput(DEMO_RUNS[mode].prompt);
   };
 
   // ── Clear stale observability data on hard refresh, then start polling ──
@@ -937,22 +1076,36 @@ export default function DevForgeDashboard() {
     setApiReady({ requirements:true, tasks:true, code_gen:true, pr_review:true, qa:true });
     setLlmCalls([]);
 
-    const D = DEMO_DATA;
-    // Pre-load captured artifacts so every stage panel + gate is populated on arrival.
-    setRealPrd(D.prd); setRealTasks(D.tasks); setRealDepGraph(D.depGraph);
-    setRealReview(D.review); setRealCodeGen(D.codeGen); setRealQA(D.qa); setRealDeploy(null);
+    const D = DEMO_RUNS[requestMode] || DEMO_RUNS.add_feature;
+    setInput(D.prompt); setInputTouched(false); // show the captured request as if the user typed it
+    // Reset artifacts; each stage's data lands mid-animation (see demoStage) so the
+    // "running" visuals — agents thinking, code being written, pytest — show first.
+    setRealPrd(null); setRealTasks([]); setRealDepGraph(null);
+    setRealReview(null); setRealCodeGen(null); setRealQA(null); setRealDeploy(null);
 
-    addLog("⟡ DEMO MODE — replaying a captured production run","gate");
-    addLog("⟡ Feature: Self-Service Password Reset","info");
+    addLog(`⟡ DEMO MODE — replaying a captured ${requestMode==="new_software"?"new-software build":"feature"} run`,"gate");
+    addLog(`⟡ ${D.label}`,"info");
 
     const pushCalls = (stage) => setLlmCalls(prev => {
       const have = new Set(prev.map(c=>c.id));
       return [...prev, ...D.llmCalls.filter(c=>c.stage===stage && !have.has(c.id))];
     });
+    const load = {
+      requirements: () => setRealPrd(D.prd),
+      tasks:        () => { setRealTasks(D.tasks); setRealDepGraph(D.depGraph); },
+      code_gen:     () => setRealCodeGen(D.codeGen),
+      pr_review:    () => setRealReview(D.review),
+      qa:           () => setRealQA(D.qa),
+    };
 
     const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); setRealDeploy(D.deploy); pushCalls("deploy"); runDeploy(); };
     function goProdGate(){ setAppState("prod_gate"); setDetail("prod_gate"); addLog("⚠ PRODUCTION GATE — mandatory approval required","gate"); resumeFn.current = s7; }
-    const demoStage = (id, onComplete) => { pushCalls(id); runStage(id, onComplete); };
+    const demoStage = (id, onComplete) => {
+      pushCalls(id);
+      runStage(id, onComplete);
+      // data lands ~0.6s before the gate, after the running animation has played
+      T(() => { if (load[id]) load[id](); }, Math.max(800, (STAGE_DUR[id]||5000) - 600));
+    };
     const s6 = () => demoStage("qa",           goProdGate);
     const s5 = () => demoStage("pr_review",    s6);
     const s4 = () => demoStage("code_gen",     s5);
@@ -1269,12 +1422,7 @@ export default function DevForgeDashboard() {
                         <span style={{opacity:.75}}>→ {f.filename}</span>
                         <span style={{color:"#bf5fff",fontSize:8,minWidth:30,textAlign:"right"}}>{open?"▲ hide":"▼ view"}</span>
                       </div>
-                      {open&&<pre style={{
-                        fontSize:8,lineHeight:1.55,fontFamily:"monospace",
-                        padding:"8px 10px",margin:"0 0 4px 0",borderRadius:2,
-                        background:"rgba(0,0,0,0.45)",color:"#c8d6e8",
-                        overflow:"auto",maxHeight:220,whiteSpace:"pre-wrap",wordBreak:"break-all",
-                      }}>{f.content}</pre>}
+                      {open&&<CodeBlock code={f.content} style={{maxHeight:220}}/>}
                     </div>);
                   })}
                 </div>
@@ -1344,6 +1492,7 @@ export default function DevForgeDashboard() {
               <div className="df-agname">{name.charAt(0).toUpperCase()+name.slice(1)} Agent</div>
               <div className="df-agst">{running?"REVIEWING CODE...":"WAITING"}</div>
             </div></div>
+            {running&&<AgentThinking agent={name} color={agentColors[name]}/>}
           </div>);
         })}</div></div>);
     }
@@ -1583,15 +1732,15 @@ export default function DevForgeDashboard() {
       <div className="df-inp-area">
         <div className="df-inp-w">
           <div className="df-mode-row">
-            <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>setRequestMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
-            <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>setRequestMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
+            <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>pickMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
+            <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>pickMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
             <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
           </div>
           <div className="df-inp-lblrow">
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
           </div>
-          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>setInput(e.target.value)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
+          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>{setInput(e.target.value); setInputTouched(true);}} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
           {/* Context attachments row */}
           <div className="df-ctx-row">
             <input
@@ -1634,9 +1783,17 @@ export default function DevForgeDashboard() {
             </div>
           )}
         </div>
-        <button className="df-launch" onClick={demoMode?handleDemoLaunch:handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||(!demoMode&&!input.trim())}>
-          {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":(demoMode?"▶ DEMO RUN":"▶ LAUNCH"))}
-        </button>
+        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+          <button className="df-launch" onClick={demoMode?handleDemoLaunch:handleLaunch} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||(!demoMode&&!input.trim())}>
+            {appState==="running"?"RUNNING...":(appState==="gate"||appState==="prod_gate")?"AWAITING...":(appState==="done"?"↺ RERUN":(demoMode?"▶ DEMO RUN":"▶ LAUNCH"))}
+          </button>
+          {appState==="running"&&(
+            <button className="df-stop" onClick={handleStop}>■ STOP</button>
+          )}
+          {(appState==="running"||appState==="gate"||appState==="done")&&(
+            <button className="df-dbg-btn" onClick={()=>{setDebugOpen(o=>!o);setDebugAns("");setDebugQ("");}} title="Ask Claude to diagnose a stuck stage">? Help</button>
+          )}
+        </div>
       </div>
 
       {/* Main */}
@@ -1679,6 +1836,11 @@ export default function DevForgeDashboard() {
                   </div>
                 )}
                 {rev&&<div className={`df-crev ${rev}`}>{rev==="approved"?"✓ Approved":"↺ Changes Req."}</div>}
+                {isDone&&!isGate&&!isActive&&["code_gen","pr_review","qa","deploy"].includes(stage.id)&&(
+                  <button className="df-rerun-btn" onClick={e=>{e.stopPropagation();rerunFromStage(stage.id);}} title={`Re-run from Stage ${stage.num} onwards`}>
+                    ↺ re-run from here
+                  </button>
+                )}
               </div>
               {i<STAGES.length-1&&<div className="df-conn"><div className={`df-cline ${isActive?"flow":""}`}/></div>}
             </div>;
@@ -1721,6 +1883,33 @@ export default function DevForgeDashboard() {
         </div>
 
       </div>
+
+      {/* Debug Help Panel */}
+      {debugOpen&&(
+        <div className="df-dbg-panel">
+          <div className="df-dbg-hdr">
+            <span className="df-dbg-title">? Debug Assistant</span>
+            <button className="df-dbg-close" onClick={()=>setDebugOpen(false)}>×</button>
+          </div>
+          <div className="df-dbg-body">
+            <div className="df-dbg-ctx">
+              <strong style={{color:"rgba(170,255,0,.6)"}}>Context:</strong> {activeStage||gateStage||"idle"} stage · last log: {logs.slice(-1)[0]?.msg||"—"}
+            </div>
+            <textarea
+              className="df-dbg-inp"
+              rows={3}
+              value={debugQ}
+              onChange={e=>setDebugQ(e.target.value)}
+              onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))sendDebugHelp();}}
+              placeholder="What's wrong? e.g. Stage 4 keeps timing out, or why is QA failing…"
+            />
+            <button className="df-dbg-send" onClick={sendDebugHelp} disabled={debugLoading||!debugQ.trim()}>
+              {debugLoading?"Thinking...":"Ask Claude ↵"}
+            </button>
+            {debugAns&&<div className="df-dbg-answer">{debugAns}</div>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
