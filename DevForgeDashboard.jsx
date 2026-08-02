@@ -201,6 +201,81 @@ const css = `
     white-space:pre-wrap}
   .df-launch:disabled{background:rgba(0,212,255,.15);color:rgba(0,212,255,.35);cursor:not-allowed}
 
+  /* Settings */
+  .df-settings-btn{background:transparent;border:1px solid rgba(200,214,232,.18);color:rgba(200,214,232,.5);
+    cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;
+    justify-content:center;transition:all .2s;flex-shrink:0}
+  .df-settings-btn:hover{background:rgba(200,214,232,.07);border-color:rgba(200,214,232,.35);color:#c8d6e8}
+  .df-int-dots{display:flex;gap:5px;align-items:center}
+  .df-int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;cursor:default}
+  .df-int-dot.on {background:#00ff88;box-shadow:0 0 5px #00ff88}
+  .df-int-dot.off{background:rgba(200,214,232,.2)}
+  .df-int-dot-lbl{font-size:7px;letter-spacing:1px;color:rgba(200,214,232,.3)}
+  .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
+  .df-settings-drawer{width:480px;max-width:100vw;height:100vh;background:#060d1a;border-left:1px solid rgba(0,212,255,.18);
+    display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.6)}
+  .df-set-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;
+    border-bottom:1px solid rgba(0,212,255,.1);flex-shrink:0}
+  .df-set-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
+  .df-set-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:3px}
+  .df-set-close:hover{color:#ff4444;background:rgba(255,68,68,.08)}
+  .df-set-tabs{display:flex;border-bottom:1px solid rgba(0,212,255,.1);flex-shrink:0}
+  .df-set-tab{flex:1;padding:10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+    border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.4);text-align:center;background:none;border-top:none;border-left:none;border-right:none;font-family:'Space Mono',monospace}
+  .df-set-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
+  .df-set-body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:22px}
+  .df-set-body::-webkit-scrollbar{width:2px}
+  .df-set-body::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
+  .df-set-section{display:flex;flex-direction:column;gap:10px}
+  .df-set-sec-title{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:2px}
+  .df-set-field{display:flex;flex-direction:column;gap:5px}
+  .df-set-lbl{font-size:10px;color:rgba(200,214,232,.55);letter-spacing:.5px}
+  .df-set-inp{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
+    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:11px;padding:8px 11px;outline:none;width:100%;transition:border-color .2s}
+  .df-set-inp:focus{border-color:rgba(0,212,255,.45)}
+  .df-set-inp::placeholder{color:rgba(200,214,232,.2)}
+  .df-set-preview{font-size:9px;color:rgba(200,214,232,.35);font-family:'Space Mono',monospace;margin-top:1px}
+  .df-set-inp-row{display:flex;gap:7px;align-items:center}
+  .df-set-inp-row .df-set-inp{flex:1}
+  .df-set-test-btn{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);color:#00d4ff;cursor:pointer;
+    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:7px 11px;border-radius:3px;white-space:nowrap;transition:all .15s}
+  .df-set-test-btn:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.5)}
+  .df-set-test-btn:disabled{opacity:.4;cursor:not-allowed}
+  .df-set-result{font-size:9px;padding:5px 9px;border-radius:2px;font-family:'Space Mono',monospace}
+  .df-set-result.ok {background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#00ff88}
+  .df-set-result.err{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);color:#ff6666}
+  /* Model cards */
+  .df-model-cards{display:flex;flex-direction:column;gap:8px}
+  .df-model-card{border:1px solid rgba(200,214,232,.1);border-radius:4px;padding:12px 14px;cursor:pointer;
+    transition:all .2s;background:rgba(255,255,255,.02);position:relative;overflow:hidden}
+  .df-model-card:hover{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.25)}
+  .df-model-card.selected{border-color:rgba(0,212,255,.6);background:rgba(0,212,255,.07)}
+  .df-model-card.selected::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#00d4ff,transparent)}
+  .df-mc-row{display:flex;align-items:center;gap:8px}
+  .df-mc-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;flex:1}
+  .df-mc-badge{font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap}
+  .df-mc-badge.default {background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.3)}
+  .df-mc-badge.powerful{background:rgba(191,95,255,.12);color:#bf5fff;border:1px solid rgba(191,95,255,.3)}
+  .df-mc-badge.fast    {background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.25)}
+  .df-mc-desc{font-size:10px;color:rgba(200,214,232,.5);margin-top:4px;line-height:1.5}
+  .df-mc-price{font-size:9px;color:rgba(200,214,232,.3);margin-top:4px;font-family:'Space Mono',monospace}
+  /* Int status row */
+  .df-int-status-row{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:3px;background:rgba(255,255,255,.02);border:1px solid rgba(200,214,232,.07)}
+  .df-int-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .df-int-status-dot.on {background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.6)}
+  .df-int-status-dot.off{background:rgba(200,214,232,.2)}
+  .df-int-status-name{font-size:10px;color:rgba(200,214,232,.7);flex:1}
+  .df-int-status-val{font-size:9px;color:rgba(200,214,232,.35);font-family:'Space Mono',monospace}
+  /* Save bar */
+  .df-set-footer{border-top:1px solid rgba(0,212,255,.1);padding:14px 22px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+  .df-set-save{background:#00d4ff;color:#060810;border:none;cursor:pointer;font-family:'Syne',sans-serif;
+    font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:9px 22px;border-radius:3px;transition:all .2s}
+  .df-set-save:hover:not(:disabled){background:#33ddff}
+  .df-set-save:disabled{opacity:.4;cursor:not-allowed}
+  .df-set-cancel{background:transparent;border:1px solid rgba(200,214,232,.18);color:rgba(200,214,232,.5);cursor:pointer;
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:9px 16px;border-radius:3px;transition:all .2s}
+  .df-set-cancel:hover{border-color:rgba(200,214,232,.4);color:#c8d6e8}
+
   /* Main layout */
   .df-main{display:flex;flex:1;min-height:0;overflow:hidden}
 
@@ -697,6 +772,13 @@ export default function DevForgeDashboard() {
   const [debugAns, setDebugAns]         = useState("");
   const [debugLoading, setDebugLoading] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
+  // Settings
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab]   = useState("llm");
+  const [settingsData, setSettingsData] = useState(null); // from GET /settings
+  const [settingsEdits, setSettingsEdits] = useState({}); // staged edits
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsTestResult, setSettingsTestResult] = useState({}); // key → {ok, info/error}
   const { elapsed, display, reset } = useTimer(appState === "running");
 
   const toRef       = useRef([]);
@@ -705,6 +787,34 @@ export default function DevForgeDashboard() {
   const inputRef    = useRef(null);
   const fileInputRef = useRef(null);
   const demoModeRef = useRef(false); // gates the observability poller during Demo Mode
+
+  // ── Settings handlers ──────────────────────────────────────────────────────
+  const openSettings = () => {
+    setSettingsEdits({});
+    setSettingsTestResult({});
+    fetch("/settings").then(r=>r.json()).then(d=>setSettingsData(d)).catch(()=>{});
+    setSettingsOpen(true);
+  };
+  const closeSettings = () => { setSettingsOpen(false); setSettingsEdits({}); };
+  const setEdit = (k,v) => setSettingsEdits(p=>({...p,[k]:v}));
+  const saveSettings = () => {
+    if (!Object.keys(settingsEdits).length) { closeSettings(); return; }
+    setSettingsSaving(true);
+    fetch("/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(settingsEdits)})
+      .then(r=>r.json()).then(d=>{ setSettingsData(d); setSettingsSaving(false); closeSettings(); })
+      .catch(()=>setSettingsSaving(false));
+  };
+  const testConnection = (service) => {
+    setSettingsTestResult(p=>({...p,[service]:{loading:true}}));
+    fetch(`/settings/test-${service}`,{method:"POST"}).then(r=>r.json()).then(d=>{
+      setSettingsTestResult(p=>({...p,[service]:d}));
+    }).catch(e=>setSettingsTestResult(p=>({...p,[service]:{ok:false,error:e.message}})));
+  };
+  // Effective settings = server data merged with unsaved edits (for display)
+  const effSettings = {...(settingsData||{}), ...Object.fromEntries(
+    Object.entries(settingsEdits).map(([k,v])=>[k,v])
+  )};
+  const activeModel = settingsEdits.model || settingsData?.model || "claude-sonnet-4-6";
 
   const handleFileAttach = (e) => {
     const files = Array.from(e.target.files || []);
@@ -849,6 +959,11 @@ export default function DevForgeDashboard() {
       .then(data => { if (!demoModeRef.current && Array.isArray(data.calls)) setLlmCalls(data.calls); })
       .catch(() => {});
   }, []);
+
+  // Load settings on mount so header dots are populated immediately
+  useEffect(()=>{
+    fetch("/settings").then(r=>r.json()).then(d=>setSettingsData(d)).catch(()=>{});
+  },[]);
 
   useEffect(() => {
     let intervalId;
@@ -1739,7 +1854,24 @@ export default function DevForgeDashboard() {
           <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autopilot Engineer · Autonomous SDLC</div></div>
         </div>
         <div className="df-timer" style={{color:timerColor}}>{display}</div>
-        <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          {/* Integration status dots */}
+          <div className="df-int-dots" title="Integration status: Anthropic · GitHub · Linear · Slack">
+            {[
+              {lbl:"AI",  on: settingsData?.anthropic_api_key_set, color:"#00d4ff"},
+              {lbl:"GH",  on: settingsData?.github_token_set,      color:"#c8d6e8"},
+              {lbl:"LI",  on: settingsData?.linear_api_key_set,    color:"#6366f1"},
+              {lbl:"SL",  on: settingsData?.slack_bot_token_set,   color:"#4ade80"},
+            ].map(({lbl,on,color})=>(
+              <div key={lbl} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                <div className={`df-int-dot ${on?"on":"off"}`} style={on?{background:color,boxShadow:`0 0 5px ${color}`}:{}} title={lbl}/>
+                <span className="df-int-dot-lbl">{lbl}</span>
+              </div>
+            ))}
+          </div>
+          <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
+          <button className="df-settings-btn" onClick={openSettings} title="Settings — API key, model, integrations">⚙</button>
+        </div>
       </div>
 
       {/* Input */}
@@ -1921,6 +2053,205 @@ export default function DevForgeDashboard() {
               {debugLoading?"Thinking...":"Ask Claude ↵"}
             </button>
             {debugAns&&<div className="df-dbg-answer">{debugAns}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* ── Settings Drawer ─────────────────────────────────────────────── */}
+      {settingsOpen&&(
+        <div className="df-settings-overlay" onClick={e=>{if(e.target===e.currentTarget)closeSettings();}}>
+          <div className="df-settings-drawer">
+            <div className="df-set-hdr">
+              <div className="df-set-title">⚙ Settings</div>
+              <button className="df-set-close" onClick={closeSettings}>×</button>
+            </div>
+            <div className="df-set-tabs">
+              {[["llm","🤖 LLM"],["integrations","🔗 Integrations"],["status","📊 Status"]].map(([id,lbl])=>(
+                <button key={id} className={`df-set-tab${settingsTab===id?" active":""}`} onClick={()=>setSettingsTab(id)}>{lbl}</button>
+              ))}
+            </div>
+
+            <div className="df-set-body">
+
+              {/* ── LLM Tab ── */}
+              {settingsTab==="llm"&&(<>
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">Anthropic API Key</div>
+                  <div className="df-set-field">
+                    <label className="df-set-lbl">API Key</label>
+                    <div className="df-set-inp-row">
+                      <input
+                        className="df-set-inp"
+                        type="password"
+                        placeholder={settingsData?.anthropic_api_key_preview || "sk-ant-..."}
+                        value={settingsEdits.anthropic_api_key||""}
+                        onChange={e=>setEdit("anthropic_api_key",e.target.value)}
+                        autoComplete="off"
+                      />
+                      <button
+                        className="df-set-test-btn"
+                        disabled={settingsTestResult.anthropic?.loading}
+                        onClick={()=>testConnection("anthropic")}
+                      >Test</button>
+                    </div>
+                    {settingsData?.anthropic_api_key_set&&!settingsEdits.anthropic_api_key&&(
+                      <span className="df-set-preview">Current: {settingsData.anthropic_api_key_preview}</span>
+                    )}
+                    {settingsTestResult.anthropic&&!settingsTestResult.anthropic.loading&&(
+                      <div className={`df-set-result ${settingsTestResult.anthropic.ok?"ok":"err"}`}>
+                        {settingsTestResult.anthropic.ok?`✓ Connected · ${settingsTestResult.anthropic.model||settingsData?.model}`:`✗ ${settingsTestResult.anthropic.error}`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">Model Selection</div>
+                  <div className="df-model-cards">
+                    {(settingsData?.available_models||[]).map(m=>(
+                      <div
+                        key={m.id}
+                        className={`df-model-card${activeModel===m.id?" selected":""}`}
+                        onClick={()=>setEdit("model",m.id)}
+                      >
+                        <div className="df-mc-row">
+                          <span className="df-mc-name">{m.name}</span>
+                          <span className={`df-mc-badge ${m.tier}`}>{m.tier}</span>
+                          {activeModel===m.id&&<span style={{color:"#00d4ff",fontSize:13}}>✓</span>}
+                        </div>
+                        <div className="df-mc-desc">{m.desc}</div>
+                        <div className="df-mc-price">${m.input_mtok}/M input · ${m.output_mtok}/M output</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>)}
+
+              {/* ── Integrations Tab ── */}
+              {settingsTab==="integrations"&&(<>
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">GitHub</div>
+                  <div className="df-set-field">
+                    <label className="df-set-lbl">Personal Access Token</label>
+                    <div className="df-set-inp-row">
+                      <input className="df-set-inp" type="password"
+                        placeholder={settingsData?.github_token_preview||"ghp_..."}
+                        value={settingsEdits.github_token||""}
+                        onChange={e=>setEdit("github_token",e.target.value)} autoComplete="off"/>
+                      <button className="df-set-test-btn" disabled={settingsTestResult.github?.loading} onClick={()=>testConnection("github")}>Test</button>
+                    </div>
+                    {settingsData?.github_token_set&&!settingsEdits.github_token&&(
+                      <span className="df-set-preview">Current: {settingsData.github_token_preview}</span>
+                    )}
+                    {settingsTestResult.github&&!settingsTestResult.github.loading&&(
+                      <div className={`df-set-result ${settingsTestResult.github.ok?"ok":"err"}`}>
+                        {settingsTestResult.github.ok?`✓ ${settingsTestResult.github.info}`:`✗ ${settingsTestResult.github.error}`}
+                      </div>
+                    )}
+                  </div>
+                  <div className="df-set-field" style={{marginTop:4}}>
+                    <label className="df-set-lbl">Deploy Target Repo <span style={{opacity:.5}}>(owner/repo)</span></label>
+                    <input className="df-set-inp"
+                      placeholder={settingsData?.github_repo||"owner/repo"}
+                      value={settingsEdits.github_repo!=null?settingsEdits.github_repo:(settingsData?.github_repo||"")}
+                      onChange={e=>setEdit("github_repo",e.target.value)}/>
+                  </div>
+                </div>
+
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">Linear</div>
+                  <div className="df-set-field">
+                    <label className="df-set-lbl">API Key</label>
+                    <div className="df-set-inp-row">
+                      <input className="df-set-inp" type="password"
+                        placeholder={settingsData?.linear_api_key_preview||"lin_api_..."}
+                        value={settingsEdits.linear_api_key||""}
+                        onChange={e=>setEdit("linear_api_key",e.target.value)} autoComplete="off"/>
+                      <button className="df-set-test-btn" disabled={settingsTestResult.linear?.loading} onClick={()=>testConnection("linear")}>Test</button>
+                    </div>
+                    {settingsData?.linear_api_key_set&&!settingsEdits.linear_api_key&&(
+                      <span className="df-set-preview">Current: {settingsData.linear_api_key_preview}</span>
+                    )}
+                    {settingsTestResult.linear&&!settingsTestResult.linear.loading&&(
+                      <div className={`df-set-result ${settingsTestResult.linear.ok?"ok":"err"}`}>
+                        {settingsTestResult.linear.ok?`✓ ${settingsTestResult.linear.info}`:`✗ ${settingsTestResult.linear.error}`}
+                      </div>
+                    )}
+                  </div>
+                  <div className="df-set-field" style={{marginTop:4}}>
+                    <label className="df-set-lbl">Team ID</label>
+                    <input className="df-set-inp"
+                      placeholder={settingsData?.linear_team_id||"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}
+                      value={settingsEdits.linear_team_id!=null?settingsEdits.linear_team_id:(settingsData?.linear_team_id||"")}
+                      onChange={e=>setEdit("linear_team_id",e.target.value)}/>
+                  </div>
+                </div>
+
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">Slack</div>
+                  <div className="df-set-field">
+                    <label className="df-set-lbl">Bot Token</label>
+                    <input className="df-set-inp" type="password"
+                      placeholder={settingsData?.slack_bot_token_preview||"xoxb-..."}
+                      value={settingsEdits.slack_bot_token||""}
+                      onChange={e=>setEdit("slack_bot_token",e.target.value)} autoComplete="off"/>
+                    {settingsData?.slack_bot_token_set&&!settingsEdits.slack_bot_token&&(
+                      <span className="df-set-preview">Current: {settingsData.slack_bot_token_preview}</span>
+                    )}
+                  </div>
+                  <div className="df-set-field" style={{marginTop:4}}>
+                    <label className="df-set-lbl">PRD Channel</label>
+                    <input className="df-set-inp"
+                      placeholder="#devforge-prd"
+                      value={settingsEdits.slack_prd_channel!=null?settingsEdits.slack_prd_channel:(settingsData?.slack_prd_channel||"")}
+                      onChange={e=>setEdit("slack_prd_channel",e.target.value)}/>
+                  </div>
+                </div>
+              </>)}
+
+              {/* ── Status Tab ── */}
+              {settingsTab==="status"&&(<>
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">Integration Status</div>
+                  {[
+                    {label:"Anthropic API",  on:settingsData?.anthropic_api_key_set,  val:settingsData?.anthropic_api_key_preview, color:"#00d4ff"},
+                    {label:"Active Model",   on:true, val:settingsData?.model||"claude-sonnet-4-6", color:"#00d4ff"},
+                    {label:"GitHub Token",   on:settingsData?.github_token_set,        val:settingsData?.github_token_preview,     color:"#c8d6e8"},
+                    {label:"GitHub Repo",    on:!!settingsData?.github_repo,           val:settingsData?.github_repo,             color:"#c8d6e8"},
+                    {label:"Linear API Key", on:settingsData?.linear_api_key_set,      val:settingsData?.linear_api_key_preview,  color:"#6366f1"},
+                    {label:"Linear Team ID", on:!!settingsData?.linear_team_id,        val:settingsData?.linear_team_id?.slice(0,8)+"...", color:"#6366f1"},
+                    {label:"Slack Bot Token",on:settingsData?.slack_bot_token_set,     val:settingsData?.slack_bot_token_preview, color:"#4ade80"},
+                    {label:"Slack Channel",  on:!!settingsData?.slack_prd_channel,     val:settingsData?.slack_prd_channel,       color:"#4ade80"},
+                  ].map(({label,on,val,color})=>(
+                    <div key={label} className="df-int-status-row">
+                      <div className="df-int-status-dot" style={on?{background:color,boxShadow:`0 0 5px ${color}`}:{}} />
+                      <span className="df-int-status-name">{label}</span>
+                      <span className="df-int-status-val">{on?(val||"configured"):"not set"}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="df-set-section">
+                  <div className="df-set-sec-title">What's Available</div>
+                  <div style={{fontSize:10,color:"rgba(200,214,232,.45)",lineHeight:1.8}}>
+                    {!settingsData?.anthropic_api_key_set&&<div style={{color:"#ff6644"}}>⚠ No Anthropic API key — pipeline will not run</div>}
+                    {!settingsData?.github_token_set&&<div style={{color:"#ffaa00"}}>⚠ No GitHub token — Stage 6 deploy disabled</div>}
+                    {!settingsData?.linear_api_key_set&&<div style={{color:"#ffaa00"}}>⚠ No Linear key — task tracking disabled</div>}
+                    {!settingsData?.slack_bot_token_set&&<div style={{color:"rgba(200,214,232,.4)"}}>ℹ No Slack token — notifications disabled</div>}
+                    {settingsData?.anthropic_api_key_set&&settingsData?.github_token_set&&settingsData?.linear_api_key_set&&(
+                      <div style={{color:"#00ff88"}}>✓ All core integrations configured — pipeline ready</div>
+                    )}
+                  </div>
+                </div>
+              </>)}
+
+            </div>
+
+            <div className="df-set-footer">
+              <button className="df-set-cancel" onClick={closeSettings}>Cancel</button>
+              <button className="df-set-save" disabled={settingsSaving||!Object.keys(settingsEdits).length} onClick={saveSettings}>
+                {settingsSaving?"Saving…":"Save Changes"}
+              </button>
+            </div>
           </div>
         </div>
       )}
