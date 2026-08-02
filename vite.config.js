@@ -15,6 +15,7 @@ export default defineConfig({
       "/stage6": "http://localhost:8000",
       "/prd":    "http://localhost:8000",
       "/health": "http://localhost:8000",
+      "/debug":  "http://localhost:8000",
     },
   },
 });
