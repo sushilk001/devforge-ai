@@ -2563,8 +2563,8 @@ export default function DevForgeDashboard() {
                   <div className="df-set-field" style={{marginTop:4}}>
                     <label className="df-set-lbl">Deploy Target Repo <span style={{opacity:.5}}>(owner/repo)</span></label>
                     <input className="df-set-inp"
-                      placeholder={settingsData?.github_repo||"owner/repo"}
-                      value={settingsEdits.github_repo!=null?settingsEdits.github_repo:(settingsData?.github_repo||"")}
+                      placeholder={settingsData?.github_repo_preview||"owner/repo"}
+                      value={settingsEdits.github_repo!=null?settingsEdits.github_repo:""}
                       onChange={e=>setEdit("github_repo",e.target.value)}/>
                   </div>
                 </div>
@@ -2628,7 +2628,7 @@ export default function DevForgeDashboard() {
                     {label:"Anthropic API",  on:settingsData?.anthropic_api_key_set,  val:settingsData?.anthropic_api_key_preview, color:"#00d4ff"},
                     {label:"Active Model",   on:true, val:settingsData?.model||"claude-sonnet-4-6", color:"#00d4ff"},
                     {label:"GitHub Token",   on:settingsData?.github_token_set,        val:settingsData?.github_token_preview,     color:"#c8d6e8"},
-                    {label:"GitHub Repo",    on:!!settingsData?.github_repo,           val:settingsData?.github_repo,             color:"#c8d6e8"},
+                    {label:"GitHub Repo",    on:!!settingsData?.github_repo,           val:settingsData?.github_repo_preview,     color:"#c8d6e8"},
                     {label:"Linear API Key", on:settingsData?.linear_api_key_set,      val:settingsData?.linear_api_key_preview,  color:"#6366f1"},
                     {label:"Linear Team ID", on:!!settingsData?.linear_team_id,        val:settingsData?.linear_team_id?.slice(0,8)+"...", color:"#6366f1"},
                     {label:"Slack Bot Token",on:settingsData?.slack_bot_token_set,     val:settingsData?.slack_bot_token_preview, color:"#4ade80"},

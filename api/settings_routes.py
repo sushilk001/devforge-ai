@@ -41,6 +41,7 @@ def _current_state() -> dict:
         "github_token_set":         bool(gh_token),
         "github_token_preview":     _preview(gh_token),
         "github_repo":              rc.get_github_repo(),
+        "github_repo_preview":      _preview(rc.get_github_repo()),
         "linear_api_key_set":       bool(li_key),
         "linear_api_key_preview":   _preview(li_key),
         "linear_team_id":           rc.get_linear_team_id(),
