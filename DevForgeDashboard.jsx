@@ -628,6 +628,33 @@ const css = `
   .obs-drift-text{opacity:.75;line-height:1.5}
   .obs-empty{text-align:center;padding:60px 20px;opacity:.52;font-size:12px;line-height:2}
 
+  /* ── About Panel ─────────────────────────────────────────────────────── */
+  .abt-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;height:100%}
+  .abt-hero{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px;padding:18px 20px}
+  .abt-title{font-size:17px;font-weight:800;letter-spacing:.02em;color:rgba(200,214,232,.95);margin-bottom:3px}
+  .abt-tagline{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:10px;font-weight:600}
+  .abt-desc{font-size:12px;line-height:1.75;opacity:.62;margin-bottom:14px}
+  .abt-links{display:flex;gap:8px;flex-wrap:wrap}
+  .abt-link{font-size:10px;padding:4px 11px;border-radius:6px;border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.7);text-decoration:none;transition:all .2s;letter-spacing:.04em}
+  .abt-link:hover{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.45)}
+  .abt-link-demo{border-color:rgba(191,95,255,.25);color:rgba(191,95,255,.7)}
+  .abt-link-demo:hover{background:rgba(191,95,255,.08);color:#bf7fff;border-color:rgba(191,95,255,.45)}
+  .abt-stages{display:flex;align-items:stretch;gap:3px;flex-wrap:wrap}
+  .abt-stage{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:9px 10px;text-align:center;flex:1;min-width:72px;transition:border-color .2s}
+  .abt-stage:hover{border-color:rgba(0,212,255,.2)}
+  .abt-stage-icon{font-size:15px;margin-bottom:3px}
+  .abt-stage-num{font-size:8px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;font-weight:600;margin-bottom:2px}
+  .abt-stage-lbl{font-size:10px;font-weight:700;color:rgba(200,214,232,.85);margin-bottom:2px}
+  .abt-stage-sub{font-size:9px;opacity:.42;line-height:1.35}
+  .abt-arrow{color:rgba(0,212,255,.3);font-size:13px;flex-shrink:0;align-self:center}
+  .abt-gates{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
+  .abt-gate-chip{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.22);color:rgba(255,170,0,.65)}
+  .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .abt-stack-group{background:rgba(255,255,255,.018);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:10px 12px}
+  .abt-stack-cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
+  .abt-stack-items{display:flex;flex-direction:column;gap:4px}
+  .abt-chip{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;opacity:.78;line-height:1.5}
+
   /* ── Log panel ───────────────────────────────────────────────────────── */
   .df-log{width:252px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
   .df-log.wide     {width:460px}
@@ -1026,6 +1053,80 @@ function ObsPanel({ llmCalls, theme }) {
         </div>
       </div>
 
+    </div>
+  );
+}
+
+// ── About Panel ────────────────────────────────────────────────────────────
+function AboutPanel({ theme }) {
+  const STAGES = [
+    { num:1, icon:"📋", label:"Requirements",      sub:"PRD generation" },
+    { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm" },
+    { num:3, icon:"🔍", label:"PR Review",          sub:"4× parallel agents" },
+    { num:4, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk" },
+    { num:5, icon:"🧪", label:"QA",                 sub:"Test runner" },
+    { num:6, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
+  ];
+  const STACK = [
+    { cat:"AI / LLM",      color:"#bf7fff", items:["Claude Sonnet 5", "Anthropic API"] },
+    { cat:"Orchestration", color:"#00d4ff", items:["LangGraph 1.x", "MemorySaver checkpointing"] },
+    { cat:"Backend",       color:"#00ff88", items:["FastAPI", "Uvicorn", "Pydantic v2"] },
+    { cat:"Frontend",      color:"#ffaa00", items:["React 18", "Recharts", "Vite"] },
+    { cat:"Integrations",  color:"#ff6b9d", items:["Slack SDK", "Linear GraphQL", "PyGithub"] },
+    { cat:"Algorithm",     color:"#ff9500", items:["Kahn's topological sort", "DP critical path"] },
+  ];
+  return (
+    <div className="abt-wrap">
+      <div className="abt-hero">
+        <div className="abt-title">DevForge AI</div>
+        <div className="abt-tagline">Autonomous end-to-end SDLC intelligence engine</div>
+        <div className="abt-desc">
+          Drop a feature request — AI agents autonomously handle requirements analysis, task planning,
+          code review, code generation, QA testing, and GitHub deployment.
+          Human review gates at each critical milestone keep you in control.
+        </div>
+        <div className="abt-links">
+          <a className="abt-link" href="https://github.com/sushilk001/devforge-ai" target="_blank" rel="noreferrer">⬡ GitHub</a>
+          <a className="abt-link abt-link-demo" href="https://tinyurl.com/DevForgeAI-demoVideo" target="_blank" rel="noreferrer">▶ Demo Video</a>
+        </div>
+      </div>
+
+      <div>
+        <div className="obs-sh">6-Stage Pipeline</div>
+        <div className="abt-stages">
+          {STAGES.map((s, i) => (
+            <React.Fragment key={s.num}>
+              <div className="abt-stage">
+                <div className="abt-stage-icon">{s.icon}</div>
+                <div className="abt-stage-num">Stage {s.num}</div>
+                <div className="abt-stage-lbl">{s.label}</div>
+                <div className="abt-stage-sub">{s.sub}</div>
+              </div>
+              {i < STAGES.length - 1 && <div className="abt-arrow">›</div>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="abt-gates">
+          <span className="abt-gate-chip">⏸ Human gate after Stage 1 — approve or request changes</span>
+          <span className="abt-gate-chip">⏸ Human gate after Stage 2 — approve or request changes</span>
+        </div>
+      </div>
+
+      <div>
+        <div className="obs-sh">Tech Stack</div>
+        <div className="abt-stack">
+          {STACK.map(g => (
+            <div key={g.cat} className="abt-stack-group">
+              <div className="abt-stack-cat" style={{color:g.color}}>{g.cat}</div>
+              <div className="abt-stack-items">
+                {g.items.map(item => (
+                  <span key={item} className="abt-chip" style={{borderColor:g.color+"33",color:g.color}}>{item}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -2356,6 +2457,7 @@ export default function DevForgeDashboard() {
             <div className={`df-tab ${tab==="observability"?"active":""}`} onClick={()=>setTab("observability")}>
               LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:10,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
+            <div className={`df-tab ${tab==="about"?"active":""}`} onClick={()=>setTab("about")}>About</div>
             <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
               style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(255,255,255,.1)":"rgba(0,0,0,.12)",
                 color:theme==="dark"?"rgba(200,214,232,.5)":"rgba(20,30,80,.5)",
@@ -2364,7 +2466,7 @@ export default function DevForgeDashboard() {
             <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(200,214,232,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
-            {tab==="pipeline"    ? renderDetail() : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
+            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
           </div>
         </div>
 
