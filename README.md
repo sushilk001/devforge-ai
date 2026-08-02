@@ -1,131 +1,138 @@
 # DevForge AI — Autonomous SDLC Intelligence Engine
 
-> Hackathon project · Built with Claude AI + LangGraph + FastAPI
+> **Hackathon project** · Raw feature request → structured PRD → task graph → code → PR review → QA, all driven by Claude AI
 
-**Author & Owner:** Sushil Kumar · [LinkedIn](https://www.linkedin.com/in/sushilk001) · [GitHub](https://github.com/sushilk001)
+**Author:** Sushil Kumar · [LinkedIn](https://www.linkedin.com/in/sushilk001) · [GitHub](https://github.com/sushilk001)
 
----
-
-## Problem Statement
-
-Modern software teams waste enormous time on the manual handoffs between product, engineering, and QA:
-
-- Feature requests arrive as vague Slack messages with no structure
-- PMs spend hours writing PRDs that still get rejected and revised in endless loops
-- Engineers manually break down requirements into tasks, guessing at dependencies
-- No traceability from original request → final deployed feature
-
-The result: **weeks of coordination overhead per feature**, inconsistent quality, and no audit trail.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-1.x-orange?style=flat-square)
+![Claude AI](https://img.shields.io/badge/Claude-Sonnet%205-blueviolet?style=flat-square)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)
 
 ---
 
-## Solution
+## What It Does
 
-DevForge AI is a **fully autonomous SDLC pipeline** that takes a raw feature request from Slack and drives it to production — with AI agents at every stage and humans only reviewing, never doing.
-
-### How AI powers each stage
-
-| Stage | Agent | What it does |
-|-------|-------|-------------|
-| **1 — Requirements** | Claude Sonnet | Parses intent, fills gaps, generates a structured PRD (goals, user stories, acceptance criteria) |
-| **2 — Tasks** | Claude Sonnet | Decomposes approved PRD into 8–14 engineering tasks with estimates, priorities, labels, and a **dependency graph** computed via Kahn's algorithm + DP critical path |
-| **3 — PR Review** *(planned)* | 4× Claude Haiku | Security, Quality, Coverage, Architecture agents review in parallel |
-| **4 — QA** *(planned)* | Claude Sonnet | Generates test cases from acceptance criteria and runs them |
-| **5 — Deploy** *(planned)* | Claude Haiku | Progressive DEV → STAGING → UAT → PROD with rollback gate |
-
-Human-in-the-loop **review gates** sit after every stage. Approvals resume the LangGraph pipeline; rejections trigger AI revision with the feedback incorporated.
-
----
-
-## Architecture Diagram
+DevForge AI eliminates the manual coordination overhead in software delivery. Drop a raw feature request in Slack — or type it in the dashboard — and autonomous AI agents handle every stage:
 
 ```
-Slack / API
-     │
-     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Stage 1 — Requirements Agent                                   │
-│                                                                 │
-│  parse_request ──► check_completeness ──► generate_prd          │
-│  (Claude Sonnet)                           (Claude Sonnet)      │
-│                                                 │               │
-│                                         ⏸ HUMAN REVIEW GATE     │
-│                                         (Slack Approve/Reject)  │
-│                                    ┌────┴─────┐                 │
-│                                 approve     reject+feedback      │
-│                                    │            │               │
-│                              finalize_prd  revise_prd ──► loop  │
-└────────────────────────────────────┼────────────────────────────┘
-                                     │ approved PRD
-                                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Stage 2 — Task Orchestration Agent                             │
-│                                                                 │
-│  decompose_tasks ──► build_dependency_graph                     │
-│  (Claude Sonnet)     (Kahn's topological sort                   │
-│                       + DP critical path)                       │
-│                                │                                │
-│                        ⏸ HUMAN REVIEW GATE                      │
-│                        (Slack Approve/Reject)                   │
-│                   ┌────┴─────┐                                  │
-│                approve    reject+feedback                        │
-│                   │            │                                 │
-│       create_linear_issues  revise_tasks ──► rebuild graph ──► loop │
-│       (issues + blockers)                                       │
-│                   │                                             │
-│           notify_slack ──► END                                  │
-└─────────────────────────────────────────────────────────────────┘
-                                     │
-                         Linear issues created
-                         with dependency graph
-                                     │
-                                     ▼
-                    Stage 3 (PR Review) — coming soon
+"Add forgot-password flow for enterprise users"
+        │
+        ▼
+  📋 Structured PRD          ← Stage 1 (Claude Sonnet)
+        │ ← human approve/reject
+        ▼
+  🗂  Task graph + Linear      ← Stage 2 (Claude Sonnet + Kahn's algorithm)
+        │ ← human approve/reject
+        ▼
+  🔍 Parallel PR review       ← Stage 3 (4× agents: security, quality, coverage, architecture)
+        │
+        ▼
+  💻 Full codebase generation  ← Stage 4 (Claude Sonnet → real files on disk)
+        │
+        ▼
+  🧪 Automated QA              ← Stage 5 (test runner + pass/fail report)
+        │
+        ▼
+  🚀 Deploy pipeline           ← Stage 6 (DEV → STAGING → UAT → PROD)
+```
+
+Human-in-the-loop **review gates** sit after every stage. Approvals resume the LangGraph pipeline; rejections feed the feedback directly back to the AI for revision.
+
+---
+
+## What's Live Today
+
+| Stage | Status | What it does |
+|-------|--------|-------------|
+| **1 — Requirements** | ✅ Complete | Parses intent, clarifies ambiguity, generates structured PRD (goals, user stories, acceptance criteria) |
+| **2 — Task Orchestration** | ✅ Complete | Decomposes PRD → 8–14 tasks with estimates, priorities, dependency graph via Kahn's topological sort + DP critical path; creates Linear issues |
+| **3 — PR Review** | ✅ Complete | 4 parallel reviewer agents (Security, Quality, Coverage, Architecture) each produce findings + a merged verdict |
+| **4 — Code Generation** | ✅ Complete | Generates a full working codebase to `output/<project-slug>/`; files streamed to disk |
+| **5 — QA** | ✅ Complete | Runs generated tests, reports pass/fail per test case |
+| **6 — Deploy** | 🔧 In progress | Progressive rollout DEV → STAGING → UAT → PROD with rollback gate |
+
+---
+
+## Architecture
+
+```
+Slack / Dashboard
+        │
+        ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  Stage 1 — Requirements Agent                                    │
+│                                                                  │
+│  parse_request ──► check_completeness ──► generate_prd           │
+│                                                │                 │
+│                                        ⏸ HUMAN REVIEW GATE       │
+│                                   ┌────┴─────┐                  │
+│                                approve     reject+feedback        │
+│                                   │            │                 │
+│                             finalize_prd  revise_prd ──► loop    │
+└───────────────────────────────────┼─────────────────────────────┘
+                                    │ approved PRD
+                                    ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  Stage 2 — Task Orchestration Agent                              │
+│                                                                  │
+│  decompose_tasks ──► build_dependency_graph                      │
+│  (Claude Sonnet)     (Kahn's topological sort + DP critical path)│
+│                               │                                  │
+│                       ⏸ HUMAN REVIEW GATE                        │
+│                  ┌────┴─────┐                                    │
+│               approve    reject+feedback                          │
+│                  │            │                                   │
+│      create_linear_issues  revise_tasks ──► rebuild graph ──► loop│
+│                  │                                               │
+│          notify_slack ──► END                                    │
+└───────────────────────────────┼──────────────────────────────────┘
+                                │ tasks + Linear issues
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  Stage 3 — PR Review Agent                                       │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  security_reviewer  ┐                                    │   │
+│  │  quality_reviewer   ├──► merge_findings ──► final_verdict│   │
+│  │  coverage_reviewer  │                                    │   │
+│  │  arch_reviewer      ┘                                    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │ review verdict
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  Stage 4 — Code Generation Agent                                 │
+│                                                                  │
+│  plan_architecture ──► generate_files ──► write_to_disk          │
+│                         (Claude Sonnet)    output/<project>/     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 **State persistence:** Each stage uses `LangGraph MemorySaver` — graphs pause at interrupt points and resume exactly where they left off when the human acts.
 
 ---
 
-## Swagger / API Reference
+## Live Dashboard
 
-Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/docs)** for the interactive Swagger UI.
+The React dashboard gives you a real-time view of every pipeline run:
 
-### Stage 1 — Requirements Agent
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/stage1/submit` | Submit a feature request; returns PRD + thread ID |
-| `GET` | `/stage1/prd/{thread_id}` | Fetch current PRD and status |
-| `POST` | `/stage1/review/{thread_id}` | Approve or reject PRD with optional feedback |
-| `POST` | `/stage1/slack/events` | Inbound Slack messages (`devforge: <request>`) |
-| `POST` | `/stage1/slack/actions` | Slack button callbacks (Approve / Request Changes) |
-
-### Stage 2 — Task Orchestration Agent
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/stage2/start/{prd_thread_id}` | Start task decomposition for an approved PRD |
-| `GET` | `/stage2/tasks/{stage2_thread_id}` | Fetch tasks + full dependency graph |
-| `POST` | `/stage2/review/{stage2_thread_id}` | Approve (creates Linear issues) or reject with feedback |
-| `GET` | `/stage2/sessions` | List all active Stage 2 sessions |
-| `POST` | `/stage2/slack/actions` | Slack button callbacks for task approval |
-
-### Health
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Service health and active stages |
+- **Pipeline control** — submit requests, approve/reject at each stage
+- **LLM Observability** — per-call token counts, latency, model used, cost estimate
+- **Stage cards** — live status for all 6 stages with log streaming
+- **Settings panel** — swap API keys, choose Claude model, add custom model IDs
+- **Light / Dark theme** — persisted in `localStorage`
 
 ---
 
-## Execution Steps
+## Quick Start
 
 ### Prerequisites
 
 - Python 3.10+
 - Node.js 18+
-- An [Anthropic API key](https://console.anthropic.com/)
+- [Anthropic API key](https://console.anthropic.com/)
 
 ### 1. Clone and install
 
@@ -140,20 +147,23 @@ pip install -r requirements.txt
 npm install
 ```
 
-### 2. Configure environment
+### 2. Configure
 
-Create `.env` in the project root:
+```bash
+cp .env.example .env
+# Edit .env — set ANTHROPIC_API_KEY (minimum required)
+```
 
 ```env
 # Required
 ANTHROPIC_API_KEY=sk-ant-...
 
-# Optional — enables Slack notifications and review buttons
+# Optional — Slack notifications and human review buttons
 SLACK_BOT_TOKEN=xoxb-...
 SLACK_SIGNING_SECRET=...
 SLACK_PRD_CHANNEL=#devforge-prd
 
-# Optional — enables Linear issue creation in Stage 2
+# Optional — Linear issue creation (Stage 2)
 LINEAR_API_KEY=...
 LINEAR_TEAM_ID=...
 ```
@@ -168,43 +178,55 @@ python main.py
 npm run dev
 ```
 
-### 4. Try the pipeline
+Open [http://localhost:3000](http://localhost:3000) → type a feature request → click **▶ LAUNCH**
 
-**Via dashboard:** Open [http://localhost:3000](http://localhost:3000) → enter a feature request → click **▶ LAUNCH**
+---
 
-**Via API:**
+## Try the Full Pipeline via API
 
 ```bash
 # Step 1 — submit a feature request
 curl -X POST http://localhost:8000/stage1/submit \
   -H "Content-Type: application/json" \
   -d '{"raw_text": "Add forgot-password flow for enterprise users via email. Success = tickets drop 80%, reset in under 2 minutes.", "requester": "alice"}'
+# Returns → { "status": "pending_review", "prd": {...}, "thread_id": "..." }
 
-# Returns → { "status": "pending_review", "prd": {...}, "message": "...Thread ID: <id>..." }
-
-# Step 2 — approve the PRD (Stage 2 auto-starts)
+# Step 2 — approve PRD → Stage 2 starts automatically
 curl -X POST http://localhost:8000/stage1/review/<thread_id> \
   -H "Content-Type: application/json" \
   -d '{"action": "approve"}'
-
-# Returns → stage2_thread_id in the message
+# Returns → stage2_thread_id
 
 # Step 3 — check tasks + dependency graph
 curl http://localhost:8000/stage2/tasks/<stage2_thread_id>
 
-# Step 4 — approve tasks → Linear issues created
+# Step 4 — approve tasks → Linear issues created, Stage 3 queued
 curl -X POST http://localhost:8000/stage2/review/<stage2_thread_id> \
   -H "Content-Type: application/json" \
   -d '{"action": "approve"}'
 ```
 
 **Via Slack** (with bot configured):
-
 ```
 devforge: Add forgot-password flow for enterprise users via email
 ```
+DevForge responds in-thread with the PRD, then posts Approve / Request Changes buttons.
 
-DevForge responds in-thread with the PRD, then posts approve/reject buttons.
+---
+
+## API Reference
+
+Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/docs)** for the full interactive Swagger UI.
+
+| Stage | Key Endpoints |
+|-------|--------------|
+| **Stage 1** | `POST /stage1/submit` · `GET /stage1/prd/{id}` · `POST /stage1/review/{id}` |
+| **Stage 2** | `POST /stage2/start/{prd_id}` · `GET /stage2/tasks/{id}` · `POST /stage2/review/{id}` |
+| **Stage 3** | `POST /stage3/start/{s2_id}` · `GET /stage3/review/{id}` |
+| **Stage 4** | `POST /stage4/start/{s2_id}` · `GET /stage4/status/{id}` |
+| **QA** | `POST /qa/run/{s4_id}` · `GET /qa/results/{id}` |
+| **Settings** | `GET /settings` · `POST /settings` · `POST /settings/custom-models` |
+| **Health** | `GET /health` |
 
 ---
 
@@ -212,10 +234,40 @@ DevForge responds in-thread with the PRD, then posts approve/reject buttons.
 
 | Layer | Technology |
 |-------|-----------|
-| AI / LLM | Claude Sonnet 4 (`claude-sonnet-4-20250514`) via Anthropic API |
+| AI / LLM | Claude Sonnet 5 (`claude-sonnet-5`) via Anthropic API |
 | Orchestration | LangGraph 1.x with `MemorySaver` checkpointing |
 | Backend | FastAPI + Uvicorn |
 | Schemas | Pydantic v2 |
 | Integrations | Slack SDK, Linear GraphQL API |
 | Frontend | React 18 + Recharts + Vite |
-| Algorithm | Kahn's topological sort + DP critical path for dependency graph |
+| Algorithm | Kahn's topological sort + DP critical path for task dependency graph |
+
+---
+
+## Project Structure
+
+```
+DevForge-AI/
+├── agents/
+│   ├── stage1/          # Requirements agent (LangGraph graph + nodes + prompts)
+│   ├── stage2/          # Task orchestration agent
+│   ├── stage3/          # PR review agent (4 parallel reviewers)
+│   └── stage4/          # Code generation agent
+├── api/
+│   ├── routes.py        # Stage 1 endpoints
+│   ├── stage2_routes.py
+│   ├── stage3_routes.py
+│   ├── stage4_routes.py
+│   ├── qa_routes.py
+│   ├── stage6_routes.py
+│   ├── observability.py # LLM call tracking
+│   └── runtime_config.py# Model + credentials management
+├── DevForgeDashboard.jsx# React dashboard (single-file)
+├── main.py              # FastAPI app entry point
+├── .env.example         # Credential template
+└── output/              # Generated codebases land here (gitignored)
+```
+
+---
+
+*Built for a hackathon. PRs and issues welcome.*

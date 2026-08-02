@@ -29,10 +29,10 @@ slide-backups/
 PRESENTER_KIT.md
 demo-video/
 
-# Personal photos
-*.jpeg
-*.jpg
-*.png
+# Personal photos (already removed from repo)
+Girish.jpeg
+Guru.jpeg
+Viral.jpeg
 
 # Misc
 *.pyc
