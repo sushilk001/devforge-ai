@@ -4,6 +4,10 @@
 
 # ---- Stage 1: build the React/Vite dashboard ----
 FROM node:20-slim AS frontend
+# puppeteer (a demo-video dev dep) tries to download Chrome on install, which
+# fails in the slim image and isn't needed to build the dashboard — skip it.
+ENV PUPPETEER_SKIP_DOWNLOAD=1 \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 WORKDIR /build
 COPY package.json package-lock.json ./
 RUN npm ci

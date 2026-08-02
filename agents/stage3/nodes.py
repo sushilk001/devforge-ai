@@ -1,6 +1,7 @@
 import json
 import time
 import logging
+import contextvars
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from langchain_anthropic import ChatAnthropic
@@ -79,7 +80,13 @@ def run_reviews(state: Stage3State) -> Stage3State:
 
     all_findings = []
     executor = ThreadPoolExecutor(max_workers=4)
-    futures = {executor.submit(run_one, name, prompt): name for name, prompt in agent_configs}
+    # copy_context() per task so each worker thread inherits the caller's
+    # session (credentials); a fresh copy per submit avoids "context already
+    # entered" when several run concurrently.
+    futures = {
+        executor.submit(contextvars.copy_context().run, run_one, name, prompt): name
+        for name, prompt in agent_configs
+    }
     try:
         for future in as_completed(futures, timeout=90):
             agent_name, findings = future.result()

@@ -163,6 +163,6 @@ def add_custom_model(body: AddCustomModelRequest):
 @router_settings.delete("/custom-models/{model_id:path}")
 def delete_custom_model(model_id: str):
     rc.remove_custom_model(model_id)
-    if rc._overrides.get("model") == model_id:
+    if rc.get_override("model") == model_id:
         rc.clear_override("model")
     return {**_current_state(), "ok": True}

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from config import get_settings
+from api import runtime_config as rc
 from agents.stage1.schemas import PRDDocument, AgentState
 
 if TYPE_CHECKING:
@@ -15,9 +15,15 @@ if TYPE_CHECKING:
     from agents.stage4.schemas import Stage4State
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
 
-client = WebClient(token=settings.slack_bot_token)
+
+def _client() -> WebClient:
+    """Slack client built from the CURRENT session's bot token (per-user)."""
+    return WebClient(token=rc.get_slack_bot_token())
+
+
+def _channel() -> str:
+    return rc.get_slack_channel()
 
 
 # ── Stage 1: PRD notifications ────────────────────────────────────────────────
@@ -77,8 +83,8 @@ def post_prd_for_review(state: AgentState) -> str | None:
     if not state.prd:
         return None
     try:
-        response = client.chat_postMessage(
-            channel=settings.slack_prd_channel,
+        response = _client().chat_postMessage(
+            channel=_channel(),
             text=f"New PRD ready for review: *{state.prd.title}*",
             blocks=_prd_blocks(state.prd, state.feature_request.source_id or "manual"),
         )
@@ -94,8 +100,8 @@ def notify_prd_approved(state: AgentState) -> None:
     if not state.slack_message_ts or not state.prd:
         return
     try:
-        client.chat_update(
-            channel=settings.slack_prd_channel,
+        _client().chat_update(
+            channel=_channel(),
             ts=state.slack_message_ts,
             text=f"✅ PRD Approved: *{state.prd.title}* — moving to task creation.",
             blocks=[{"type": "section", "text": {"type": "mrkdwn",
@@ -108,7 +114,7 @@ def notify_prd_approved(state: AgentState) -> None:
 
 def notify_error(channel: str, error_msg: str) -> None:
     try:
-        client.chat_postMessage(channel=channel, text=f"⚠️ *DevForge Error*: {error_msg}")
+        _client().chat_postMessage(channel=channel, text=f"⚠️ *DevForge Error*: {error_msg}")
     except SlackApiError as e:
         logger.error(f"[Slack] notify_error failed: {e.response['error']}")
 
@@ -121,7 +127,7 @@ def post_incomplete_request(channel: str, missing_info: list[str], ts: str = Non
         kwargs: dict = {"channel": channel, "text": text}
         if ts:
             kwargs["thread_ts"] = ts
-        client.chat_postMessage(**kwargs)
+        _client().chat_postMessage(**kwargs)
     except SlackApiError as e:
         logger.error(f"[Slack] post_incomplete_request failed: {e.response['error']}")
 
@@ -190,8 +196,8 @@ def post_tasks_for_review(state: Stage2State) -> str | None:
     ]
 
     try:
-        response = client.chat_postMessage(
-            channel=settings.slack_prd_channel,
+        response = _client().chat_postMessage(
+            channel=_channel(),
             text=f"Task breakdown ready for review: *{prd_title}* ({len(state.tasks)} tasks, {total_hours:.1f}h)",
             blocks=blocks,
         )
@@ -255,8 +261,8 @@ def notify_review_complete(state: Stage3State) -> str | None:
     ]
 
     try:
-        response = client.chat_postMessage(
-            channel=settings.slack_prd_channel,
+        response = _client().chat_postMessage(
+            channel=_channel(),
             text=f"{verdict_emoji} PR Review complete for *{prd_title}*: {state.verdict}",
             blocks=blocks,
         )
@@ -309,8 +315,8 @@ def notify_code_generated(state: Stage4State) -> str | None:
     ]
 
     try:
-        response = client.chat_postMessage(
-            channel=settings.slack_prd_channel,
+        response = _client().chat_postMessage(
+            channel=_channel(),
             text=f"💻 Code generated for *{prd_title}*: {len(generated)} tasks, {total_files} files",
             blocks=blocks,
         )
@@ -335,8 +341,8 @@ def notify_deploy_complete(
     ) if qa_summary else "not run"
 
     try:
-        resp = client.chat_postMessage(
-            channel=settings.slack_prd_channel,
+        resp = _client().chat_postMessage(
+            channel=_channel(),
             text=f"🚀 PR #{pr_number} created for *{prd_title}*",
             blocks=[{"type": "section", "text": {"type": "mrkdwn",
                 "text": (
@@ -363,8 +369,8 @@ def notify_tasks_approved(state: Stage2State) -> None:
     issue_count = len(state.linear_issue_ids)
 
     try:
-        client.chat_update(
-            channel=settings.slack_prd_channel,
+        _client().chat_update(
+            channel=_channel(),
             ts=state.slack_message_ts,
             text=f"✅ {issue_count} Linear issues created for *{prd_title}*",
             blocks=[{"type": "section", "text": {"type": "mrkdwn",

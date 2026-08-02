@@ -1,6 +1,7 @@
 import json
 import time
 import logging
+import contextvars
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from langchain_anthropic import ChatAnthropic
@@ -117,8 +118,11 @@ def generate_code_for_tasks(state: Stage4State) -> Stage4State:
 
     results: list[dict] = []
     with ThreadPoolExecutor(max_workers=4) as executor:
+        # copy_context() per task so each worker thread inherits the caller's
+        # session (credentials); a fresh copy per submit avoids "context already
+        # entered" when several run concurrently.
         futures = {
-            executor.submit(_generate_for_task, task, prd, feedback): task.get("id", idx)
+            executor.submit(contextvars.copy_context().run, _generate_for_task, task, prd, feedback): task.get("id", idx)
             for idx, task in enumerate(tasks)
         }
         for future in as_completed(futures):

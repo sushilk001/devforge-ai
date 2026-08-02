@@ -128,8 +128,9 @@ async def approve_review(thread_id: str, body: dict):
             except Exception as e:
                 logger.error(f"[Stage3] Re-run failed: {e}")
 
-        import threading
-        threading.Thread(target=_rerun, daemon=True).start()
+        import threading, contextvars
+        # run in the caller's context so the session's credentials propagate
+        threading.Thread(target=contextvars.copy_context().run, args=(_rerun,), daemon=True).start()
 
         return ReviewResponse(
             status="rerunning",

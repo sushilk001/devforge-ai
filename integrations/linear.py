@@ -1,16 +1,15 @@
 import httpx
 import logging
-from config import get_settings
+from api import runtime_config as rc
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
 
 LINEAR_API_URL = "https://api.linear.app/graphql"
 
 
 def _headers() -> dict:
     return {
-        "Authorization": settings.linear_api_key,
+        "Authorization": rc.get_linear_api_key(),
         "Content-Type": "application/json",
     }
 
@@ -45,7 +44,7 @@ def create_issue(title: str, description: str) -> str | None:
     data = _gql(query, {"input": {
         "title":       title,
         "description": description,
-        "teamId":      settings.linear_team_id,
+        "teamId":      rc.get_linear_team_id(),
     }})
 
     if data and data.get("data", {}).get("issueCreate", {}).get("success"):
@@ -77,7 +76,7 @@ def create_project(name: str, description: str = "",
     """
     data = _gql(query, {"input": {
         "name":        name[:255],
-        "teamIds":     [settings.linear_team_id],
+        "teamIds":     [rc.get_linear_team_id()],
         "description": description[:255] if description else "",
         "startDate":   today.isoformat(),
         "targetDate":  target.isoformat(),
@@ -115,7 +114,7 @@ def create_task_issue(
     issue_input: dict = {
         "title":       f"[{task_type.upper()}] {title}",
         "description": description,
-        "teamId":      settings.linear_team_id,
+        "teamId":      rc.get_linear_team_id(),
         "priority":    priority,
     }
 
@@ -171,7 +170,7 @@ _state_cache: dict[str, list] = {}   # team_id → list of {id, name, type}
 def _get_team_states() -> list[dict]:
     """Fetch and cache workflow states for the configured team."""
     global _state_cache
-    team_id = settings.linear_team_id
+    team_id = rc.get_linear_team_id()
     if team_id in _state_cache:
         return _state_cache[team_id]
     query = """

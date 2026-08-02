@@ -1,8 +1,11 @@
 import logging
+import secrets
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from api import runtime_config as rc
 
 from api.routes import router
 from api.stage2_routes import router_stage2
@@ -42,6 +45,58 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Per-session credentials ───────────────────────────────────────────────────
+# Give each browser its own credential session via an HttpOnly `df_sid` cookie,
+# so users who paste their own API keys never share or clobber one another.
+# Pure-ASGI middleware (NOT BaseHTTPMiddleware) so the session ContextVar set
+# here propagates to endpoints, background tasks, and worker threads.
+class _SessionMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        sid = None
+        for name, value in scope.get("headers") or []:
+            if name == b"cookie":
+                for part in value.decode("latin-1").split(";"):
+                    k, _, v = part.strip().partition("=")
+                    if k == "df_sid" and v:
+                        sid = v
+                        break
+            if sid:
+                break
+
+        new = sid is None
+        if new:
+            sid = secrets.token_urlsafe(18)
+        rc.set_current_session(sid)
+
+        if not new:
+            await self.app(scope, receive, send)
+            return
+
+        secure = scope.get("scheme") == "https"
+        cookie = ("df_sid=%s; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800" % sid) + (
+            "; Secure" if secure else ""
+        )
+
+        async def _send(message):
+            if message["type"] == "http.response.start":
+                message.setdefault("headers", []).append(
+                    (b"set-cookie", cookie.encode("latin-1"))
+                )
+            await send(message)
+
+        await self.app(scope, receive, _send)
+
+
+app.add_middleware(_SessionMiddleware)
 
 app.include_router(router)
 app.include_router(router_stage2)
