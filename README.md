@@ -1,14 +1,3 @@
----
-title: DevForge AI
-emoji: ⚡
-colorFrom: green
-colorTo: yellow
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Autonomous end-to-end SDLC intelligence engine
----
-
 # DevForge AI — Autonomous SDLC Intelligence Engine
 
 > Raw idea → PRD → tasks → code → PR review → QA → deploy. Fully autonomous, human-in-the-loop.
