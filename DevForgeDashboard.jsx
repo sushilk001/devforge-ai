@@ -137,7 +137,7 @@ const css = `
   .df-timer{font-size:22px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
     font-family:'SF Mono','Cascadia Code',monospace;color:#d4daf5}
   .df-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid;border-radius:20px}
-  .df-badge.idle   {color:rgba(200,214,232,.3);border-color:rgba(200,214,232,.12)}
+  .df-badge.idle   {color:rgba(200,214,232,.65);border-color:rgba(200,214,232,.2)}
   .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.35);animation:pulse 1.5s infinite}
   .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.35);animation:pulse 1s infinite}
   .df-badge.done   {color:#00d4ff;border-color:rgba(0,212,255,.35)}
@@ -153,10 +153,10 @@ const css = `
   .df-mode-btn{
     font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;
     padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.1);
-    background:transparent;color:rgba(200,214,232,.4);transition:all .15s;font-weight:500;
+    background:transparent;color:rgba(200,214,232,.65);transition:all .15s;font-weight:500;
   }
   .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.45);color:#00d4ff}
-  .df-mode-btn:disabled{opacity:.3;cursor:not-allowed}
+  .df-mode-btn:disabled{opacity:.4;cursor:not-allowed}
   .df-mode-btn.demo{margin-left:auto;border-color:rgba(255,170,0,.35);color:rgba(255,170,0,.65)}
   .df-mode-btn.demo.on{background:rgba(255,170,0,.12);border-color:rgba(255,170,0,.5);color:#ffaa00;animation:pulse 2s infinite}
   .df-inp-w{flex:1;min-width:0}
@@ -166,7 +166,7 @@ const css = `
     border-radius:8px;color:#d4daf5;font-family:'SF Mono','Cascadia Code',monospace;
     font-size:11px;padding:6px 10px;outline:none;transition:border-color .2s;
   }
-  .df-ctx-gh::placeholder{color:rgba(200,214,232,.2)}
+  .df-ctx-gh::placeholder{color:rgba(200,214,232,.42)}
   .df-ctx-gh:focus{border-color:rgba(0,212,255,.4)}
   .df-ctx-attach{
     font-size:10px;letter-spacing:.04em;padding:6px 12px;border-radius:8px;cursor:pointer;
@@ -184,14 +184,14 @@ const css = `
   .df-ctx-chip button:hover{color:#ff5555}
   .df-ctx-chip.gh{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);color:rgba(0,212,255,.8)}
   .df-inp{
-    width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+    width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
     border-radius:10px;color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;
     font-size:13px;padding:11px 14px;outline:none;resize:vertical;
     min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s;
   }
   .df-inp::-webkit-resizer{border-width:0 5px 5px 0;border-style:solid;border-color:transparent rgba(0,212,255,.35)}
   .df-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-inp::placeholder{color:rgba(200,214,232,.18)}
+  .df-inp::placeholder{color:rgba(200,214,232,.45)}
   .df-launch{
     background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
     font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;
@@ -208,10 +208,10 @@ const css = `
   }
   .df-stop:hover{background:rgba(255,60,60,.1);border-color:#ff5555}
   .df-rerun-btn{
-    display:flex;align-items:center;gap:4px;margin-top:7px;padding:5px 10px;
-    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;
+    display:flex;align-items:center;gap:4px;margin-top:4px;padding:3px 8px;
+    font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:.02em;
     background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:6px;
-    color:rgba(200,214,232,.35);cursor:pointer;transition:all .15s;width:100%;
+    color:rgba(200,214,232,.58);cursor:pointer;transition:all .15s;width:100%;
   }
   .df-rerun-btn:hover{border-color:rgba(0,212,255,.35);color:#00d4ff;background:rgba(0,212,255,.06)}
   .df-dbg-btn{
@@ -264,8 +264,8 @@ const css = `
   .df-int-dots{display:flex;gap:6px;align-items:center}
   .df-int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;cursor:default}
   .df-int-dot.on {background:#00ff88;box-shadow:0 0 5px rgba(0,255,136,.7)}
-  .df-int-dot.off{background:rgba(200,214,232,.18)}
-  .df-int-dot-lbl{font-size:9px;letter-spacing:.04em;color:rgba(200,214,232,.28)}
+  .df-int-dot.off{background:rgba(200,214,232,.35)}
+  .df-int-dot-lbl{font-size:9px;letter-spacing:.04em;color:rgba(200,214,232,.58)}
   .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
   .df-settings-drawer{
     width:480px;max-width:100vw;height:100vh;
@@ -280,7 +280,7 @@ const css = `
   .df-set-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;padding:0 8px}
   .df-set-tab{
     flex:1;padding:12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-    border:none;border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.38);
+    border:none;border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.6);
     text-align:center;background:none;font-family:-apple-system,system-ui,sans-serif;font-weight:500;
   }
   .df-set-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
@@ -297,8 +297,8 @@ const css = `
     padding:9px 12px;outline:none;width:100%;transition:border-color .2s;
   }
   .df-set-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-set-inp::placeholder{color:rgba(200,214,232,.18)}
-  .df-set-preview{font-size:10px;color:rgba(200,214,232,.3);font-family:'SF Mono','Cascadia Code',monospace;margin-top:2px}
+  .df-set-inp::placeholder{color:rgba(200,214,232,.42)}
+  .df-set-preview{font-size:10px;color:rgba(200,214,232,.52);font-family:'SF Mono','Cascadia Code',monospace;margin-top:2px}
   .df-set-inp-row{display:flex;gap:8px;align-items:center}
   .df-set-inp-row .df-set-inp{flex:1}
   .df-set-test-btn{
@@ -328,14 +328,14 @@ const css = `
   .df-mc-badge.fast    {background:rgba(0,255,136,.09);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
   .df-mc-badge.custom  {background:rgba(255,255,255,.06);color:rgba(200,214,232,.7);border:1px solid rgba(255,255,255,.14)}
   .df-mc-desc{font-size:11px;color:rgba(200,214,232,.48);margin-top:5px;line-height:1.5}
-  .df-mc-price{font-size:10px;color:rgba(200,214,232,.28);margin-top:5px;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-mc-price{font-size:10px;color:rgba(200,214,232,.55);margin-top:5px;font-family:'SF Mono','Cascadia Code',monospace}
   .df-mc-remove{margin-left:auto;background:none;border:none;color:rgba(255,100,100,.5);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;transition:color .15s}
   .df-mc-remove:hover{color:rgba(255,80,80,.9)}
   .df-add-model{margin-top:12px;display:flex;flex-direction:column;gap:6px}
   .df-add-model-row{display:flex;gap:6px}
   .df-add-model-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 12px;font-size:12px;color:#d4daf5;outline:none;font-family:inherit;transition:border-color .15s}
   .df-add-model-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-add-model-inp::placeholder{color:rgba(200,214,232,.25)}
+  .df-add-model-inp::placeholder{color:rgba(200,214,232,.42)}
   .df-add-model-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:7px;color:#00d4ff;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
   .df-add-model-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.45)}
   .df-add-model-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -347,7 +347,7 @@ const css = `
   .df-int-status-dot.on {background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.5)}
   .df-int-status-dot.off{background:rgba(200,214,232,.18)}
   .df-int-status-name{font-size:12px;color:rgba(200,214,232,.65);flex:1;font-weight:500}
-  .df-int-status-val{font-size:10px;color:rgba(200,214,232,.3);font-family:'SF Mono','Cascadia Code',monospace}
+  .df-int-status-val{font-size:10px;color:rgba(200,214,232,.58);font-family:'SF Mono','Cascadia Code',monospace}
   .df-set-footer{border-top:1px solid rgba(255,255,255,.07);padding:16px 24px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
   .df-set-save{
     background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
@@ -369,13 +369,13 @@ const css = `
   /* ── Pipeline sidebar ────────────────────────────────────────────────── */
   .df-pipe{
     width:292px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;
-    padding:16px 14px;border-right:1px solid rgba(255,255,255,.05);
+    padding:10px 10px;border-right:1px solid rgba(255,255,255,.05);
     transition:width .25s ease;background:rgba(8,9,18,.5);
   }
-  .df-pipe.collapsed{width:60px;padding:14px 8px}
+  .df-pipe.collapsed{width:60px;padding:10px 8px}
   .df-pipe::-webkit-scrollbar{width:2px}
   .df-pipe::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08)}
-  .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:24px}
+  .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;min-height:20px}
   .df-pipe-hdr-lbl{font-size:10px;letter-spacing:.14em;color:rgba(120,160,220,.55);text-transform:uppercase;font-weight:600}
   .df-pipe-btn{
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);cursor:pointer;
@@ -384,41 +384,41 @@ const css = `
   }
   .df-pipe-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#d4daf5}
   .df-rail{
-    display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0;border-radius:8px;
-    margin-bottom:5px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);transition:all .2s;
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0;border-radius:8px;
+    margin-bottom:3px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);transition:all .2s;
   }
   .df-rail:hover{background:rgba(255,255,255,.04)}
   .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35)}
   .df-rail.done{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
   .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.04)}
-  .df-rail-num{font-size:8px;letter-spacing:.06em;opacity:.35;font-weight:600}
+  .df-rail-num{font-size:10px;letter-spacing:.06em;opacity:.6;font-weight:600}
   .df-rail-dot{width:6px;height:6px;border-radius:50%}
   .df-card{
-    border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;margin-bottom:6px;
-    background:rgba(255,255,255,.02);transition:all .3s;position:relative;overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 10px;margin-bottom:3px;
+    background:rgba(255,255,255,.05);transition:all .3s;position:relative;overflow:hidden;
   }
-  .df-card.active{border-color:var(--c);background:rgba(0,0,0,.42);animation:glow 2s ease-in-out infinite}
-  .df-card.done  {border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
+  .df-card.active{border-color:var(--c);background:rgba(0,212,255,.07);animation:glow 2s ease-in-out infinite}
+  .df-card.done  {border-color:rgba(0,255,136,.28);background:rgba(0,255,136,.04)}
   .df-card.gate  {border-color:#ffaa00;background:rgba(255,170,0,.04);animation:pulse 1s infinite}
   .df-card.active::before,.df-card.gate::before{
     content:'';position:absolute;top:0;left:0;right:0;height:2px;
     background:linear-gradient(to right,transparent,var(--c,#ffaa00),transparent);
   }
-  .df-crow{display:flex;align-items:center;gap:9px}
-  .df-cnum{font-size:9px;letter-spacing:.06em;opacity:.3;font-weight:600}
-  .df-cicon{font-size:14px;transition:color .3s}
+  .df-crow{display:flex;align-items:center;gap:7px}
+  .df-cnum{font-size:10px;letter-spacing:.06em;opacity:.58;font-weight:600}
+  .df-cicon{font-size:13px;transition:color .3s}
   .df-cicon.spin{animation:spin 1s linear infinite}
   .df-clbl{flex:1}
-  .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:13px;font-weight:700;color:#fff;transition:color .3s}
-  .df-csub{font-size:9px;letter-spacing:.06em;opacity:.4;font-weight:500}
+  .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:12px;font-weight:700;color:#fff;transition:color .3s}
+  .df-csub{font-size:10px;letter-spacing:.06em;opacity:.65;font-weight:500}
   .df-cdot{width:7px;height:7px;border-radius:50%;transition:background .3s}
-  .df-cdesc{font-size:11px;opacity:.38;margin-top:6px;line-height:1.5}
-  .df-cprog{height:2px;background:rgba(255,255,255,.06);margin-top:8px;border-radius:1px;overflow:hidden}
+  .df-cdesc{font-size:10px;opacity:.65;margin-top:3px;line-height:1.4}
+  .df-cprog{height:2px;background:rgba(255,255,255,.06);margin-top:5px;border-radius:1px;overflow:hidden}
   .df-cfill{height:100%;border-radius:1px;transition:width .3s}
-  .df-crev{font-size:9px;letter-spacing:.04em;padding:2px 8px;border-radius:20px;margin-top:5px;display:inline-block;font-weight:600}
+  .df-crev{font-size:9px;letter-spacing:.04em;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;font-weight:600}
   .df-crev.approved{background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
   .df-crev.changes {background:rgba(255,100,0,.1);color:#ff6400;border:1px solid rgba(255,100,0,.22)}
-  .df-conn{display:flex;align-items:center;justify-content:center;height:12px}
+  .df-conn{display:flex;align-items:center;justify-content:center;height:7px}
   .df-cline{width:1px;height:100%;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
   .df-cline.flow::after{content:'';position:absolute;top:0;left:0;width:100%;height:35%;
     background:#00d4ff;animation:flowLine 1s ease-in-out infinite}
@@ -434,10 +434,10 @@ const css = `
   .df-tab{
     padding:12px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
     border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;
-    color:rgba(200,214,232,.35);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
+    color:rgba(200,214,232,.62);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
   }
   .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
-  .df-tab:hover:not(.active){color:rgba(200,214,232,.65)}
+  .df-tab:hover:not(.active){color:rgba(200,214,232,.85)}
 
   /* Detail pane */
   .df-detail{flex:1;overflow-y:auto;padding:18px 22px}
@@ -581,7 +581,7 @@ const css = `
   .df-metrics{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .df-metric{text-align:center;padding:12px 18px;border:1px solid rgba(0,212,255,.16);border-radius:10px;min-width:90px;background:rgba(0,212,255,.03)}
   .df-mv{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:22px;font-weight:800;color:#00d4ff}
-  .df-ml{font-size:10px;letter-spacing:.08em;opacity:.42;margin-top:4px;font-weight:500}
+  .df-ml{font-size:10px;letter-spacing:.08em;opacity:.62;margin-top:4px;font-weight:500}
 
   /* ── Observability ───────────────────────────────────────────────────── */
   .obs-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px}
@@ -626,7 +626,7 @@ const css = `
   }
   .obs-drift-icon{font-size:14px}
   .obs-drift-text{opacity:.75;line-height:1.5}
-  .obs-empty{text-align:center;padding:60px 20px;opacity:.22;font-size:12px;line-height:2}
+  .obs-empty{text-align:center;padding:60px 20px;opacity:.52;font-size:12px;line-height:2}
 
   /* ── Log panel ───────────────────────────────────────────────────────── */
   .df-log{width:252px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
@@ -646,16 +646,47 @@ const css = `
     font-size:11px;line-height:1.6;padding:3px 0;
     border-bottom:1px solid rgba(255,255,255,.04);animation:slideLog .2s ease-out;
   }
-  .df-log-ts {color:rgba(0,212,255,.3);margin-right:5px;font-family:'SF Mono','Cascadia Code',monospace;font-size:10px}
-  .df-log-msg.info   {color:rgba(200,214,232,.5)}
+  .df-log-ts {color:rgba(0,212,255,.55);margin-right:5px;font-family:'SF Mono','Cascadia Code',monospace;font-size:10px}
+  .df-log-msg.info   {color:rgba(200,214,232,.75)}
   .df-log-msg.success{color:#00ff88}
   .df-log-msg.warn   {color:#ff9500}
   .df-log-msg.agent  {color:#c8d6e8}
   .df-log-msg.gate   {color:#ffaa00}
   .df-log-msg.handoff{color:#00d4ff}
   .df-log-msg.done   {color:#ff2d6b;font-weight:700}
-  .df-idle-hint{text-align:center;padding:56px 20px;opacity:.22;font-size:12px;line-height:2}
+  .df-idle-hint{text-align:center;padding:56px 20px;opacity:.52;font-size:12px;line-height:2}
   .df-cursor{animation:blink 1s step-end infinite;color:#00d4ff}
+
+  /* ── Fullscreen code viewer ──────────────────────────────────────────── */
+  .df-fsv{position:fixed;inset:0;z-index:3000;background:rgba(4,5,14,.97);display:flex;flex-direction:column;animation:fadeUp .15s ease-out}
+  .df-fsv-hdr{
+    display:flex;align-items:center;gap:10px;padding:13px 20px;flex-shrink:0;
+    border-bottom:1px solid rgba(191,95,255,.22);
+    background:rgba(8,9,18,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  }
+  .df-fsv-dot{width:8px;height:8px;border-radius:50%;background:#bf5fff;flex-shrink:0;box-shadow:0 0 6px rgba(191,95,255,.6)}
+  .df-fsv-fname{font-family:'SF Mono','Cascadia Code',monospace;font-size:14px;font-weight:600;color:#e8eeff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .df-fsv-task{font-size:10px;letter-spacing:.04em;color:rgba(191,95,255,.65);flex-shrink:0;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+  .df-fsv-copy{
+    background:rgba(191,95,255,.1);border:1px solid rgba(191,95,255,.3);color:#bf5fff;
+    cursor:pointer;font-size:11px;padding:5px 14px;border-radius:6px;font-weight:500;
+    transition:all .15s;white-space:nowrap;font-family:-apple-system,system-ui,sans-serif;
+  }
+  .df-fsv-copy:hover{background:rgba(191,95,255,.2);border-color:#bf5fff}
+  .df-fsv-copy.copied{color:#00ff88;border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.08)}
+  .df-fsv-close{
+    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);
+    cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:8px;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+  }
+  .df-fsv-close:hover{background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.4);color:#ff5555}
+  .df-fsv-body{flex:1;overflow:auto;padding:0}
+  .df-fsv-body pre{margin:0;border-radius:0;border:none;max-height:none!important;height:100%;font-size:13px!important;padding:20px 24px!important}
+  .df-fsv-exp{
+    background:transparent;border:none;color:rgba(191,95,255,.55);cursor:pointer;
+    font-size:13px;padding:2px 5px;border-radius:3px;line-height:1;transition:color .12s;flex-shrink:0;
+  }
+  .df-fsv-exp:hover{color:#bf5fff}
 
   /* Tooltip */
   .recharts-tooltip-wrapper .recharts-default-tooltip{
@@ -670,7 +701,7 @@ const css = `
   .df[data-theme='light'] .df-lname{color:#0d0f1f}
   .df[data-theme='light'] .df-ltag{color:rgba(20,40,120,.55)}
   .df[data-theme='light'] .df-timer{color:#1a1d2e}
-  .df[data-theme='light'] .df-badge.idle{color:rgba(20,30,80,.4);border-color:rgba(20,30,80,.15)}
+  .df[data-theme='light'] .df-badge.idle{color:rgba(20,30,80,.65);border-color:rgba(20,30,80,.22)}
   .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
   .df[data-theme='light'] .df-settings-btn:hover{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.2);color:#1a1d2e}
   .df[data-theme='light'] .df-int-dot.off{background:rgba(0,0,0,.18)}
@@ -680,9 +711,9 @@ const css = `
   .df[data-theme='light'] .df-mode-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
   .df[data-theme='light'] .df-mode-btn.active{background:rgba(0,140,180,.1);border-color:rgba(0,140,180,.4);color:#007799}
   .df[data-theme='light'] .df-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-inp::placeholder{color:rgba(20,30,80,.38)}
   .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.8);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-ctx-gh::placeholder{color:rgba(20,30,80,.22)}
+  .df[data-theme='light'] .df-ctx-gh::placeholder{color:rgba(20,30,80,.38)}
   .df[data-theme='light'] .df-ctx-attach{border-color:rgba(0,140,180,.3);color:rgba(0,140,180,.65)}
   .df[data-theme='light'] .df-ctx-attach:hover{border-color:rgba(0,140,180,.6);color:#007799}
   .df[data-theme='light'] .df-ctx-chip{background:rgba(0,140,180,.06);border-color:rgba(0,140,180,.2);color:rgba(20,30,80,.7)}
@@ -761,7 +792,7 @@ const css = `
   .df[data-theme='light'] .df-log-ts{color:rgba(0,140,180,.35)}
   .df[data-theme='light'] .df-log-msg.info{color:rgba(20,30,80,.55)}
   .df[data-theme='light'] .df-log-msg.agent{color:rgba(20,30,80,.7)}
-  .df[data-theme='light'] .df-idle-hint{color:rgba(20,30,80,.28);opacity:1}
+  .df[data-theme='light'] .df-idle-hint{color:rgba(20,30,80,.52);opacity:1}
   .df[data-theme='light'] .df-settings-overlay{background:rgba(0,0,0,.35)}
   .df[data-theme='light'] .df-settings-drawer{background:#f5f7fe;border-left-color:rgba(0,0,0,.1)}
   .df[data-theme='light'] .df-set-hdr{border-bottom-color:rgba(0,0,0,.08)}
@@ -774,7 +805,7 @@ const css = `
   .df[data-theme='light'] .df-set-sec-title{color:rgba(0,140,180,.6)}
   .df[data-theme='light'] .df-set-lbl{color:rgba(20,30,80,.6)}
   .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-set-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-set-inp::placeholder{color:rgba(20,30,80,.38)}
   .df[data-theme='light'] .df-set-inp:focus{border-color:rgba(0,140,180,.4)}
   .df[data-theme='light'] .df-set-preview{color:rgba(20,30,80,.35)}
   .df[data-theme='light'] .df-model-card{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
@@ -894,10 +925,10 @@ function ObsPanel({ llmCalls, theme }) {
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={latencyData} margin={{top:4,right:8,bottom:0,left:-20}}>
               <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
-              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
-              <YAxis tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} unit="ms" />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
+              <YAxis tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} unit="ms" />
               <Tooltip content={<ChartTip/>} />
-              <ReferenceLine y={avgLatency} stroke="rgba(255,149,0,.4)" strokeDasharray="3 3" label={{value:"avg",fill:"rgba(255,149,0,.5)",fontSize:8}} />
+              <ReferenceLine y={avgLatency} stroke="rgba(255,149,0,.4)" strokeDasharray="3 3" label={{value:"avg",fill:"rgba(255,149,0,.7)",fontSize:10}} />
               <Line type="monotone" dataKey="latency" stroke="#00d4ff" strokeWidth={2} dot={{r:3,fill:"#00d4ff"}} name="Latency" unit="ms" />
               <Line type="monotone" dataKey="avg"     stroke="#ff9500" strokeWidth={1.5} strokeDasharray="4 2" dot={false} name="Rolling avg" unit="ms" />
             </LineChart>
@@ -914,8 +945,8 @@ function ObsPanel({ llmCalls, theme }) {
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={stageRollup} margin={{top:4,right:8,bottom:0,left:-20}}>
               <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
-              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
-              <YAxis tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
+              <YAxis tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
               <Tooltip content={<ChartTip/>} />
               <Bar dataKey="input"  fill="#00d4ff" name="Input tokens"  radius={[2,2,0,0]} maxBarSize={30}/>
               <Bar dataKey="output" fill="#00ff88" name="Output tokens" radius={[2,2,0,0]} maxBarSize={30}/>
@@ -947,7 +978,7 @@ function ObsPanel({ llmCalls, theme }) {
                   <td style={{color:"rgba(0,212,255,.45)"}}>{c.id}</td>
                   <td>
                     <div style={{color:tc("#e8f4ff","#1a1d2e"),marginBottom:2}}>{c.label}</div>
-                    <div style={{fontSize:8,color:STAGE_COLORS[c.stage],opacity:.8}}>{c.stage}</div>
+                    <div style={{fontSize:10,color:STAGE_COLORS[c.stage],opacity:.85}}>{c.stage}</div>
                   </td>
                   <td>
                     <span className="obs-model-chip" style={{background:`${MODEL_COLORS[c.model]}18`,color:MODEL_COLORS[c.model],border:`1px solid ${MODEL_COLORS[c.model]}35`}}>
@@ -963,10 +994,10 @@ function ObsPanel({ llmCalls, theme }) {
                   </td>
                   <td>
                     <span style={{color: isSlow?"#ff9500":tc("#c8d6e8","rgba(20,30,80,.7)")}}>{c.latencyMs}ms</span>
-                    {isSlow && <span style={{fontSize:8,color:"#ff9500",marginLeft:4}}>↑</span>}
+                    {isSlow && <span style={{fontSize:10,color:"#ff9500",marginLeft:4}}>↑</span>}
                   </td>
                   <td style={{color:"#bf5fff"}}>${c.cost.toFixed(4)}</td>
-                  <td><span style={{fontSize:8,color:"#00ff88",background:"rgba(0,255,136,.1)",padding:"2px 6px",borderRadius:2,border:"1px solid rgba(0,255,136,.25)"}}>OK</span></td>
+                  <td><span style={{fontSize:10,color:"#00ff88",background:"rgba(0,255,136,.1)",padding:"2px 6px",borderRadius:2,border:"1px solid rgba(0,255,136,.25)"}}>OK</span></td>
                 </tr>
               );
             })}
@@ -989,7 +1020,7 @@ function ObsPanel({ llmCalls, theme }) {
             <div key={i} style={{background:tc("rgba(0,0,0,.25)","rgba(0,0,0,.04)"),border:`1px solid ${tc("rgba(200,214,232,.08)","rgba(0,0,0,.09)")}`,borderRadius:4,padding:"10px 12px"}}>
               <div style={{fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:800,color:m.color,marginBottom:3}}>{m.val}</div>
               <div style={{fontSize:9,color:tc("rgba(200,214,232,.65)","rgba(20,30,80,.65)"),marginBottom:2}}>{m.lbl}</div>
-              <div style={{fontSize:8,color:tc("rgba(200,214,232,.35)","rgba(20,30,80,.35)"),letterSpacing:1}}>{m.sub}</div>
+              <div style={{fontSize:10,color:tc("rgba(200,214,232,.58)","rgba(20,30,80,.55)"),letterSpacing:1}}>{m.sub}</div>
             </div>
           ))}
         </div>
@@ -1028,7 +1059,8 @@ export default function DevForgeDashboard() {
   const [realQA, setRealQA]          = useState(null);
   const [qaThreadId, setQaTid]       = useState(null);
   const [realDeploy, setRealDeploy]  = useState(null);
-  const [expandedFile, setExpandedFile] = useState(null);
+  const [expandedFile, setExpandedFile]   = useState(null);
+  const [fullscreenFile, setFullscreenFile] = useState(null); // {filename, content, taskTitle, copied}
   const [pipeCollapsed, setPipeCollapsed] = useState(false);
   const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
   const [inputBig, setInputBig] = useState(false);
@@ -1054,6 +1086,11 @@ export default function DevForgeDashboard() {
   const [customModelAdding, setCustomModelAdding] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("df-theme") || "dark");
   useEffect(() => { localStorage.setItem("df-theme", theme); }, [theme]);
+  useEffect(() => {
+    const onKey = e => { if(e.key==="Escape" && fullscreenFile) setFullscreenFile(null); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [fullscreenFile]);
   const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
   const tc = (dark, light) => theme === "dark" ? dark : light;
   const { elapsed, display, reset } = useTimer(appState === "running");
@@ -1714,6 +1751,27 @@ export default function DevForgeDashboard() {
     if(!prodOK) return;
     addLog("✓ Production approved","success");
 
+    // Deploy from a named output directory on disk (survives server restart)
+    const doFireFromDir = (dirName, attempt=0) => {
+      if(attempt >= 4) { addLog("⚠ Deploy failed after 4 attempts — check backend logs","warn"); return; }
+      fetch("/stage6/deploy", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ output_dir_name: dirName })
+      }).then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d=>{
+          if(d.deploy_thread_id) {
+            addLog(`⟡ Deploy job started from disk (${dirName})...`,"info");
+            pollDeploy(d.deploy_thread_id);
+          } else {
+            addLog(`⚠ Deploy start failed: ${JSON.stringify(d)}`,"warn");
+          }
+        }).catch(e=>{
+          const delay = (attempt+1)*3000;
+          addLog(`⚠ Deploy error: ${e.message} — retry ${attempt+1}/4 in ${delay/1000}s...`,"warn");
+          setTimeout(()=>doFireFromDir(dirName, attempt+1), delay);
+        });
+    };
+
     // If thread IDs aren't in state (e.g. after page refresh), recover from sessions API
     const doFire = (s4tid, s2tid, s3tid, qtid, attempt=0) => {
       if(attempt >= 4) {
@@ -1747,7 +1805,7 @@ export default function DevForgeDashboard() {
     if(stage4ThreadId && stage2ThreadId) {
       doFire(stage4ThreadId, stage2ThreadId, stage3ThreadId, qaThreadId);
     } else {
-      // Recover thread IDs from sessions endpoints
+      // Recover thread IDs from sessions endpoints; fall back to disk output dirs
       addLog("⟡ Recovering session IDs from backend...","info");
       Promise.all([
         fetch("/stage4/sessions").then(r=>r.json()),
@@ -1757,12 +1815,20 @@ export default function DevForgeDashboard() {
         const s2entry = Object.entries(s2sessions).sort((a,b)=>b[1].task_count-a[1].task_count)[0];
         if(s4entry && s2entry) {
           const s4tid = s4entry[0], s2tid = s2entry[0];
-          const s3tid = stage3ThreadId || null;
-          const qtid  = qaThreadId || null;
           addLog(`⟡ Recovered: stage4=${s4tid.slice(0,8)}... stage2=${s2tid.slice(0,8)}...`,"info");
-          doFire(s4tid, s2tid, s3tid, qtid);
+          doFire(s4tid, s2tid, stage3ThreadId||null, qaThreadId||null);
         } else {
-          addLog("⚠ Could not recover session IDs — no sessions found","warn");
+          // Sessions lost (server restart) — deploy directly from the most recent output dir on disk
+          addLog("⟡ Sessions cleared (server restart) — scanning output dirs on disk...","info");
+          fetch("/stage6/output-dirs").then(r=>r.json()).then(dirs=>{
+            if(!dirs || !dirs.length) {
+              addLog("⚠ No output directories found — re-run the full pipeline first","warn");
+              return;
+            }
+            const dirName = dirs[0]; // newest first
+            addLog(`⟡ Deploying from disk: output/${dirName}`,"info");
+            doFireFromDir(dirName);
+          }).catch(e=>addLog("⚠ Output dir scan failed: "+e.message,"warn"));
         }
       }).catch(e=>addLog("⚠ Session recovery failed: "+e.message,"warn"));
     }
@@ -1823,7 +1889,7 @@ export default function DevForgeDashboard() {
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
                     <span className="df-tid">[CODE]</span>
                     <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                      {linearId && <span style={{fontSize:8,fontFamily:"monospace",color:"#bf5fff",opacity:.7}}>#{linearId.slice(-6)}</span>}
+                      {linearId && <span style={{fontSize:10,fontFamily:"monospace",color:"#bf5fff",opacity:.75}}>#{linearId.slice(-6)}</span>}
                       <span style={{fontSize:9,opacity:.5}}>{t.files?.length||0} file{t.files?.length!==1?"s":""}</span>
                     </div>
                   </div>
@@ -1832,13 +1898,14 @@ export default function DevForgeDashboard() {
                     const fkey=`${i}-${j}`;
                     const open=expandedFile===fkey;
                     return (<div key={j}>
-                      <div onClick={()=>setExpandedFile(open?null:fkey)} style={{
+                      <div style={{
                         display:"flex",justifyContent:"space-between",alignItems:"center",
-                        fontSize:9,fontFamily:"monospace",padding:"3px 8px",marginBottom:2,
-                        background:"rgba(191,95,255,0.08)",borderRadius:2,cursor:"pointer",
+                        fontSize:9,fontFamily:"monospace",padding:"3px 4px 3px 8px",marginBottom:2,
+                        background:"rgba(191,95,255,0.08)",borderRadius:2,
                       }}>
-                        <span style={{opacity:.75}}>→ {f.filename}</span>
-                        <span style={{color:"#bf5fff",fontSize:8,minWidth:30,textAlign:"right"}}>{open?"▲ hide":"▼ view"}</span>
+                        <span style={{opacity:.75,cursor:"pointer",flex:1}} onClick={()=>setExpandedFile(open?null:fkey)}>→ {f.filename}</span>
+                        <span style={{color:"#bf5fff",fontSize:10,minWidth:30,textAlign:"right",cursor:"pointer"}} onClick={()=>setExpandedFile(open?null:fkey)}>{open?"▲ hide":"▼ view"}</span>
+                        <button className="df-fsv-exp" title="Full screen" onClick={()=>setFullscreenFile({filename:f.filename,content:f.content,taskTitle:t.task_title})}>⛶</button>
                       </div>
                       {open&&<CodeBlock code={f.content} style={{maxHeight:220}}/>}
                     </div>);
@@ -1980,14 +2047,14 @@ export default function DevForgeDashboard() {
           </div>
           {realDeploy?.pr_url && (
             <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,212,255,.2)",background:"rgba(0,212,255,.04)",marginTop:10}}>
-              <div style={{fontSize:8,color:"#00d4ff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Pull Request</div>
+              <div style={{fontSize:10,color:"#00d4ff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Pull Request</div>
               <a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,wordBreak:"break-all",display:"block"}}>🔗 {realDeploy.pr_url}</a>
               <div style={{fontSize:9,opacity:.5,marginTop:4}}>{realDeploy.branch} · {realDeploy.files_pushed} files pushed{realDeploy.linear_issues_closed>0?` · ${realDeploy.linear_issues_closed} issues closed`:""}</div>
             </div>
           )}
           {realDeploy?.app_url && (
             <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,255,136,.25)",background:"rgba(0,255,136,.06)",marginTop:8}}>
-              <div style={{fontSize:8,color:"#00ff88",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>🟢 App Running</div>
+              <div style={{fontSize:10,color:"#00ff88",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>🟢 App Running</div>
               <a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:12,fontWeight:"bold",display:"block",marginBottom:4}}>🚀 {realDeploy.app_url}</a>
               {realDeploy.app_docs_url && <a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.7)",fontSize:10,display:"block"}}>📖 API Docs — {realDeploy.app_docs_url}</a>}
             </div>
@@ -2266,7 +2333,7 @@ export default function DevForgeDashboard() {
                 {(isActive||isDone||isGate)&&<div className="df-cdesc">{isGate?"Awaiting your approval":stage.desc}</div>}
                 {(isActive||isDone)&&<div className="df-cprog"><div className="df-cfill" style={{width:`${isDone?100:p}%`,background:isGate?"#ffaa00":stage.color}}/></div>}
                 {llmCalls.filter(c=>c.stage===stage.id).length>0&&(
-                  <div style={{fontSize:9,marginTop:5,opacity:.5,color:stage.color}}>
+                  <div style={{fontSize:9,marginTop:3,opacity:.55,color:stage.color}}>
                     {llmCalls.filter(c=>c.stage===stage.id).length} LLM call{llmCalls.filter(c=>c.stage===stage.id).length>1?"s":""} · {llmCalls.filter(c=>c.stage===stage.id).reduce((a,c)=>a+c.inputTok+c.outputTok,0).toLocaleString()} tok
                   </div>
                 )}
@@ -2287,7 +2354,7 @@ export default function DevForgeDashboard() {
           <div className="df-tabs" style={{alignItems:"center"}}>
             <div className={`df-tab ${tab==="pipeline"?"active":""}`}    onClick={()=>setTab("pipeline")}>Pipeline</div>
             <div className={`df-tab ${tab==="observability"?"active":""}`} onClick={()=>setTab("observability")}>
-              LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:8,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
+              LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:10,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
             <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
               style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(255,255,255,.1)":"rgba(0,0,0,.12)",
@@ -2353,6 +2420,27 @@ export default function DevForgeDashboard() {
       )}
 
       {/* ── Settings Drawer ─────────────────────────────────────────────── */}
+      {fullscreenFile&&(
+        <div className="df-fsv" onClick={e=>{if(e.target===e.currentTarget)setFullscreenFile(null);}}>
+          <div className="df-fsv-hdr">
+            <div className="df-fsv-dot"/>
+            <div className="df-fsv-fname">{fullscreenFile.filename}</div>
+            {fullscreenFile.taskTitle && <div className="df-fsv-task">{fullscreenFile.taskTitle}</div>}
+            <button className="df-fsv-copy"
+              onClick={()=>{
+                navigator.clipboard?.writeText(fullscreenFile.content||"");
+                setFullscreenFile(f=>({...f,_copied:true}));
+                setTimeout(()=>setFullscreenFile(f=>f?{...f,_copied:false}:f),1800);
+              }}
+            >{fullscreenFile._copied?"✓ Copied":"Copy"}</button>
+            <button className="df-fsv-close" title="Close (Esc)" onClick={()=>setFullscreenFile(null)}>×</button>
+          </div>
+          <div className="df-fsv-body">
+            <CodeBlock code={fullscreenFile.content||""} style={{maxHeight:"none",height:"100%",borderRadius:0,border:"none",fontSize:13,padding:"20px 24px"}}/>
+          </div>
+        </div>
+      )}
+
       {settingsOpen&&(
         <div className="df-settings-overlay" onClick={e=>{if(e.target===e.currentTarget)closeSettings();}}>
           <div className="df-settings-drawer">
@@ -2585,8 +2673,8 @@ export default function DevForgeDashboard() {
         borderTop:`1px solid ${tc("rgba(255,255,255,.05)","rgba(0,0,0,.07)")}`,
         background:tc("rgba(8,9,18,.6)","rgba(238,241,252,.7)"),
       }}>
-        <span style={{fontSize:10,color:tc("rgba(200,214,232,.22)","rgba(20,30,80,.3)"),letterSpacing:".04em"}}>
-          Built by <strong style={{color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),fontWeight:600}}>Sushil Kumar</strong>
+        <span style={{fontSize:10,color:tc("rgba(200,214,232,.58)","rgba(20,30,80,.5)"),letterSpacing:".04em"}}>
+          Built by <strong style={{color:tc("rgba(200,214,232,.82)","rgba(20,30,80,.75)"),fontWeight:600}}>Sushil Kumar</strong>
         </span>
         <a href="https://www.linkedin.com/in/sushilk001" target="_blank" rel="noreferrer"
           style={{fontSize:10,color:"#0a66c2",textDecoration:"none",display:"flex",alignItems:"center",gap:4,fontWeight:500,opacity:.8,transition:"opacity .15s"}}

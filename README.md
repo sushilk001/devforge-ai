@@ -25,6 +25,8 @@ short_description: Autonomous end-to-end SDLC intelligence engine
 
 ## Demo
 
+**Full demo video:** [https://tinyurl.com/DevForgeAI-demoVideo](https://tinyurl.com/DevForgeAI-demoVideo)
+
 ![DevForge AI demo](docs/demo.gif)
 
 ---

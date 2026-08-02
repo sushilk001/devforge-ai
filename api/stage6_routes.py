@@ -170,6 +170,7 @@ def _create_pr(branch: str, pr_title: str, pr_body: str) -> tuple[str, int]:
         raise ValueError(f"GitHub PR creation failed: {e.data}") from e
 
 
+_stage6_sessions: dict = {}                        # deploy_thread_id → session state
 _app_processes: dict[str, subprocess.Popen] = {}  # deploy_thread_id → process
 
 # Ports reserved by DevForge AI itself — never hand these to generated apps
@@ -303,7 +304,8 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | No
 
 def _run_deploy(deploy_thread_id: str, stage4_thread_id: str,
                 stage2_thread_id: str, qa_thread_id: str | None,
-                stage3_thread_id: str | None):
+                stage3_thread_id: str | None,
+                output_dir_override: Path | None = None):
     sess = _stage6_sessions[deploy_thread_id]
     try:
         from api.stage4_routes import _stage4_sessions, _stage4_output_paths
@@ -313,17 +315,19 @@ def _run_deploy(deploy_thread_id: str, stage4_thread_id: str,
 
         stage4_state = _stage4_sessions.get(stage4_thread_id)
         stage2_state = _stage2_sessions.get(stage2_thread_id)
-        output_dir   = _stage4_output_paths.get(stage4_thread_id)
         qa_session   = _qa_sessions.get(qa_thread_id) if qa_thread_id else None
         stage3_state = _stage3_sessions.get(stage3_thread_id) if stage3_thread_id else None
 
-        # Fallback: scan output/ for a directory matching the thread_id (survives server reload)
+        # Resolve output directory: explicit override → in-memory path → disk scan
+        output_dir = output_dir_override or _stage4_output_paths.get(stage4_thread_id)
         if not output_dir or not output_dir.exists():
             base_output = Path(__file__).parent.parent / "output"
             matches = list(base_output.rglob(stage4_thread_id)) if base_output.exists() else []
             if matches:
                 output_dir = matches[0]
                 logger.info(f"[Stage6] Recovered output path from disk: {output_dir}")
+            elif output_dir_override:
+                raise ValueError(f"Output directory not found: {output_dir_override}")
             else:
                 raise ValueError(f"Generated code not found — checked memory and {base_output}/{stage4_thread_id}")
 
@@ -418,19 +422,47 @@ def _run_deploy(deploy_thread_id: str, stage4_thread_id: str,
         sess["error"]  = str(e)
 
 
+@router_stage6.get("/output-dirs")
+def list_output_dirs():
+    """List generated output directories on disk, newest first."""
+    base = Path(__file__).parent.parent / "output"
+    if not base.exists():
+        return []
+    dirs = []
+    for d in base.iterdir():
+        if d.is_dir():
+            dirs.append({"name": d.name, "mtime": d.stat().st_mtime})
+    dirs.sort(key=lambda x: x["mtime"], reverse=True)
+    return [d["name"] for d in dirs]
+
+
 @router_stage6.post("/deploy")
 async def start_deploy(body: dict, background_tasks: BackgroundTasks):
-    """Push generated code to GitHub, create PR, notify Slack, close Linear issues."""
-    stage4_thread_id = body.get("stage4_thread_id", "")
-    stage2_thread_id = body.get("stage2_thread_id", "")
-    if not stage4_thread_id or not stage2_thread_id:
-        raise HTTPException(400, "stage4_thread_id and stage2_thread_id are required")
+    """Push generated code to GitHub, create PR, notify Slack, close Linear issues.
+
+    Accepts either stage4_thread_id (in-memory session) or output_dir_name
+    (disk path under output/) so deploy survives a server restart.
+    """
+    stage4_thread_id = body.get("stage4_thread_id", "") or ""
+    stage2_thread_id = body.get("stage2_thread_id", "") or ""
+    output_dir_name  = body.get("output_dir_name")
+
+    # Allow deploy-from-disk: no thread IDs needed if output_dir_name is given
+    if not output_dir_name and (not stage4_thread_id or not stage2_thread_id):
+        raise HTTPException(400, "Provide stage4_thread_id + stage2_thread_id, or output_dir_name")
+
+    output_dir_override: Path | None = None
+    if output_dir_name:
+        output_dir_override = Path(__file__).parent.parent / "output" / output_dir_name
+        if not output_dir_override.exists():
+            raise HTTPException(404, f"Output directory not found: {output_dir_name}")
 
     deploy_thread_id = str(uuid.uuid4())
     _stage6_sessions[deploy_thread_id] = {
         "status": "running", "step": "starting",
         "stage4_thread_id":     stage4_thread_id,
         "stage2_thread_id":     stage2_thread_id,
+        "output_dir_name":      output_dir_name,
         "qa_thread_id":         body.get("qa_thread_id"),
         "stage3_thread_id":     body.get("stage3_thread_id"),
         "branch":               None,
@@ -448,6 +480,7 @@ async def start_deploy(body: dict, background_tasks: BackgroundTasks):
         _run_deploy, deploy_thread_id,
         stage4_thread_id, stage2_thread_id,
         body.get("qa_thread_id"), body.get("stage3_thread_id"),
+        output_dir_override,
     )
     return {"status": "started", "deploy_thread_id": deploy_thread_id}
 

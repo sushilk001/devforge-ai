@@ -36,7 +36,7 @@ export default function CodeBlock({ code = "", style }) {
 
   return (
     <pre style={{
-      fontSize: 8, lineHeight: 1.6, fontFamily: "'Space Mono',monospace", padding: "8px 11px",
+      fontSize: 11, lineHeight: 1.6, fontFamily: "'Space Mono','SF Mono','Cascadia Code',monospace", padding: "12px 14px",
       margin: "0 0 4px 0", borderRadius: 3, background: "rgba(0,0,0,0.5)",
       border: "1px solid rgba(191,95,255,0.12)", overflow: "auto", maxHeight: 240,
       whiteSpace: "pre", ...style,
