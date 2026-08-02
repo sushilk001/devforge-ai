@@ -1,6 +1,6 @@
 # DevForge AI — Autonomous SDLC Intelligence Engine
 
-> **Hackathon project** · Raw feature request → structured PRD → task graph → code → PR review → QA, all driven by Claude AI
+> Raw feature request → structured PRD → task graph → code → PR review → QA, all driven by Claude AI
 
 **Author:** Sushil Kumar · [LinkedIn](https://www.linkedin.com/in/sushilk001) · [GitHub](https://github.com/sushilk001)
 
@@ -270,4 +270,4 @@ DevForge-AI/
 
 ---
 
-*Built for a hackathon. PRs and issues welcome.*
+*PRs and issues welcome.*
