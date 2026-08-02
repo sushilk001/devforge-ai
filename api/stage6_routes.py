@@ -268,7 +268,7 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | No
         try:
             subprocess.run(
                 [sys.executable, "-m", "pip", "install", "-q", "-r", str(req_file)],
-                timeout=60, check=True, capture_output=True,
+                timeout=30, check=True, capture_output=True,
             )
             logger.info(f"[Stage6] Installed requirements from {req_file}")
         except Exception as e:
@@ -282,10 +282,17 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | No
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         _app_processes[deploy_thread_id] = proc
-        # Give uvicorn a moment to bind
-        time.sleep(2)
-        if proc.poll() is not None:
-            logger.warning(f"[Stage6] App process exited immediately (rc={proc.returncode})")
+        # Wait up to 8s for the port to actually accept connections
+        for _ in range(8):
+            time.sleep(1)
+            if proc.poll() is not None:
+                logger.warning(f"[Stage6] App process exited (rc={proc.returncode})")
+                return None
+            if _port_in_use(port):
+                break
+        else:
+            logger.warning(f"[Stage6] App did not bind to port {port} within 8s")
+            proc.kill()
             return None
         app_url  = f"http://localhost:{port}"
         docs_url = f"http://localhost:{port}/docs"

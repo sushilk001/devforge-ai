@@ -797,14 +797,27 @@ export default function DevForgeDashboard() {
   const sendDebugHelp = () => {
     if (!debugQ.trim()) return;
     setDebugLoading(true); setDebugAns("");
-    const currentStage = activeStage || gateStage || "unknown";
+    const currentStage = activeStage || gateStage || (appState === "done" ? "complete" : appState === "idle" ? "idle" : "unknown");
+    const pipelineState = {
+      app_state: appState,
+      active_stage: activeStage || null,
+      gate_stage: gateStage || null,
+      completed_stages: [...done],
+      requirements: realPrd ? { title: realPrd.title, goals: realPrd.goals?.length, stories: realPrd.user_stories?.length } : null,
+      tasks: realTasks.length > 0 ? { count: realTasks.length } : null,
+      code_gen: realCodeGen ? { tasks_generated: realCodeGen.generated?.length || 0, total_files: realCodeGen.total_files || 0 } : null,
+      pr_review: realReview ? { findings: realReview.findings?.length || 0, verdict: realReview.verdict || null } : null,
+      qa: realQA?.result ? { passed: realQA.result.passed, failed: realQA.result.failed, total: realQA.result.total, failed_tests: (realQA.result.tests||[]).filter(t=>t.status==="FAILED").map(t=>t.name) } : null,
+      deploy: realDeploy ? { status: realDeploy.status, step: realDeploy.step, pr_url: realDeploy.pr_url, app_url: realDeploy.app_url, error: realDeploy.error } : null,
+    };
     fetch("/debug/help", {
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         stage: currentStage,
         question: debugQ,
-        logs: logs.slice(-20).map(l=>l.msg),
-        error: logs.filter(l=>l.type==="warn"||l.type==="error").slice(-3).map(l=>l.msg).join(" | "),
+        logs: logs.slice(-30).map(l=>l.msg),
+        error: logs.filter(l=>l.type==="warn"||l.type==="error").slice(-5).map(l=>l.msg).join(" | "),
+        pipeline_state: pipelineState,
       })
     }).then(r=>r.json())
       .then(d=>{ setDebugAns(d.answer||"No response"); setDebugLoading(false); })
@@ -1546,10 +1559,11 @@ export default function DevForgeDashboard() {
         {key:"launching", label:"Launch App",           done: !!(realDeploy?.app_url)},
       ];
       const curStep = realDeploy?.step;
+      const stepLabel = {pushing:"Pushing files to GitHub…",pr:"Generating PR description…",slack:"Notifying Slack…",linear:"Closing Linear issues…",launching:"Installing packages & launching app…"}[curStep] || "Deploying…";
       return (
         <div>
           <div className="df-dtitle" style={{color:"#ff2d6b"}}>Deploy Pipeline</div>
-          <div className="df-dsub">{realDeploy?.status==="complete"?"Deployed & Live":realDeploy?.status==="error"?"Deploy Failed":"Deploying..."}</div>
+          <div className="df-dsub">{realDeploy?.status==="complete"?"Deployed & Live":realDeploy?.status==="error"?"Deploy Failed":stepLabel}</div>
           <div className="df-envs">
             {deploySteps.map(s=>(
               <div key={s.key} className={`df-env ${s.done?"live":""}`}>

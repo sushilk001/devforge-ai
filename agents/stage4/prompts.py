@@ -45,18 +45,35 @@ Return ONLY a JSON object with this exact structure:
 Return valid JSON only — no markdown fences, no explanation outside the JSON."""
 
 ENTRYPOINT_PROMPT = """You are an expert software engineer. The following files have been generated for a project.
-Your job is to produce exactly 2 files that make the project launchable:
+Your job is to produce exactly 2 files that make the project launchable.
 
-1. `main.py` — a FastAPI entry point that imports every route module below as an APIRouter and registers it.
-   - Create a FastAPI app instance.
-   - For EACH Python implementation file listed, import its router (assume each exposes `router = APIRouter()`).
-     If the file does not export a router (e.g. it is a utility or model file), skip it.
-   - Mount all routers with appropriate prefixes derived from their paths.
-   - Include a `/health` GET endpoint returning {{"status": "ok"}}.
-   - No stubs, no TODO comments.
+First, determine the project type from the imports and content in the files below:
+- CLI project: any file imports `click` or `typer`
+- FastAPI/web project: any file imports `fastapi` and has a `router = APIRouter()` pattern
+- Script/other: neither of the above
 
-2. `requirements.txt` — list every third-party package actually used across all files below.
-   Always include: fastapi, uvicorn[standard], pydantic. Add others only if actually imported.
+Then generate the appropriate `main.py`:
+
+**If CLI project (click/typer detected):**
+- Generate `main.py` as a Click/Typer CLI assembler.
+- Import each command group or command from the implementation files.
+- Add all commands to a top-level `cli` group.
+- End with `if __name__ == "__main__": cli()`.
+- Do NOT add FastAPI or uvicorn unless the project explicitly has HTTP routes.
+
+**If FastAPI/web project:**
+- Generate `main.py` as a FastAPI app that imports every `router = APIRouter()` from the files.
+- Mount all routers with appropriate prefixes.
+- Include a `/health` GET endpoint returning {{"status": "ok"}}.
+
+**If script/other:**
+- Generate `main.py` as a simple script that imports and calls the main entry function.
+
+For `requirements.txt`:
+- List every third-party package actually imported across all files.
+- For CLI projects: include click or typer (whichever is used), plus any other real imports.
+- For FastAPI projects: include fastapi, uvicorn[standard], pydantic, plus others.
+- Do NOT add fastapi/uvicorn to a CLI-only project.
 
 PRD title: {prd_title}
 
@@ -70,12 +87,12 @@ Return ONLY a JSON object:
       "filename": "main.py",
       "language": "python",
       "content": "full main.py content here",
-      "description": "FastAPI entry point wiring all generated routers"
+      "description": "Entry point appropriate for this project type"
     }},
     {{
       "filename": "requirements.txt",
       "language": "text",
-      "content": "fastapi\\nuvicorn[standard]\\npydantic\\n...",
+      "content": "package1\\npackage2\\n...",
       "description": "Third-party dependencies for this project"
     }}
   ],
