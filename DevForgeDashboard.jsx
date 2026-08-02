@@ -8,7 +8,7 @@ import { DEMO_RUNS } from "./demoData.js";
 
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
-fontLink.href = "https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap";
+fontLink.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap";
 document.head.appendChild(fontLink);
 
 // ── Stages ─────────────────────────────────────────────────────────────────
@@ -88,443 +88,712 @@ const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", code_gen:"#bf5ff
 
 // ── CSS ────────────────────────────────────────────────────────────────────
 const css = `
+
+  /* ── Animations ─────────────────────────────────────────────────────── */
   @keyframes pulse    {0%,100%{opacity:1}50%{opacity:.4}}
-  @keyframes glow     {0%,100%{box-shadow:0 0 12px var(--glow),0 0 40px var(--glow)}50%{box-shadow:0 0 24px var(--glow),0 0 80px var(--glow)}}
+  @keyframes glow     {0%,100%{box-shadow:0 0 10px var(--glow),0 0 32px var(--glow)}50%{box-shadow:0 0 20px var(--glow),0 0 60px var(--glow)}}
   @keyframes spin     {from{transform:rotate(0)}to{transform:rotate(360deg)}}
-  @keyframes fadeUp   {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes slideLog {from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
-  @keyframes scanline {0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+  @keyframes fadeUp   {from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideLog {from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
   @keyframes blink    {0%,100%{opacity:1}50%{opacity:0}}
   @keyframes flowLine {0%{transform:translateY(-100%);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(200%);opacity:0}}
-  @keyframes prodPulse{0%,100%{box-shadow:0 0 20px rgba(255,45,107,.5),0 0 60px rgba(255,45,107,.25)}50%{box-shadow:0 0 40px rgba(255,45,107,.8),0 0 120px rgba(255,45,107,.4)}}
-  @keyframes countUp  {from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-  @keyframes tokenIn  {from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes prodPulse{0%,100%{box-shadow:0 0 16px rgba(255,45,107,.4),0 0 48px rgba(255,45,107,.2)}50%{box-shadow:0 0 32px rgba(255,45,107,.7),0 0 96px rgba(255,45,107,.35)}}
+  @keyframes countUp  {from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes tokenIn  {from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes logoGlow {0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:.8;transform:scale(1.1)}}
 
+  /* ── Base ────────────────────────────────────────────────────────────── */
   .df*{box-sizing:border-box;margin:0;padding:0}
-  .df{font-family:'Space Mono',monospace;background:#060810;height:100vh;color:#c8d6e8;overflow:hidden;position:relative;display:flex;flex-direction:column}
-  .df-scan{position:fixed;top:0;left:0;width:100%;height:2px;pointer-events:none;z-index:999;
-    background:linear-gradient(to bottom,transparent,rgba(0,212,255,.05),transparent);animation:scanline 8s linear infinite}
+  .df{
+    font-family:-apple-system,'SF Pro Text','Helvetica Neue',system-ui,sans-serif;
+    background:#080912;height:100vh;color:#d4daf5;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;
+  }
+  .df-scan{display:none}
 
-  /* Header */
-  .df-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;
-    border-bottom:1px solid rgba(0,212,255,.1);background:rgba(0,6,20,.9);backdrop-filter:blur(12px)}
-  .df-logo{display:flex;align-items:center;gap:13px}
-  .df-hex{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .df-hex::before{content:'';position:absolute;inset:-5px;border-radius:50%;z-index:0;
-    background:radial-gradient(circle,rgba(0,212,255,.4),transparent 68%);animation:logoGlow 2.8s ease-in-out infinite}
+  /* ── Header ─────────────────────────────────────────────────────────── */
+  .df-hdr{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 24px;flex-shrink:0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    background:rgba(8,9,18,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  }
+  .df-logo{display:flex;align-items:center;gap:12px}
+  .df-hex{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .df-hex::before{content:'';position:absolute;inset:-4px;border-radius:50%;z-index:0;
+    background:radial-gradient(circle,rgba(0,212,255,.35),transparent 68%);animation:logoGlow 2.8s ease-in-out infinite}
   .df-hex svg{position:relative;z-index:1;filter:drop-shadow(0 0 5px rgba(0,212,255,.5))}
-  @keyframes logoGlow{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.12)}}
-  .df-lname{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:.4px;line-height:1}
-  .df-lname span{background:linear-gradient(90deg,#00e5ff,#3aa0ff);-webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 9px rgba(0,212,255,.55))}
-  .df-ltag{display:flex;align-items:center;gap:6px;font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);
-    text-transform:uppercase;margin-top:5px}
+  .df-lname{
+    font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;
+    font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1
+  }
+  .df-lname span{
+    background:linear-gradient(90deg,#00d4ff,#6495ff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df-ltag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:rgba(120,160,220,.6);margin-top:4px}
   .df-ltag::before{content:'';width:5px;height:5px;border-radius:50%;background:#00ff88;flex-shrink:0;
-    box-shadow:0 0 7px #00ff88;animation:pulse 1.6s infinite}
-  .df-timer{font-size:24px;font-weight:700;letter-spacing:2px;font-variant-numeric:tabular-nums}
-  .df-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:5px 13px;border:1px solid;border-radius:2px}
-  .df-badge.idle   {color:rgba(200,214,232,.35);border-color:rgba(200,214,232,.15)}
-  .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.4);animation:pulse 1.5s infinite}
-  .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.4);animation:pulse 1s infinite}
-  .df-badge.done   {color:#00d4ff;border-color:rgba(0,212,255,.4)}
+    box-shadow:0 0 6px #00ff88;animation:pulse 1.6s infinite}
+  .df-timer{font-size:22px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+    font-family:'SF Mono','Cascadia Code',monospace;color:#d4daf5}
+  .df-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid;border-radius:20px}
+  .df-badge.idle   {color:rgba(200,214,232,.3);border-color:rgba(200,214,232,.12)}
+  .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.35);animation:pulse 1.5s infinite}
+  .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.35);animation:pulse 1s infinite}
+  .df-badge.done   {color:#00d4ff;border-color:rgba(0,212,255,.35)}
 
-  /* Input */
-  .df-inp-area{display:flex;gap:10px;align-items:flex-end;padding:14px 22px;flex-shrink:0;
-    border-bottom:1px solid rgba(0,212,255,.07);background:rgba(0,6,20,.6)}
-  .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-  .df-inp-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);text-transform:uppercase}
-  .df-mode-row{display:flex;gap:6px;margin-bottom:7px}
-  .df-mode-btn{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;padding:4px 10px;border-radius:2px;cursor:pointer;border:1px solid rgba(0,212,255,.22);background:transparent;color:rgba(200,214,232,.45);transition:all .15s;text-transform:uppercase}
-  .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.55);color:#00d4ff}
-  .df-mode-btn:disabled{opacity:.35;cursor:not-allowed}
-  .df-mode-btn.demo{margin-left:auto;border-color:rgba(255,170,0,.4);color:rgba(255,170,0,.75)}
-  .df-mode-btn.demo.on{background:rgba(255,170,0,.14);border-color:rgba(255,170,0,.6);color:#ffaa00;animation:pulse 2s infinite}
+  /* ── Input area ──────────────────────────────────────────────────────── */
+  .df-inp-area{
+    display:flex;gap:10px;align-items:flex-end;padding:14px 24px;flex-shrink:0;
+    border-bottom:1px solid rgba(255,255,255,.05);background:rgba(10,11,22,.7);
+  }
+  .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .df-inp-lbl{font-size:11px;letter-spacing:.06em;color:rgba(120,160,220,.7);font-weight:500}
+  .df-mode-row{display:flex;gap:6px;margin-bottom:8px}
+  .df-mode-btn{
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;
+    padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.1);
+    background:transparent;color:rgba(200,214,232,.4);transition:all .15s;font-weight:500;
+  }
+  .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.45);color:#00d4ff}
+  .df-mode-btn:disabled{opacity:.3;cursor:not-allowed}
+  .df-mode-btn.demo{margin-left:auto;border-color:rgba(255,170,0,.35);color:rgba(255,170,0,.65)}
+  .df-mode-btn.demo.on{background:rgba(255,170,0,.12);border-color:rgba(255,170,0,.5);color:#ffaa00;animation:pulse 2s infinite}
   .df-inp-w{flex:1;min-width:0}
   .df-ctx-row{display:flex;gap:7px;margin-top:7px;align-items:center;flex-wrap:wrap}
-  .df-ctx-gh{flex:1;min-width:160px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:2px;color:#c8d6e8;font-family:'Space Mono',monospace;font-size:10px;padding:5px 9px;outline:none}
-  .df-ctx-gh::placeholder{color:rgba(200,214,232,.22)}
-  .df-ctx-gh:focus{border-color:rgba(0,212,255,.38)}
-  .df-ctx-attach{font-size:9px;letter-spacing:1px;padding:5px 10px;border-radius:2px;cursor:pointer;border:1px dashed rgba(0,212,255,.28);background:transparent;color:rgba(0,212,255,.55);text-transform:uppercase;white-space:nowrap}
+  .df-ctx-gh{
+    flex:1;min-width:160px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+    border-radius:8px;color:#d4daf5;font-family:'SF Mono','Cascadia Code',monospace;
+    font-size:11px;padding:6px 10px;outline:none;transition:border-color .2s;
+  }
+  .df-ctx-gh::placeholder{color:rgba(200,214,232,.2)}
+  .df-ctx-gh:focus{border-color:rgba(0,212,255,.4)}
+  .df-ctx-attach{
+    font-size:10px;letter-spacing:.04em;padding:6px 12px;border-radius:8px;cursor:pointer;
+    border:1px dashed rgba(0,212,255,.25);background:transparent;color:rgba(0,212,255,.5);
+    white-space:nowrap;transition:all .2s;
+  }
   .df-ctx-attach:hover{border-color:rgba(0,212,255,.5);color:#00d4ff}
   .df-ctx-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
-  .df-ctx-chip{display:flex;align-items:center;gap:4px;font-size:9px;padding:3px 7px;border-radius:10px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.22);color:rgba(200,214,232,.7);max-width:180px}
+  .df-ctx-chip{
+    display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;
+    background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:rgba(200,214,232,.7);max-width:180px;
+  }
   .df-ctx-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .df-ctx-chip button{background:none;border:none;color:rgba(200,214,232,.45);cursor:pointer;padding:0;font-size:10px;line-height:1;flex-shrink:0}
-  .df-ctx-chip button:hover{color:#ff4444}
-  .df-ctx-chip.gh{background:rgba(170,255,0,.07);border-color:rgba(170,255,0,.25);color:rgba(170,255,0,.8)}
-  .df-inp{width:100%;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
-    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:12px;padding:9px 13px;outline:none;resize:vertical;
-    min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s}
-  .df-inp::-webkit-resizer{border-width:0 6px 6px 0;border-style:solid;border-color:transparent rgba(0,212,255,.4)}
-  .df-inp:focus{border-color:rgba(0,212,255,.45)}
-  .df-inp::placeholder{color:rgba(200,214,232,.2)}
-  .df-launch{background:#00d4ff;color:#060810;border:none;cursor:pointer;font-family:'Syne',sans-serif;
-    font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:0 22px;
-    border-radius:3px;height:42px;transition:all .2s;white-space:nowrap}
-  .df-launch:hover:not(:disabled){background:#33ddff;transform:translateY(-1px)}
-  .df-stop{background:transparent;border:1px solid rgba(255,60,60,.5);color:#ff4444;cursor:pointer;
-    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
-    padding:0 14px;border-radius:3px;height:42px;transition:all .2s;white-space:nowrap}
-  .df-stop:hover{background:rgba(255,60,60,.1);border-color:#ff4444}
-  .df-rerun-btn{display:flex;align-items:center;gap:4px;margin-top:7px;padding:4px 8px;
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;
-    background:transparent;border:1px solid rgba(200,214,232,.15);border-radius:2px;
-    color:rgba(200,214,232,.4);cursor:pointer;transition:all .15s;width:100%}
-  .df-rerun-btn:hover{border-color:rgba(0,212,255,.4);color:#00d4ff;background:rgba(0,212,255,.06)}
-  .df-dbg-btn{background:transparent;border:1px solid rgba(170,255,0,.3);color:rgba(170,255,0,.7);
-    cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;
-    text-transform:uppercase;padding:0 12px;border-radius:3px;height:42px;transition:all .2s}
-  .df-dbg-btn:hover{background:rgba(170,255,0,.08);border-color:rgba(170,255,0,.6);color:#aaff00}
-  .df-dbg-panel{position:fixed;bottom:0;right:0;width:380px;max-height:60vh;
-    background:rgba(4,10,24,.97);border:1px solid rgba(170,255,0,.25);border-radius:6px 0 0 0;
-    display:flex;flex-direction:column;z-index:1000;animation:fadeUp .2s ease-out}
-  .df-dbg-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
-    border-bottom:1px solid rgba(170,255,0,.12);flex-shrink:0}
-  .df-dbg-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(170,255,0,.8)}
-  .df-dbg-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:16px;line-height:1}
-  .df-dbg-close:hover{color:#ff4444}
-  .df-dbg-body{padding:12px 14px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
-  .df-dbg-ctx{font-size:9px;color:rgba(200,214,232,.35);background:rgba(0,0,0,.3);
-    border-radius:2px;padding:6px 8px;max-height:80px;overflow-y:auto;font-family:'Space Mono',monospace}
-  .df-dbg-inp{background:rgba(170,255,0,.04);border:1px solid rgba(170,255,0,.2);border-radius:2px;
-    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:11px;padding:8px 10px;
-    resize:none;outline:none;width:100%}
-  .df-dbg-inp::placeholder{color:rgba(200,214,232,.2)}
-  .df-dbg-inp:focus{border-color:rgba(170,255,0,.45)}
-  .df-dbg-send{align-self:flex-end;background:#aaff00;color:#060810;border:none;cursor:pointer;
-    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
-    padding:6px 14px;border-radius:2px;font-weight:700;transition:all .15s}
-  .df-dbg-send:hover:not(:disabled){background:#c4ff33}
-  .df-dbg-send:disabled{opacity:.4;cursor:not-allowed}
-  .df-dbg-answer{font-size:11px;color:rgba(200,214,232,.85);line-height:1.65;
-    background:rgba(170,255,0,.04);border:1px solid rgba(170,255,0,.12);border-radius:2px;padding:10px;
-    white-space:pre-wrap}
-  .df-launch:disabled{background:rgba(0,212,255,.15);color:rgba(0,212,255,.35);cursor:not-allowed}
-
-  /* Settings */
-  .df-settings-btn{background:transparent;border:1px solid rgba(200,214,232,.18);color:rgba(200,214,232,.5);
-    cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;
-    justify-content:center;transition:all .2s;flex-shrink:0}
-  .df-settings-btn:hover{background:rgba(200,214,232,.07);border-color:rgba(200,214,232,.35);color:#c8d6e8}
-  .df-int-dots{display:flex;gap:5px;align-items:center}
-  .df-int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;cursor:default}
-  .df-int-dot.on {background:#00ff88;box-shadow:0 0 5px #00ff88}
-  .df-int-dot.off{background:rgba(200,214,232,.2)}
-  .df-int-dot-lbl{font-size:7px;letter-spacing:1px;color:rgba(200,214,232,.3)}
-  .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
-  .df-settings-drawer{width:480px;max-width:100vw;height:100vh;background:#060d1a;border-left:1px solid rgba(0,212,255,.18);
-    display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.6)}
-  .df-set-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;
+  .df-ctx-chip button{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;padding:0;font-size:10px;line-height:1;flex-shrink:0}
+  .df-ctx-chip button:hover{color:#ff5555}
+  .df-ctx-chip.gh{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);color:rgba(0,212,255,.8)}
+  .df-inp{
+    width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;
+    font-size:13px;padding:11px 14px;outline:none;resize:vertical;
+    min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s;
+  }
+  .df-inp::-webkit-resizer{border-width:0 5px 5px 0;border-style:solid;border-color:transparent rgba(0,212,255,.35)}
+  .df-inp:focus{border-color:rgba(0,212,255,.4)}
+  .df-inp::placeholder{color:rgba(200,214,232,.18)}
+  .df-launch{
+    background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
+    font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;
+    font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:0 22px;border-radius:10px;height:44px;transition:all .2s;white-space:nowrap;
+    box-shadow:0 2px 16px rgba(0,150,255,.3);
+  }
+  .df-launch:hover:not(:disabled){background:linear-gradient(135deg,#00b3f0,#0077ff);transform:translateY(-1px);box-shadow:0 4px 24px rgba(0,150,255,.45)}
+  .df-launch:disabled{background:rgba(0,212,255,.12);color:rgba(0,212,255,.35);cursor:not-allowed;box-shadow:none}
+  .df-stop{
+    background:transparent;border:1px solid rgba(255,60,60,.45);color:#ff5555;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:12px;letter-spacing:.04em;
+    text-transform:uppercase;padding:0 16px;border-radius:10px;height:44px;transition:all .2s;white-space:nowrap;
+  }
+  .df-stop:hover{background:rgba(255,60,60,.1);border-color:#ff5555}
+  .df-rerun-btn{
+    display:flex;align-items:center;gap:4px;margin-top:7px;padding:5px 10px;
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;
+    background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:6px;
+    color:rgba(200,214,232,.35);cursor:pointer;transition:all .15s;width:100%;
+  }
+  .df-rerun-btn:hover{border-color:rgba(0,212,255,.35);color:#00d4ff;background:rgba(0,212,255,.06)}
+  .df-dbg-btn{
+    background:transparent;border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.65);
+    cursor:pointer;font-family:-apple-system,system-ui,sans-serif;font-size:11px;
+    letter-spacing:.02em;text-transform:uppercase;padding:0 14px;border-radius:10px;height:44px;transition:all .2s;
+  }
+  .df-dbg-btn:hover{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.5);color:#00d4ff}
+  .df-dbg-panel{
+    position:fixed;bottom:0;right:0;width:380px;max-height:60vh;
+    background:rgba(10,12,26,.98);border:1px solid rgba(0,212,255,.2);border-radius:12px 0 0 0;
+    display:flex;flex-direction:column;z-index:1000;animation:fadeUp .2s ease-out;
+    box-shadow:-8px -8px 40px rgba(0,0,0,.6);
+  }
+  .df-dbg-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
     border-bottom:1px solid rgba(0,212,255,.1);flex-shrink:0}
-  .df-set-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
-  .df-set-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:3px}
-  .df-set-close:hover{color:#ff4444;background:rgba(255,68,68,.08)}
-  .df-set-tabs{display:flex;border-bottom:1px solid rgba(0,212,255,.1);flex-shrink:0}
-  .df-set-tab{flex:1;padding:10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-    border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.4);text-align:center;background:none;border-top:none;border-left:none;border-right:none;font-family:'Space Mono',monospace}
+  .df-dbg-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,212,255,.8);font-weight:600}
+  .df-dbg-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:16px;line-height:1}
+  .df-dbg-close:hover{color:#ff5555}
+  .df-dbg-body{padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+  .df-dbg-ctx{font-size:10px;color:rgba(200,214,232,.3);background:rgba(0,0,0,.3);
+    border-radius:6px;padding:7px 9px;max-height:80px;overflow-y:auto;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-dbg-inp{
+    background:rgba(255,255,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:8px;
+    color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:9px 11px;
+    resize:none;outline:none;width:100%;transition:border-color .2s;
+  }
+  .df-dbg-inp::placeholder{color:rgba(200,214,232,.2)}
+  .df-dbg-inp:focus{border-color:rgba(0,212,255,.4)}
+  .df-dbg-send{
+    align-self:flex-end;background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+    padding:7px 16px;border-radius:8px;font-weight:700;transition:all .15s;
+  }
+  .df-dbg-send:hover:not(:disabled){background:linear-gradient(135deg,#00b3f0,#0077ff)}
+  .df-dbg-send:disabled{opacity:.4;cursor:not-allowed}
+  .df-dbg-answer{
+    font-size:12px;color:rgba(200,214,232,.85);line-height:1.7;
+    background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px;
+    padding:12px;white-space:pre-wrap;
+  }
+
+  /* ── Settings ──────────────────────────────────────────────────────────── */
+  .df-settings-btn{
+    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.45);
+    cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
+  }
+  .df-settings-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22);color:#d4daf5}
+  .df-int-dots{display:flex;gap:6px;align-items:center}
+  .df-int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;cursor:default}
+  .df-int-dot.on {background:#00ff88;box-shadow:0 0 5px rgba(0,255,136,.7)}
+  .df-int-dot.off{background:rgba(200,214,232,.18)}
+  .df-int-dot-lbl{font-size:9px;letter-spacing:.04em;color:rgba(200,214,232,.28)}
+  .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
+  .df-settings-drawer{
+    width:480px;max-width:100vw;height:100vh;
+    background:#0c0e1f;border-left:1px solid rgba(255,255,255,.08);
+    display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.7);
+  }
+  .df-set-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;
+    border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+  .df-set-title{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:17px;font-weight:700;color:#fff}
+  .df-set-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:20px;line-height:1;padding:3px 7px;border-radius:6px}
+  .df-set-close:hover{color:#ff5555;background:rgba(255,68,68,.08)}
+  .df-set-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;padding:0 8px}
+  .df-set-tab{
+    flex:1;padding:12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+    border:none;border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.38);
+    text-align:center;background:none;font-family:-apple-system,system-ui,sans-serif;font-weight:500;
+  }
   .df-set-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
-  .df-set-body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:22px}
-  .df-set-body::-webkit-scrollbar{width:2px}
-  .df-set-body::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
-  .df-set-section{display:flex;flex-direction:column;gap:10px}
-  .df-set-sec-title{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:2px}
-  .df-set-field{display:flex;flex-direction:column;gap:5px}
-  .df-set-lbl{font-size:10px;color:rgba(200,214,232,.55);letter-spacing:.5px}
-  .df-set-inp{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:3px;
-    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:11px;padding:8px 11px;outline:none;width:100%;transition:border-color .2s}
-  .df-set-inp:focus{border-color:rgba(0,212,255,.45)}
-  .df-set-inp::placeholder{color:rgba(200,214,232,.2)}
-  .df-set-preview{font-size:9px;color:rgba(200,214,232,.35);font-family:'Space Mono',monospace;margin-top:1px}
-  .df-set-inp-row{display:flex;gap:7px;align-items:center}
+  .df-set-body{flex:1;overflow-y:auto;padding:22px 24px;display:flex;flex-direction:column;gap:24px}
+  .df-set-body::-webkit-scrollbar{width:3px}
+  .df-set-body::-webkit-scrollbar-thumb{background:rgba(0,212,255,.15)}
+  .df-set-section{display:flex;flex-direction:column;gap:12px}
+  .df-set-sec-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,212,255,.55);margin-bottom:2px;font-weight:600}
+  .df-set-field{display:flex;flex-direction:column;gap:6px}
+  .df-set-lbl{font-size:12px;color:rgba(200,214,232,.55);font-weight:500}
+  .df-set-inp{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;
+    color:#e8eeff;font-family:'SF Mono','Cascadia Code',monospace;font-size:12px;
+    padding:9px 12px;outline:none;width:100%;transition:border-color .2s;
+  }
+  .df-set-inp:focus{border-color:rgba(0,212,255,.4)}
+  .df-set-inp::placeholder{color:rgba(200,214,232,.18)}
+  .df-set-preview{font-size:10px;color:rgba(200,214,232,.3);font-family:'SF Mono','Cascadia Code',monospace;margin-top:2px}
+  .df-set-inp-row{display:flex;gap:8px;align-items:center}
   .df-set-inp-row .df-set-inp{flex:1}
-  .df-set-test-btn{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);color:#00d4ff;cursor:pointer;
-    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:7px 11px;border-radius:3px;white-space:nowrap;transition:all .15s}
-  .df-set-test-btn:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.5)}
+  .df-set-test-btn{
+    background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.22);color:#00d4ff;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;padding:8px 13px;
+    border-radius:8px;white-space:nowrap;transition:all .15s;font-weight:500;
+  }
+  .df-set-test-btn:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.45)}
   .df-set-test-btn:disabled{opacity:.4;cursor:not-allowed}
-  .df-set-result{font-size:9px;padding:5px 9px;border-radius:2px;font-family:'Space Mono',monospace}
-  .df-set-result.ok {background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#00ff88}
-  .df-set-result.err{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);color:#ff6666}
-  /* Model cards */
+  .df-set-result{font-size:10px;padding:6px 10px;border-radius:6px;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-set-result.ok {background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.18);color:#00ff88}
+  .df-set-result.err{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.18);color:#ff6666}
   .df-model-cards{display:flex;flex-direction:column;gap:8px}
-  .df-model-card{border:1px solid rgba(200,214,232,.1);border-radius:4px;padding:12px 14px;cursor:pointer;
-    transition:all .2s;background:rgba(255,255,255,.02);position:relative;overflow:hidden}
-  .df-model-card:hover{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.25)}
-  .df-model-card.selected{border-color:rgba(0,212,255,.6);background:rgba(0,212,255,.07)}
+  .df-model-card{
+    border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;cursor:pointer;
+    transition:all .2s;background:rgba(255,255,255,.02);position:relative;overflow:hidden;
+  }
+  .df-model-card:hover{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.22)}
+  .df-model-card.selected{border-color:rgba(0,212,255,.5);background:rgba(0,212,255,.07)}
   .df-model-card.selected::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#00d4ff,transparent)}
   .df-mc-row{display:flex;align-items:center;gap:8px}
-  .df-mc-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;flex:1}
-  .df-mc-badge{font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap}
-  .df-mc-badge.default {background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.3)}
-  .df-mc-badge.powerful{background:rgba(191,95,255,.12);color:#bf5fff;border:1px solid rgba(191,95,255,.3)}
-  .df-mc-badge.fast    {background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.25)}
-  .df-mc-desc{font-size:10px;color:rgba(200,214,232,.5);margin-top:4px;line-height:1.5}
-  .df-mc-price{font-size:9px;color:rgba(200,214,232,.3);margin-top:4px;font-family:'Space Mono',monospace}
-  /* Int status row */
-  .df-int-status-row{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:3px;background:rgba(255,255,255,.02);border:1px solid rgba(200,214,232,.07)}
+  .df-mc-name{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:14px;font-weight:700;color:#fff;flex:1}
+  .df-mc-badge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;font-weight:600}
+  .df-mc-badge.default {background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.25)}
+  .df-mc-badge.powerful{background:rgba(191,95,255,.12);color:#bf5fff;border:1px solid rgba(191,95,255,.25)}
+  .df-mc-badge.balanced{background:rgba(255,180,0,.10);color:#ffb400;border:1px solid rgba(255,180,0,.22)}
+  .df-mc-badge.fast    {background:rgba(0,255,136,.09);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
+  .df-mc-badge.custom  {background:rgba(255,255,255,.06);color:rgba(200,214,232,.7);border:1px solid rgba(255,255,255,.14)}
+  .df-mc-desc{font-size:11px;color:rgba(200,214,232,.48);margin-top:5px;line-height:1.5}
+  .df-mc-price{font-size:10px;color:rgba(200,214,232,.28);margin-top:5px;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-mc-remove{margin-left:auto;background:none;border:none;color:rgba(255,100,100,.5);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;transition:color .15s}
+  .df-mc-remove:hover{color:rgba(255,80,80,.9)}
+  .df-add-model{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .df-add-model-row{display:flex;gap:6px}
+  .df-add-model-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 12px;font-size:12px;color:#d4daf5;outline:none;font-family:inherit;transition:border-color .15s}
+  .df-add-model-inp:focus{border-color:rgba(0,212,255,.4)}
+  .df-add-model-inp::placeholder{color:rgba(200,214,232,.25)}
+  .df-add-model-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:7px;color:#00d4ff;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .df-add-model-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.45)}
+  .df-add-model-btn:disabled{opacity:.4;cursor:not-allowed}
+  .df-int-status-row{
+    display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+    background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+  }
   .df-int-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-  .df-int-status-dot.on {background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.6)}
-  .df-int-status-dot.off{background:rgba(200,214,232,.2)}
-  .df-int-status-name{font-size:10px;color:rgba(200,214,232,.7);flex:1}
-  .df-int-status-val{font-size:9px;color:rgba(200,214,232,.35);font-family:'Space Mono',monospace}
-  /* Save bar */
-  .df-set-footer{border-top:1px solid rgba(0,212,255,.1);padding:14px 22px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
-  .df-set-save{background:#00d4ff;color:#060810;border:none;cursor:pointer;font-family:'Syne',sans-serif;
-    font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:9px 22px;border-radius:3px;transition:all .2s}
-  .df-set-save:hover:not(:disabled){background:#33ddff}
+  .df-int-status-dot.on {background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.5)}
+  .df-int-status-dot.off{background:rgba(200,214,232,.18)}
+  .df-int-status-name{font-size:12px;color:rgba(200,214,232,.65);flex:1;font-weight:500}
+  .df-int-status-val{font-size:10px;color:rgba(200,214,232,.3);font-family:'SF Mono','Cascadia Code',monospace}
+  .df-set-footer{border-top:1px solid rgba(255,255,255,.07);padding:16px 24px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+  .df-set-save{
+    background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:12px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;padding:10px 24px;border-radius:8px;transition:all .2s;
+  }
+  .df-set-save:hover:not(:disabled){background:linear-gradient(135deg,#00b3f0,#0077ff)}
   .df-set-save:disabled{opacity:.4;cursor:not-allowed}
-  .df-set-cancel{background:transparent;border:1px solid rgba(200,214,232,.18);color:rgba(200,214,232,.5);cursor:pointer;
-    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:9px 16px;border-radius:3px;transition:all .2s}
-  .df-set-cancel:hover{border-color:rgba(200,214,232,.4);color:#c8d6e8}
+  .df-set-cancel{
+    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.45);cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;
+    padding:10px 18px;border-radius:8px;transition:all .2s;
+  }
+  .df-set-cancel:hover{border-color:rgba(255,255,255,.2);color:#d4daf5}
 
-  /* Main layout */
+  /* ── Main layout ─────────────────────────────────────────────────────── */
   .df-main{display:flex;flex:1;min-height:0;overflow:hidden}
 
-  /* Pipeline sidebar */
-  .df-pipe{width:286px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;padding:14px 12px;border-right:1px solid rgba(0,212,255,.07);transition:width .25s ease}
-  .df-pipe.collapsed{width:58px;padding:14px 7px}
+  /* ── Pipeline sidebar ────────────────────────────────────────────────── */
+  .df-pipe{
+    width:292px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;
+    padding:16px 14px;border-right:1px solid rgba(255,255,255,.05);
+    transition:width .25s ease;background:rgba(8,9,18,.5);
+  }
+  .df-pipe.collapsed{width:60px;padding:14px 8px}
   .df-pipe::-webkit-scrollbar{width:2px}
-  .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
-  .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;min-height:24px}
-  .df-pipe-hdr-lbl{font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.5);text-transform:uppercase}
-  .df-pipe-btn{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:#00d4ff;cursor:pointer;
-    width:24px;height:24px;border-radius:3px;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;
-    transition:all .2s;flex-shrink:0;font-family:'Space Mono',monospace}
-  .df-pipe-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.4)}
-  .df-rail{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0;border-radius:4px;
-    margin-bottom:5px;border:1px solid rgba(200,214,232,.07);background:rgba(255,255,255,.015);transition:all .2s}
-  .df-rail:hover{background:rgba(255,255,255,.045)}
-  .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.4)}
-  .df-rail.done{border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.025)}
-  .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.05)}
-  .df-rail-num{font-size:7px;letter-spacing:1px;opacity:.4}
+  .df-pipe::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08)}
+  .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:24px}
+  .df-pipe-hdr-lbl{font-size:10px;letter-spacing:.14em;color:rgba(120,160,220,.55);text-transform:uppercase;font-weight:600}
+  .df-pipe-btn{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);cursor:pointer;
+    width:26px;height:26px;border-radius:6px;font-size:13px;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
+  }
+  .df-pipe-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#d4daf5}
+  .df-rail{
+    display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0;border-radius:8px;
+    margin-bottom:5px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);transition:all .2s;
+  }
+  .df-rail:hover{background:rgba(255,255,255,.04)}
+  .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35)}
+  .df-rail.done{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
+  .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.04)}
+  .df-rail-num{font-size:8px;letter-spacing:.06em;opacity:.35;font-weight:600}
   .df-rail-dot{width:6px;height:6px;border-radius:50%}
-  .df-card{border:1px solid rgba(200,214,232,.07);border-radius:4px;padding:11px;margin-bottom:5px;
-    background:rgba(255,255,255,.015);transition:all .3s;position:relative;overflow:hidden}
-  .df-card.active{border-color:var(--c);background:rgba(0,0,0,.45);animation:glow 2s ease-in-out infinite}
-  .df-card.done  {border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.025)}
-  .df-card.gate  {border-color:#ffaa00;background:rgba(255,170,0,.05);animation:pulse 1s infinite}
-  .df-card.active::before,.df-card.gate::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(to right,transparent,var(--c,#ffaa00),transparent)}
-  .df-crow{display:flex;align-items:center;gap:8px}
-  .df-cnum{font-size:8px;letter-spacing:2px;opacity:.35}
-  .df-cicon{font-size:15px;transition:color .3s}
+  .df-card{
+    border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;margin-bottom:6px;
+    background:rgba(255,255,255,.02);transition:all .3s;position:relative;overflow:hidden;
+  }
+  .df-card.active{border-color:var(--c);background:rgba(0,0,0,.42);animation:glow 2s ease-in-out infinite}
+  .df-card.done  {border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
+  .df-card.gate  {border-color:#ffaa00;background:rgba(255,170,0,.04);animation:pulse 1s infinite}
+  .df-card.active::before,.df-card.gate::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(to right,transparent,var(--c,#ffaa00),transparent);
+  }
+  .df-crow{display:flex;align-items:center;gap:9px}
+  .df-cnum{font-size:9px;letter-spacing:.06em;opacity:.3;font-weight:600}
+  .df-cicon{font-size:14px;transition:color .3s}
   .df-cicon.spin{animation:spin 1s linear infinite}
   .df-clbl{flex:1}
-  .df-cname{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;transition:color .3s}
-  .df-csub{font-size:8px;letter-spacing:2px;opacity:.45}
+  .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:13px;font-weight:700;color:#fff;transition:color .3s}
+  .df-csub{font-size:9px;letter-spacing:.06em;opacity:.4;font-weight:500}
   .df-cdot{width:7px;height:7px;border-radius:50%;transition:background .3s}
-  .df-cdesc{font-size:10px;opacity:.4;margin-top:6px;line-height:1.5}
-  .df-cprog{height:2px;background:rgba(200,214,232,.07);margin-top:7px;border-radius:1px;overflow:hidden}
+  .df-cdesc{font-size:11px;opacity:.38;margin-top:6px;line-height:1.5}
+  .df-cprog{height:2px;background:rgba(255,255,255,.06);margin-top:8px;border-radius:1px;overflow:hidden}
   .df-cfill{height:100%;border-radius:1px;transition:width .3s}
-  .df-crev{font-size:8px;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:5px;display:inline-block}
-  .df-crev.approved{background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.25)}
-  .df-crev.changes {background:rgba(255,100,0,.1);color:#ff6400;border:1px solid rgba(255,100,0,.25)}
-  .df-conn{display:flex;align-items:center;justify-content:center;height:13px}
-  .df-cline{width:1px;height:100%;background:rgba(200,214,232,.08);position:relative;overflow:hidden}
+  .df-crev{font-size:9px;letter-spacing:.04em;padding:2px 8px;border-radius:20px;margin-top:5px;display:inline-block;font-weight:600}
+  .df-crev.approved{background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
+  .df-crev.changes {background:rgba(255,100,0,.1);color:#ff6400;border:1px solid rgba(255,100,0,.22)}
+  .df-conn{display:flex;align-items:center;justify-content:center;height:12px}
+  .df-cline{width:1px;height:100%;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
   .df-cline.flow::after{content:'';position:absolute;top:0;left:0;width:100%;height:35%;
     background:#00d4ff;animation:flowLine 1s ease-in-out infinite}
 
-  /* Center panel */
-  .df-center{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(0,212,255,.07)}
+  /* ── Center panel ────────────────────────────────────────────────────── */
+  .df-center{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05)}
 
   /* Tabs */
-  .df-tabs{display:flex;border-bottom:1px solid rgba(0,212,255,.1);background:rgba(0,6,20,.6);flex-shrink:0}
-  .df-tab{padding:10px 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-    border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;color:rgba(200,214,232,.4)}
+  .df-tabs{
+    display:flex;border-bottom:1px solid rgba(255,255,255,.06);
+    background:rgba(8,9,18,.7);flex-shrink:0;padding:0 8px;
+  }
+  .df-tab{
+    padding:12px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+    border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;
+    color:rgba(200,214,232,.35);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
+  }
   .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
-  .df-tab:hover:not(.active){color:rgba(200,214,232,.7)}
+  .df-tab:hover:not(.active){color:rgba(200,214,232,.65)}
 
-  /* Detail */
-  .df-detail{flex:1;overflow-y:auto;padding:16px 20px}
-  .df-detail::-webkit-scrollbar{width:2px}
-  .df-detail::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
-  .df-dtitle{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:3px}
-  .df-dsub  {font-size:9px;letter-spacing:2px;color:rgba(0,212,255,.55);text-transform:uppercase;margin-bottom:14px}
+  /* Detail pane */
+  .df-detail{flex:1;overflow-y:auto;padding:18px 22px}
+  .df-detail::-webkit-scrollbar{width:3px}
+  .df-detail::-webkit-scrollbar-thumb{background:rgba(0,212,255,.15)}
+  .df-dtitle{
+    font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;
+    font-size:17px;font-weight:700;color:#fff;margin-bottom:4px;
+  }
+  .df-dsub{font-size:11px;letter-spacing:.08em;color:rgba(0,212,255,.5);text-transform:uppercase;margin-bottom:16px;font-weight:500}
 
   /* PRD */
-  .df-prd{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:4px;padding:13px}
-  .df-prd-h{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#00d4ff;margin-bottom:9px}
-  .df-ps{margin-bottom:11px}
-  .df-pl{font-size:8px;letter-spacing:2px;color:rgba(0,212,255,.55);text-transform:uppercase;margin-bottom:4px}
-  .df-pt{font-size:11px;line-height:1.7;opacity:.75}
-  .df-pi{font-size:11px;line-height:1.8;opacity:.75}
+  .df-prd{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:10px;padding:14px}
+  .df-prd-h{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:14px;font-weight:700;color:#00d4ff;margin-bottom:10px}
+  .df-ps{margin-bottom:12px}
+  .df-pl{font-size:10px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;margin-bottom:5px;font-weight:600}
+  .df-pt{font-size:12px;line-height:1.7;opacity:.75}
+  .df-pi{font-size:12px;line-height:1.8;opacity:.75}
   .df-pi::before{content:'→ ';color:#00d4ff}
 
   /* Tasks */
   .df-tasks{display:flex;flex-direction:column;gap:6px}
-  .df-task{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.13);border-radius:3px;
-    padding:8px 11px;display:flex;align-items:center;gap:9px;animation:fadeUp .3s ease-out}
-  .df-tid  {font-size:9px;color:#00ff88;opacity:.7;min-width:56px}
-  .df-tname{font-size:11px;flex:1}
-  .df-tpts {font-size:9px;color:#00ff88;opacity:.7}
+  .df-task{
+    background:rgba(0,255,136,.03);border:1px solid rgba(0,255,136,.12);border-radius:8px;
+    padding:9px 12px;display:flex;align-items:center;gap:10px;animation:fadeUp .3s ease-out;
+  }
+  .df-tid  {font-size:10px;color:#00ff88;opacity:.65;min-width:56px;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-tname{font-size:12px;flex:1}
+  .df-tpts {font-size:10px;color:#00ff88;opacity:.65;font-family:'SF Mono','Cascadia Code',monospace}
 
   /* Agents */
   .df-agents{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .df-agent{border-radius:4px;padding:10px;border:1px solid rgba(200,214,232,.08);background:rgba(0,0,0,.3);transition:all .3s}
+  .df-agent{border-radius:10px;padding:11px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);transition:all .3s}
   .df-agent.running{border-color:var(--ac)}
-  .df-agent.passed {border-color:rgba(0,255,136,.25)}
-  .df-agent.warned {border-color:rgba(255,149,0,.25)}
-  .df-agh{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+  .df-agent.passed {border-color:rgba(0,255,136,.22)}
+  .df-agent.warned {border-color:rgba(255,149,0,.22)}
+  .df-agh{display:flex;align-items:center;gap:7px;margin-bottom:7px}
   .df-agd{width:7px;height:7px;border-radius:50%}
-  .df-agname{font-size:11px;font-weight:700;color:#fff}
-  .df-agst{font-size:8px;letter-spacing:1px;opacity:.6}
-  .df-agf{font-size:10px;line-height:1.5;opacity:.65}
+  .df-agname{font-size:12px;font-weight:700;color:#fff}
+  .df-agst{font-size:10px;letter-spacing:.04em;opacity:.55;font-weight:500}
+  .df-agf{font-size:11px;line-height:1.55;opacity:.65}
 
   /* QA */
   .df-qa-list{display:flex;flex-direction:column;gap:6px}
-  .df-qa-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:3px;
-    border:1px solid rgba(191,95,255,.13);background:rgba(191,95,255,.04);animation:fadeUp .3s ease-out}
-  .df-qa-type {font-size:9px;color:#bf5fff;min-width:106px}
-  .df-qa-count{font-size:11px;flex:1}
-  .df-qa-badge{font-size:8px;padding:2px 7px;border-radius:2px;background:rgba(0,255,136,.1);color:#00ff88;
-    border:1px solid rgba(0,255,136,.25)}
+  .df-qa-row{
+    display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+    border:1px solid rgba(191,95,255,.12);background:rgba(191,95,255,.04);animation:fadeUp .3s ease-out;
+  }
+  .df-qa-type {font-size:10px;color:#bf5fff;min-width:106px;font-weight:600}
+  .df-qa-count{font-size:12px;flex:1}
+  .df-qa-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(0,255,136,.1);color:#00ff88;
+    border:1px solid rgba(0,255,136,.22);font-weight:600}
 
   /* Deploy */
-  .df-envs{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-  .df-env{display:flex;align-items:center;gap:11px;padding:9px 13px;border-radius:3px;
-    border:1px solid rgba(255,45,107,.13);background:rgba(255,45,107,.04);transition:all .4s}
-  .df-env.live{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.05)}
-  .df-env-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;min-width:78px}
+  .df-envs{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+  .df-env{
+    display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;
+    border:1px solid rgba(255,45,107,.12);background:rgba(255,45,107,.04);transition:all .4s;
+  }
+  .df-env.live{border-color:rgba(0,255,136,.25);background:rgba(0,255,136,.04)}
+  .df-env-name{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:12px;font-weight:700;color:#fff;min-width:78px}
   .df-env-bar{flex:1;height:3px;background:rgba(255,45,107,.1);border-radius:2px;overflow:hidden}
   .df-env-fill{height:100%;background:#ff2d6b;border-radius:2px;transition:width 1.5s ease}
   .df-env.live .df-env-fill{background:#00ff88}
-  .df-env-st{font-size:9px;min-width:68px;text-align:right}
+  .df-env-st{font-size:10px;min-width:68px;text-align:right;font-weight:500}
 
   /* Gate */
-  .df-gate{border-radius:5px;border:1px solid rgba(255,170,0,.35);background:rgba(255,170,0,.05);
-    padding:16px;animation:fadeUp .4s ease-out}
-  .df-gate-hdr{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .df-gate{border-radius:10px;border:1px solid rgba(255,170,0,.3);background:rgba(255,170,0,.04);
+    padding:18px;animation:fadeUp .4s ease-out}
+  .df-gate-hdr{display:flex;align-items:center;gap:9px;margin-bottom:11px}
   .df-gate-icon{font-size:18px}
-  .df-gate-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#ffaa00}
-  .df-gate-verdict{font-size:11px;opacity:.7;margin-bottom:10px;line-height:1.6}
-  .df-gate-pts{margin-bottom:14px}
-  .df-gate-pt{font-size:11px;opacity:.7;line-height:1.9}
+  .df-gate-title{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:15px;font-weight:800;color:#ffaa00}
+  .df-gate-verdict{font-size:12px;opacity:.7;margin-bottom:12px;line-height:1.65}
+  .df-gate-pts{margin-bottom:16px}
+  .df-gate-pt{font-size:12px;opacity:.7;line-height:1.9}
   .df-gate-pt::before{content:'· ';color:#ffaa00}
   .df-gate-actions{display:flex;gap:9px;flex-wrap:wrap}
-  .df-gate-ok{background:#00ff88;color:#060810;border:none;cursor:pointer;font-family:'Syne',sans-serif;
-    font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:9px 18px;border-radius:3px;transition:all .2s}
+  .df-gate-ok{
+    background:#00ff88;color:#080912;border:none;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:12px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;padding:10px 20px;border-radius:8px;transition:all .2s;
+  }
   .df-gate-ok:hover{background:#33ff99;transform:translateY(-1px)}
-  .df-gate-rej{background:transparent;color:#ff6464;border:1px solid rgba(255,100,100,.35);cursor:pointer;
-    font-family:'Space Mono',monospace;font-size:11px;padding:9px 18px;border-radius:3px;transition:all .2s}
-  .df-gate-rej:hover{border-color:rgba(255,100,100,.7);background:rgba(255,100,100,.07)}
-  .df-fb-wrap{margin-top:11px;animation:fadeUp .3s ease-out}
-  .df-fb-lbl{font-size:8px;letter-spacing:2px;color:rgba(255,100,100,.7);text-transform:uppercase;margin-bottom:5px}
-  .df-fb-inp{width:100%;background:rgba(255,100,100,.05);border:1px solid rgba(255,100,100,.25);border-radius:3px;
-    color:#e8f4ff;font-family:'Space Mono',monospace;font-size:11px;padding:8px 11px;outline:none;resize:none;line-height:1.5}
-  .df-fb-inp:focus{border-color:rgba(255,100,100,.5)}
-  .df-fb-sub{margin-top:7px;background:rgba(255,100,100,.12);color:#ff6464;border:1px solid rgba(255,100,100,.28);
-    cursor:pointer;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;
-    text-transform:uppercase;padding:7px 14px;border-radius:3px;transition:all .2s}
-  .df-fb-sub:hover{background:rgba(255,100,100,.22)}
+  .df-gate-rej{
+    background:transparent;color:#ff6464;border:1px solid rgba(255,100,100,.3);cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:10px 20px;border-radius:8px;transition:all .2s;
+  }
+  .df-gate-rej:hover{border-color:rgba(255,100,100,.6);background:rgba(255,100,100,.07)}
+  .df-fb-wrap{margin-top:12px;animation:fadeUp .3s ease-out}
+  .df-fb-lbl{font-size:10px;letter-spacing:.1em;color:rgba(255,100,100,.7);text-transform:uppercase;margin-bottom:6px;font-weight:600}
+  .df-fb-inp{
+    width:100%;background:rgba(255,100,100,.04);border:1px solid rgba(255,100,100,.22);border-radius:8px;
+    color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;font-size:12px;
+    padding:9px 12px;outline:none;resize:none;line-height:1.5;
+  }
+  .df-fb-inp:focus{border-color:rgba(255,100,100,.45)}
+  .df-fb-sub{
+    margin-top:8px;background:rgba(255,100,100,.1);color:#ff6464;border:1px solid rgba(255,100,100,.25);
+    cursor:pointer;font-family:-apple-system,system-ui,sans-serif;font-size:11px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;padding:8px 16px;border-radius:8px;transition:all .2s;
+  }
+  .df-fb-sub:hover{background:rgba(255,100,100,.2)}
 
   /* Prod gate */
-  .df-prod-gate{border-radius:5px;border:1.5px solid rgba(255,45,107,.6);background:rgba(255,45,107,.06);
-    padding:20px;animation:prodPulse 2s ease-in-out infinite,fadeUp .4s ease-out;position:relative;overflow:hidden}
+  .df-prod-gate{
+    border-radius:12px;border:1.5px solid rgba(255,45,107,.55);background:rgba(255,45,107,.05);
+    padding:22px;animation:prodPulse 2s ease-in-out infinite,fadeUp .4s ease-out;position:relative;overflow:hidden;
+  }
   .df-prod-gate::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
     background:linear-gradient(to right,transparent,#ff2d6b,transparent)}
-  .df-pg-hdr{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  .df-pg-hdr{display:flex;align-items:center;gap:9px;margin-bottom:8px}
   .df-pg-icon{font-size:22px}
-  .df-pg-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#ff2d6b}
-  .df-pg-sub{font-size:9px;letter-spacing:2px;color:rgba(255,45,107,.6);text-transform:uppercase;margin-bottom:12px}
+  .df-pg-title{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:16px;font-weight:800;color:#ff2d6b}
+  .df-pg-sub{font-size:10px;letter-spacing:.1em;color:rgba(255,45,107,.55);text-transform:uppercase;margin-bottom:14px;font-weight:600}
   .df-pg-checks{margin-bottom:14px}
-  .df-pg-check{display:flex;align-items:center;gap:8px;padding:5px 0;
-    border-bottom:1px solid rgba(255,45,107,.1);font-size:11px;opacity:.8}
-  .df-pg-check-ic{color:#00ff88;font-size:11px;min-width:13px}
-  .df-pg-clbl{font-size:8px;letter-spacing:2px;color:rgba(255,45,107,.7);text-transform:uppercase;margin-bottom:6px;margin-top:12px}
-  .df-pg-cinp{width:100%;background:rgba(255,45,107,.05);border:1px solid rgba(255,45,107,.3);border-radius:3px;
-    color:#ff8099;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:9px 13px;
-    outline:none;letter-spacing:3px;text-align:center}
-  .df-pg-cinp:focus{border-color:rgba(255,45,107,.6)}
-  .df-pg-cinp::placeholder{color:rgba(255,45,107,.25);letter-spacing:1px;font-size:10px}
-  .df-pg-btn{width:100%;margin-top:11px;padding:13px;border:none;border-radius:3px;cursor:pointer;
-    font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
-  .df-pg-btn.locked  {background:rgba(255,45,107,.1);color:rgba(255,45,107,.35);cursor:not-allowed}
+  .df-pg-check{display:flex;align-items:center;gap:9px;padding:6px 0;
+    border-bottom:1px solid rgba(255,45,107,.1);font-size:12px;opacity:.8}
+  .df-pg-check-ic{color:#00ff88;font-size:11px;min-width:14px}
+  .df-pg-clbl{font-size:10px;letter-spacing:.1em;color:rgba(255,45,107,.7);text-transform:uppercase;margin-bottom:7px;margin-top:14px;font-weight:600}
+  .df-pg-cinp{
+    width:100%;background:rgba(255,45,107,.04);border:1px solid rgba(255,45,107,.28);border-radius:8px;
+    color:#ff8099;font-family:'SF Mono','Cascadia Code',monospace;font-size:13px;font-weight:700;
+    padding:10px 14px;outline:none;letter-spacing:.2em;text-align:center;
+  }
+  .df-pg-cinp:focus{border-color:rgba(255,45,107,.55)}
+  .df-pg-cinp::placeholder{color:rgba(255,45,107,.22);letter-spacing:.04em;font-size:11px}
+  .df-pg-btn{
+    width:100%;margin-top:12px;padding:14px;border:none;border-radius:10px;cursor:pointer;
+    font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;transition:all .2s;
+  }
+  .df-pg-btn.locked  {background:rgba(255,45,107,.1);color:rgba(255,45,107,.32);cursor:not-allowed}
   .df-pg-btn.unlocked{background:#ff2d6b;color:#fff}
   .df-pg-btn.unlocked:hover{background:#ff5588;transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,45,107,.4)}
 
   /* Done */
-  .df-done{text-align:center;padding:44px 20px;animation:fadeUp .5s ease-out}
-  .df-done-ic{font-size:44px;margin-bottom:14px}
-  .df-done-t {font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:5px}
-  .df-done-s {font-size:10px;color:rgba(0,212,255,.6);letter-spacing:2px;margin-bottom:22px}
+  .df-done{text-align:center;padding:48px 24px;animation:fadeUp .5s ease-out}
+  .df-done-ic{font-size:48px;margin-bottom:16px}
+  .df-done-t{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:6px}
+  .df-done-s{font-size:11px;color:rgba(0,212,255,.55);letter-spacing:.1em;margin-bottom:24px;font-weight:500}
   .df-metrics{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .df-metric {text-align:center;padding:11px 16px;border:1px solid rgba(0,212,255,.18);border-radius:3px;min-width:85px}
-  .df-mv     {font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#00d4ff}
-  .df-ml     {font-size:8px;letter-spacing:2px;opacity:.45;margin-top:3px}
+  .df-metric{text-align:center;padding:12px 18px;border:1px solid rgba(0,212,255,.16);border-radius:10px;min-width:90px;background:rgba(0,212,255,.03)}
+  .df-mv{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:22px;font-weight:800;color:#00d4ff}
+  .df-ml{font-size:10px;letter-spacing:.08em;opacity:.42;margin-top:4px;font-weight:500}
 
-  /* ── OBSERVABILITY ─────────────────────────────────────────────────── */
-  .obs-wrap  {padding:16px 20px;display:flex;flex-direction:column;gap:16px}
-
-  /* Summary strip */
+  /* ── Observability ───────────────────────────────────────────────────── */
+  .obs-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px}
   .obs-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-  .obs-stat  {background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:4px;padding:11px 13px;
-    text-align:center;animation:countUp .4s ease-out}
-  .obs-stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:3px}
-  .obs-stat-lbl{font-size:8px;letter-spacing:2px;opacity:.45;text-transform:uppercase}
-
-  /* Section header */
-  .obs-sh  {font-size:8px;letter-spacing:3px;color:rgba(0,212,255,.55);text-transform:uppercase;margin-bottom:8px;
-    display:flex;align-items:center;gap:8px}
-  .obs-sh::after{content:'';flex:1;height:1px;background:rgba(0,212,255,.1)}
-
-  /* Call table */
-  .obs-table{width:100%;border-collapse:collapse;font-size:10px}
-  .obs-table th{font-size:8px;letter-spacing:2px;color:rgba(0,212,255,.5);text-transform:uppercase;
-    padding:5px 8px;border-bottom:1px solid rgba(0,212,255,.1);text-align:left;font-weight:400}
-  .obs-table td{padding:6px 8px;border-bottom:1px solid rgba(200,214,232,.04);vertical-align:middle}
+  .obs-stat{
+    background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:10px;
+    padding:12px 14px;text-align:center;animation:countUp .4s ease-out;
+  }
+  .obs-stat-val{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:20px;font-weight:800;margin-bottom:4px}
+  .obs-stat-lbl{font-size:9px;letter-spacing:.12em;opacity:.42;text-transform:uppercase;font-weight:600}
+  .obs-sh{
+    font-size:10px;letter-spacing:.12em;color:rgba(0,212,255,.5);text-transform:uppercase;margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;font-weight:600;
+  }
+  .obs-sh::after{content:'';flex:1;height:1px;background:rgba(0,212,255,.08)}
+  .obs-table{width:100%;border-collapse:collapse;font-size:11px}
+  .obs-table th{
+    font-size:9px;letter-spacing:.1em;color:rgba(0,212,255,.45);text-transform:uppercase;
+    padding:6px 9px;border-bottom:1px solid rgba(0,212,255,.08);text-align:left;font-weight:600;
+  }
+  .obs-table td{padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
   .obs-table tr{animation:tokenIn .25s ease-out}
-  .obs-table tr:hover td{background:rgba(0,212,255,.03)}
-  .obs-model-chip{display:inline-block;font-size:8px;padding:2px 6px;border-radius:2px;letter-spacing:1px}
-  .obs-drift-warn{display:inline-flex;align-items:center;gap:4px;font-size:8px;color:#ff9500;
-    background:rgba(255,149,0,.1);border:1px solid rgba(255,149,0,.25);padding:2px 7px;border-radius:2px}
-
-  /* Token bar inline */
-  .obs-tok-bar{display:flex;height:5px;border-radius:2px;overflow:hidden;min-width:60px;gap:1px}
-  .obs-tok-in {background:#00d4ff;border-radius:2px 0 0 2px}
-  .obs-tok-out{background:#00ff88;border-radius:0 2px 2px 0}
-
-  /* Chart containers */
+  .obs-table tr:hover td{background:rgba(0,212,255,.025)}
+  .obs-model-chip{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;letter-spacing:.04em;font-weight:600}
+  .obs-drift-warn{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:#ff9500;
+    background:rgba(255,149,0,.1);border:1px solid rgba(255,149,0,.22);padding:2px 8px;border-radius:20px;font-weight:600}
+  .obs-tok-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;min-width:60px;gap:1px}
+  .obs-tok-in {background:#00d4ff;border-radius:3px 0 0 3px}
+  .obs-tok-out{background:#00ff88;border-radius:0 3px 3px 0}
   .obs-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .obs-chart-box{background:rgba(0,0,0,.25);border:1px solid rgba(0,212,255,.08);border-radius:4px;padding:13px}
-  .obs-chart-title{font-size:8px;letter-spacing:2px;color:rgba(0,212,255,.55);text-transform:uppercase;margin-bottom:10px}
-
-  /* Legend */
-  .obs-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
-  .obs-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;opacity:.65}
+  .obs-chart-box{
+    background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;padding:14px;
+  }
+  .obs-chart-title{font-size:10px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;margin-bottom:12px;font-weight:600}
+  .obs-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .obs-legend-item{display:flex;align-items:center;gap:5px;font-size:10px;opacity:.6}
   .obs-legend-dot{width:8px;height:8px;border-radius:50%}
-
-  /* Drift indicator */
-  .obs-drift-banner{background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:4px;
-    padding:9px 13px;display:flex;align-items:center;gap:10px;font-size:10px}
+  .obs-drift-banner{
+    background:rgba(255,149,0,.06);border:1px solid rgba(255,149,0,.22);border-radius:10px;
+    padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:11px;
+  }
   .obs-drift-icon{font-size:14px}
   .obs-drift-text{opacity:.75;line-height:1.5}
-  .obs-empty{text-align:center;padding:60px 20px;opacity:.25;font-size:11px;line-height:2}
+  .obs-empty{text-align:center;padding:60px 20px;opacity:.22;font-size:12px;line-height:2}
 
-  /* Log */
-  .df-log    {width:248px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
+  /* ── Log panel ───────────────────────────────────────────────────────── */
+  .df-log{width:252px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
   .df-log.wide     {width:460px}
-  .df-log.collapsed{width:44px}
-  .df-log-hdr{padding:13px;border-bottom:1px solid rgba(0,212,255,.07);font-size:8px;letter-spacing:3px;
-    color:rgba(0,212,255,.55);text-transform:uppercase;display:flex;align-items:center;gap:7px}
+  .df-log.collapsed{width:46px}
+  .df-log-hdr{
+    padding:14px 14px;border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:10px;letter-spacing:.12em;color:rgba(120,160,220,.55);text-transform:uppercase;
+    display:flex;align-items:center;gap:7px;font-weight:600;
+  }
   .df-log.collapsed .df-log-hdr{flex-direction:column;gap:9px;padding:11px 0}
   .df-log-dot{width:6px;height:6px;border-radius:50%}
-  .df-log-bd {flex:1;overflow-y:auto;padding:9px}
+  .df-log-bd{flex:1;overflow-y:auto;padding:10px}
   .df-log-bd::-webkit-scrollbar{width:2px}
-  .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
-  .df-log-row{font-size:10px;line-height:1.6;padding:3px 0;border-bottom:1px solid rgba(200,214,232,.04);animation:slideLog .2s ease-out}
-  .df-log-ts {color:rgba(0,212,255,.35);margin-right:5px}
-  .df-log-msg.info   {color:rgba(200,214,232,.55)}
+  .df-log-bd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08)}
+  .df-log-row{
+    font-size:11px;line-height:1.6;padding:3px 0;
+    border-bottom:1px solid rgba(255,255,255,.04);animation:slideLog .2s ease-out;
+  }
+  .df-log-ts {color:rgba(0,212,255,.3);margin-right:5px;font-family:'SF Mono','Cascadia Code',monospace;font-size:10px}
+  .df-log-msg.info   {color:rgba(200,214,232,.5)}
   .df-log-msg.success{color:#00ff88}
   .df-log-msg.warn   {color:#ff9500}
   .df-log-msg.agent  {color:#c8d6e8}
   .df-log-msg.gate   {color:#ffaa00}
   .df-log-msg.handoff{color:#00d4ff}
   .df-log-msg.done   {color:#ff2d6b;font-weight:700}
-  .df-idle-hint{text-align:center;padding:56px 20px;opacity:.25;font-size:11px;line-height:2}
+  .df-idle-hint{text-align:center;padding:56px 20px;opacity:.22;font-size:12px;line-height:2}
   .df-cursor{animation:blink 1s step-end infinite;color:#00d4ff}
 
-  /* Tooltip override */
-  .recharts-tooltip-wrapper .recharts-default-tooltip{background:#0d1425!important;border-color:rgba(0,212,255,.2)!important;font-family:'Space Mono',monospace!important;font-size:10px!important;color:#c8d6e8!important}
+  /* Tooltip */
+  .recharts-tooltip-wrapper .recharts-default-tooltip{
+    background:#0d1128!important;border-color:rgba(0,212,255,.18)!important;
+    font-family:-apple-system,system-ui,sans-serif!important;font-size:11px!important;color:#d4daf5!important;
+    border-radius:8px!important;
+  }
+
+  /* ── Light Theme ────────────────────────────────────────────────────────── */
+  .df[data-theme='light']{background:#f1f3fa;color:#1a1d2e}
+  .df[data-theme='light'] .df-hdr{background:rgba(238,241,252,.96);border-bottom-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-lname{color:#0d0f1f}
+  .df[data-theme='light'] .df-ltag{color:rgba(20,40,120,.55)}
+  .df[data-theme='light'] .df-timer{color:#1a1d2e}
+  .df[data-theme='light'] .df-badge.idle{color:rgba(20,30,80,.4);border-color:rgba(20,30,80,.15)}
+  .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
+  .df[data-theme='light'] .df-settings-btn:hover{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.2);color:#1a1d2e}
+  .df[data-theme='light'] .df-int-dot.off{background:rgba(0,0,0,.18)}
+  .df[data-theme='light'] .df-int-dot-lbl{color:rgba(20,30,80,.35)}
+  .df[data-theme='light'] .df-inp-area{background:rgba(232,235,250,.85);border-bottom-color:rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-inp-lbl{color:rgba(20,40,120,.6)}
+  .df[data-theme='light'] .df-mode-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
+  .df[data-theme='light'] .df-mode-btn.active{background:rgba(0,140,180,.1);border-color:rgba(0,140,180,.4);color:#007799}
+  .df[data-theme='light'] .df-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
+  .df[data-theme='light'] .df-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.8);border-color:rgba(0,0,0,.1);color:#1a1d2e}
+  .df[data-theme='light'] .df-ctx-gh::placeholder{color:rgba(20,30,80,.22)}
+  .df[data-theme='light'] .df-ctx-attach{border-color:rgba(0,140,180,.3);color:rgba(0,140,180,.65)}
+  .df[data-theme='light'] .df-ctx-attach:hover{border-color:rgba(0,140,180,.6);color:#007799}
+  .df[data-theme='light'] .df-ctx-chip{background:rgba(0,140,180,.06);border-color:rgba(0,140,180,.2);color:rgba(20,30,80,.7)}
+  .df[data-theme='light'] .df-ctx-chip button{color:rgba(20,30,80,.4)}
+  .df[data-theme='light'] .df-rerun-btn{border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.4)}
+  .df[data-theme='light'] .df-rerun-btn:hover{border-color:rgba(0,140,180,.35);color:#007799;background:rgba(0,140,180,.06)}
+  .df[data-theme='light'] .df-dbg-btn{border-color:rgba(0,140,180,.25);color:rgba(0,140,180,.65)}
+  .df[data-theme='light'] .df-dbg-panel{background:rgba(241,244,255,.99);border-color:rgba(0,140,180,.2);box-shadow:-8px -8px 40px rgba(0,0,0,.16)}
+  .df[data-theme='light'] .df-dbg-title{color:rgba(0,140,180,.8)}
+  .df[data-theme='light'] .df-dbg-close{color:rgba(20,30,80,.4)}
+  .df[data-theme='light'] .df-dbg-ctx{color:rgba(20,30,80,.4);background:rgba(0,0,0,.04)}
+  .df[data-theme='light'] .df-dbg-inp{background:rgba(255,255,255,.9);border-color:rgba(0,140,180,.18);color:#1a1d2e}
+  .df[data-theme='light'] .df-dbg-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-dbg-answer{color:rgba(20,30,80,.88);background:rgba(0,140,180,.04);border-color:rgba(0,140,180,.12)}
+  .df[data-theme='light'] .df-tabs{background:rgba(238,241,252,.9);border-bottom-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-tab{color:rgba(20,30,80,.38)}
+  .df[data-theme='light'] .df-tab.active{color:#007799;border-bottom-color:#007799}
+  .df[data-theme='light'] .df-tab:hover:not(.active){color:rgba(20,30,80,.7)}
+  .df[data-theme='light'] .df-pipe{background:rgba(238,242,253,.7);border-right-color:rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-pipe-hdr-lbl{color:rgba(20,40,120,.45)}
+  .df[data-theme='light'] .df-pipe-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.6)}
+  .df[data-theme='light'] .df-pipe-btn:hover{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#1a1d2e}
+  .df[data-theme='light'] .df-rail{border-color:rgba(0,0,0,.07);background:rgba(0,0,0,.01)}
+  .df[data-theme='light'] .df-rail:hover{background:rgba(0,0,0,.04)}
+  .df[data-theme='light'] .df-rail.active{background:rgba(0,0,0,.2)}
+  .df[data-theme='light'] .df-card{background:rgba(0,0,0,.025);border-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-card.active{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-card.done{background:rgba(0,200,100,.03)}
+  .df[data-theme='light'] .df-cnum{opacity:.35;color:#1a1d2e}
+  .df[data-theme='light'] .df-cname{color:#0d0f1f}
+  .df[data-theme='light'] .df-csub{opacity:.4;color:#1a1d2e}
+  .df[data-theme='light'] .df-cdesc{opacity:.45;color:#1a1d2e}
+  .df[data-theme='light'] .df-cprog{background:rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-cline{background:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-center{border-right-color:rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-detail::-webkit-scrollbar-thumb{background:rgba(0,140,180,.12)}
+  .df[data-theme='light'] .df-dtitle{color:#0d0f1f}
+  .df[data-theme='light'] .df-dsub{color:rgba(0,140,180,.55)}
+  .df[data-theme='light'] .df-prd{background:rgba(0,140,180,.03);border-color:rgba(0,140,180,.12)}
+  .df[data-theme='light'] .df-pt{color:rgba(20,30,80,.75);opacity:1}
+  .df[data-theme='light'] .df-pi{color:rgba(20,30,80,.75);opacity:1}
+  .df[data-theme='light'] .df-task{background:rgba(0,200,100,.03);border-color:rgba(0,200,100,.14)}
+  .df[data-theme='light'] .df-agent{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-agname{color:#0d0f1f}
+  .df[data-theme='light'] .df-agst{color:rgba(20,30,80,.5);opacity:1}
+  .df[data-theme='light'] .df-agf{color:rgba(20,30,80,.65);opacity:1}
+  .df[data-theme='light'] .df-qa-row{background:rgba(140,60,220,.03);border-color:rgba(140,60,220,.14)}
+  .df[data-theme='light'] .df-env{background:rgba(200,30,80,.02);border-color:rgba(200,30,80,.1)}
+  .df[data-theme='light'] .df-env-name{color:#0d0f1f}
+  .df[data-theme='light'] .df-env-bar{background:rgba(200,30,80,.08)}
+  .df[data-theme='light'] .df-env-st{color:rgba(20,30,80,.5)}
+  .df[data-theme='light'] .df-gate{background:rgba(255,190,0,.03);border-color:rgba(190,140,0,.3)}
+  .df[data-theme='light'] .df-gate-verdict{color:rgba(20,30,80,.7);opacity:1}
+  .df[data-theme='light'] .df-gate-pt{color:rgba(20,30,80,.7);opacity:1}
+  .df[data-theme='light'] .df-gate-ok{color:#0a0c1a}
+  .df[data-theme='light'] .df-gate-rej{color:#cc4444;border-color:rgba(200,60,60,.3)}
+  .df[data-theme='light'] .df-fb-inp{background:rgba(220,50,50,.03);border-color:rgba(200,60,60,.2);color:#1a1d2e}
+  .df[data-theme='light'] .df-done-t{color:#0d0f1f}
+  .df[data-theme='light'] .df-done-s{color:rgba(0,140,180,.55)}
+  .df[data-theme='light'] .df-metric{background:rgba(0,140,180,.03);border-color:rgba(0,140,180,.15)}
+  .df[data-theme='light'] .obs-stat{background:rgba(0,140,180,.03);border-color:rgba(0,140,180,.12)}
+  .df[data-theme='light'] .obs-sh{color:rgba(0,140,180,.55)}
+  .df[data-theme='light'] .obs-sh::after{background:rgba(0,140,180,.1)}
+  .df[data-theme='light'] .obs-table th{color:rgba(0,140,180,.5);border-bottom-color:rgba(0,140,180,.1)}
+  .df[data-theme='light'] .obs-table td{border-bottom-color:rgba(0,0,0,.05)}
+  .df[data-theme='light'] .obs-table tr:hover td{background:rgba(0,140,180,.03)}
+  .df[data-theme='light'] .obs-chart-box{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .obs-chart-title{color:rgba(0,140,180,.5)}
+  .df[data-theme='light'] .obs-legend-item{color:rgba(20,30,80,.6);opacity:1}
+  .df[data-theme='light'] .obs-empty{color:rgba(20,30,80,.3);opacity:1}
+  .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:#fff!important;border-color:rgba(0,140,180,.18)!important;color:#1a1d2e!important}
+  .df[data-theme='light'] .df-log-hdr{border-bottom-color:rgba(0,0,0,.08);color:rgba(20,40,120,.5)}
+  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.05)}
+  .df[data-theme='light'] .df-log-ts{color:rgba(0,140,180,.35)}
+  .df[data-theme='light'] .df-log-msg.info{color:rgba(20,30,80,.55)}
+  .df[data-theme='light'] .df-log-msg.agent{color:rgba(20,30,80,.7)}
+  .df[data-theme='light'] .df-idle-hint{color:rgba(20,30,80,.28);opacity:1}
+  .df[data-theme='light'] .df-settings-overlay{background:rgba(0,0,0,.35)}
+  .df[data-theme='light'] .df-settings-drawer{background:#f5f7fe;border-left-color:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-set-hdr{border-bottom-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-set-title{color:#0d0f1f}
+  .df[data-theme='light'] .df-set-close{color:rgba(20,30,80,.4)}
+  .df[data-theme='light'] .df-set-tabs{border-bottom-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-set-tab{color:rgba(20,30,80,.4)}
+  .df[data-theme='light'] .df-set-tab.active{color:#007799;border-bottom-color:#007799}
+  .df[data-theme='light'] .df-set-body::-webkit-scrollbar-thumb{background:rgba(0,140,180,.12)}
+  .df[data-theme='light'] .df-set-sec-title{color:rgba(0,140,180,.6)}
+  .df[data-theme='light'] .df-set-lbl{color:rgba(20,30,80,.6)}
+  .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
+  .df[data-theme='light'] .df-set-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-set-inp:focus{border-color:rgba(0,140,180,.4)}
+  .df[data-theme='light'] .df-set-preview{color:rgba(20,30,80,.35)}
+  .df[data-theme='light'] .df-model-card{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-model-card:hover{background:rgba(0,140,180,.04);border-color:rgba(0,140,180,.22)}
+  .df[data-theme='light'] .df-model-card.selected{background:rgba(0,140,180,.07);border-color:rgba(0,140,180,.45)}
+  .df[data-theme='light'] .df-mc-name{color:#0d0f1f}
+  .df[data-theme='light'] .df-mc-desc{color:rgba(20,30,80,.5)}
+  .df[data-theme='light'] .df-mc-price{color:rgba(20,30,80,.32)}
+  .df[data-theme='light'] .df-add-model-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
+  .df[data-theme='light'] .df-add-model-inp::placeholder{color:rgba(20,30,80,.2)}
+  .df[data-theme='light'] .df-int-status-row{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-int-status-name{color:rgba(20,30,80,.65)}
+  .df[data-theme='light'] .df-int-status-val{color:rgba(20,30,80,.35)}
+  .df[data-theme='light'] .df-set-footer{border-top-color:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-set-cancel{border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.5)}
+  .df[data-theme='light'] .df-set-cancel:hover{border-color:rgba(0,0,0,.2);color:#1a1d2e}
+  .df[data-theme='light'] .df-set-result.ok{background:rgba(0,180,100,.05);border-color:rgba(0,180,100,.2);color:#008855}
+  .df[data-theme='light'] .df-set-result.err{background:rgba(200,50,50,.05);border-color:rgba(200,50,50,.2);color:#cc3333}
+
 `;
 
 // ── useTimer ───────────────────────────────────────────────────────────────
@@ -556,7 +825,8 @@ const ChartTip = ({ active, payload, label }) => {
 };
 
 // ── Observability Panel ────────────────────────────────────────────────────
-function ObsPanel({ llmCalls }) {
+function ObsPanel({ llmCalls, theme }) {
+  const tc = (dark, light) => theme === "dark" ? dark : light;
   if (llmCalls.length === 0) return (
     <div className="obs-empty">⟡ LLM calls will appear here<br/>as the pipeline runs<br/><br/><span style={{animation:"blink 1s step-end infinite",color:"#00d4ff"}}>_</span></div>
   );
@@ -623,9 +893,9 @@ function ObsPanel({ llmCalls }) {
           <div className="obs-chart-title">Latency Drift — per LLM call</div>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={latencyData} margin={{top:4,right:8,bottom:0,left:-20}}>
-              <CartesianGrid strokeDasharray="2 4" stroke="rgba(200,214,232,.07)" />
-              <XAxis dataKey="name" tick={{fill:"rgba(200,214,232,.35)",fontSize:8}} />
-              <YAxis tick={{fill:"rgba(200,214,232,.35)",fontSize:8}} unit="ms" />
+              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
+              <YAxis tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} unit="ms" />
               <Tooltip content={<ChartTip/>} />
               <ReferenceLine y={avgLatency} stroke="rgba(255,149,0,.4)" strokeDasharray="3 3" label={{value:"avg",fill:"rgba(255,149,0,.5)",fontSize:8}} />
               <Line type="monotone" dataKey="latency" stroke="#00d4ff" strokeWidth={2} dot={{r:3,fill:"#00d4ff"}} name="Latency" unit="ms" />
@@ -643,9 +913,9 @@ function ObsPanel({ llmCalls }) {
           <div className="obs-chart-title">Token Usage — by stage</div>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={stageRollup} margin={{top:4,right:8,bottom:0,left:-20}}>
-              <CartesianGrid strokeDasharray="2 4" stroke="rgba(200,214,232,.07)" />
-              <XAxis dataKey="name" tick={{fill:"rgba(200,214,232,.35)",fontSize:8}} />
-              <YAxis tick={{fill:"rgba(200,214,232,.35)",fontSize:8}} />
+              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
+              <YAxis tick={{fill:tc("rgba(200,214,232,.35)","rgba(20,30,80,.45)"),fontSize:8}} />
               <Tooltip content={<ChartTip/>} />
               <Bar dataKey="input"  fill="#00d4ff" name="Input tokens"  radius={[2,2,0,0]} maxBarSize={30}/>
               <Bar dataKey="output" fill="#00ff88" name="Output tokens" radius={[2,2,0,0]} maxBarSize={30}/>
@@ -676,7 +946,7 @@ function ObsPanel({ llmCalls }) {
                 <tr key={c.id}>
                   <td style={{color:"rgba(0,212,255,.45)"}}>{c.id}</td>
                   <td>
-                    <div style={{color:"#e8f4ff",marginBottom:2}}>{c.label}</div>
+                    <div style={{color:tc("#e8f4ff","#1a1d2e"),marginBottom:2}}>{c.label}</div>
                     <div style={{fontSize:8,color:STAGE_COLORS[c.stage],opacity:.8}}>{c.stage}</div>
                   </td>
                   <td>
@@ -685,14 +955,14 @@ function ObsPanel({ llmCalls }) {
                     </span>
                   </td>
                   <td>
-                    <div style={{marginBottom:3,fontSize:9,opacity:.6}}>{c.inputTok.toLocaleString()} / {c.outputTok.toLocaleString()}</div>
+                    <div style={{marginBottom:3,fontSize:9,color:tc("rgba(200,214,232,.6)","rgba(20,30,80,.6)")}}>{c.inputTok.toLocaleString()} / {c.outputTok.toLocaleString()}</div>
                     <div className="obs-tok-bar">
                       <div className="obs-tok-in"  style={{width:`${inW}%`}}/>
                       <div className="obs-tok-out" style={{width:`${100-inW}%`}}/>
                     </div>
                   </td>
                   <td>
-                    <span style={{color: isSlow?"#ff9500":"#c8d6e8"}}>{c.latencyMs}ms</span>
+                    <span style={{color: isSlow?"#ff9500":tc("#c8d6e8","rgba(20,30,80,.7)")}}>{c.latencyMs}ms</span>
                     {isSlow && <span style={{fontSize:8,color:"#ff9500",marginLeft:4}}>↑</span>}
                   </td>
                   <td style={{color:"#bf5fff"}}>${c.cost.toFixed(4)}</td>
@@ -716,10 +986,10 @@ function ObsPanel({ llmCalls }) {
             {lbl:"Total Calls",   val:llmCalls.length,           color:"#bf5fff", sub:"Across all stages"},
             {lbl:"Est. Total Cost",val:`$${totalCost.toFixed(4)}`,color:"#ff9500", sub:"Claude API usage"},
           ].map((m,i)=>(
-            <div key={i} style={{background:"rgba(0,0,0,.25)",border:"1px solid rgba(200,214,232,.08)",borderRadius:4,padding:"10px 12px"}}>
+            <div key={i} style={{background:tc("rgba(0,0,0,.25)","rgba(0,0,0,.04)"),border:`1px solid ${tc("rgba(200,214,232,.08)","rgba(0,0,0,.09)")}`,borderRadius:4,padding:"10px 12px"}}>
               <div style={{fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:800,color:m.color,marginBottom:3}}>{m.val}</div>
-              <div style={{fontSize:9,opacity:.65,marginBottom:2}}>{m.lbl}</div>
-              <div style={{fontSize:8,opacity:.35,letterSpacing:1}}>{m.sub}</div>
+              <div style={{fontSize:9,color:tc("rgba(200,214,232,.65)","rgba(20,30,80,.65)"),marginBottom:2}}>{m.lbl}</div>
+              <div style={{fontSize:8,color:tc("rgba(200,214,232,.35)","rgba(20,30,80,.35)"),letterSpacing:1}}>{m.sub}</div>
             </div>
           ))}
         </div>
@@ -779,6 +1049,13 @@ export default function DevForgeDashboard() {
   const [settingsEdits, setSettingsEdits] = useState({}); // staged edits
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsTestResult, setSettingsTestResult] = useState({}); // key → {ok, info/error}
+  const [customModelInput, setCustomModelInput]   = useState("");
+  const [customModelName, setCustomModelName]     = useState("");
+  const [customModelAdding, setCustomModelAdding] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem("df-theme") || "dark");
+  useEffect(() => { localStorage.setItem("df-theme", theme); }, [theme]);
+  const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
+  const tc = (dark, light) => theme === "dark" ? dark : light;
   const { elapsed, display, reset } = useTimer(appState === "running");
 
   const toRef       = useRef([]);
@@ -809,6 +1086,19 @@ export default function DevForgeDashboard() {
     fetch(`/settings/test-${service}`,{method:"POST"}).then(r=>r.json()).then(d=>{
       setSettingsTestResult(p=>({...p,[service]:d}));
     }).catch(e=>setSettingsTestResult(p=>({...p,[service]:{ok:false,error:e.message}})));
+  };
+  const addCustomModel = () => {
+    const id = customModelInput.trim();
+    if (!id) return;
+    setCustomModelAdding(true);
+    fetch("/settings/custom-models",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model_id:id,name:customModelName.trim()||id})
+    }).then(r=>r.json()).then(d=>{ setSettingsData(d); setCustomModelInput(""); setCustomModelName(""); setCustomModelAdding(false); })
+      .catch(()=>setCustomModelAdding(false));
+  };
+  const removeCustomModel = (modelId) => {
+    fetch(`/settings/custom-models/${encodeURIComponent(modelId)}`,{method:"DELETE"})
+      .then(r=>r.json()).then(d=>{ setSettingsData(d); });
   };
   // Effective settings = server data merged with unsaved edits (for display)
   const effSettings = {...(settingsData||{}), ...Object.fromEntries(
@@ -1557,7 +1847,7 @@ export default function DevForgeDashboard() {
               );
             })}
             {skipped.length>0 && (
-              <div style={{marginTop:6,padding:"6px 10px",background:"rgba(255,255,255,0.03)",borderLeft:"2px solid rgba(191,95,255,0.3)",borderRadius:3}}>
+              <div style={{marginTop:6,padding:"6px 10px",background:tc("rgba(255,255,255,.03)","rgba(0,0,0,.03)"),borderLeft:"2px solid rgba(191,95,255,0.3)",borderRadius:3}}>
                 <span style={{fontSize:9,opacity:.4}}>{skipped.length} task{skipped.length!==1?"s":""} skipped (cap): </span>
                 <span style={{fontSize:9,opacity:.35,fontStyle:"italic"}}>{skipped.map(t=>t.title).join(", ")}</span>
               </div>
@@ -1616,7 +1906,7 @@ export default function DevForgeDashboard() {
         <div className="df-agents">{agentNames.map((name)=>{
           const running = p > 10;
           return(<div key={name} className={`df-agent ${running?"running":""}`} style={{"--ac":agentColors[name]}}>
-            <div className="df-agh"><div className="df-agd" style={{background:running?agentColors[name]:"rgba(200,214,232,.15)",animation:running?"pulse .8s infinite":"none"}}/><div>
+            <div className="df-agh"><div className="df-agd" style={{background:running?agentColors[name]:tc("rgba(200,214,232,.15)","rgba(20,30,80,.15)"),animation:running?"pulse .8s infinite":"none"}}/><div>
               <div className="df-agname">{name.charAt(0).toUpperCase()+name.slice(1)} Agent</div>
               <div className="df-agst">{running?"REVIEWING CODE...":"WAITING"}</div>
             </div></div>
@@ -1650,12 +1940,12 @@ export default function DevForgeDashboard() {
               c.badge==="PASS" ? `${c.passed} / ${c.total} passed` :
               c.badge==="ERROR" ? `${c.errors} error${c.errors!==1?"s":""}` :
               `${c.passed} passed, ${c.failed+c.errors} failed`;
-            const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":"rgba(200,214,232,.35)";
-            const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":"rgba(200,214,232,.06)";
+            const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":tc("rgba(200,214,232,.35)","rgba(20,30,80,.4)");
+            const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":tc("rgba(200,214,232,.06)","rgba(20,30,80,.06)");
             return (
               <div key={key} className="df-qa-row">
                 <span className="df-qa-type">{label}</span>
-                <span className="df-qa-count" style={{color:"rgba(200,214,232,.6)",fontSize:10}}>{count}</span>
+                <span className="df-qa-count" style={{color:tc("rgba(200,214,232,.6)","rgba(20,30,80,.55)"),fontSize:10}}>{count}</span>
                 <span className="df-qa-badge" style={{background:badgeBg,color:badgeColor,minWidth:52,textAlign:"center",animation:badge==="RUNNING"?"pulse .8s infinite":"none"}}>
                   {badge}
                 </span>
@@ -1684,7 +1974,7 @@ export default function DevForgeDashboard() {
               <div key={s.key} className={`df-env ${s.done?"live":""}`}>
                 <span className="df-env-name" style={{fontSize:10,minWidth:140}}>{s.label}</span>
                 <div className="df-env-bar"><div className="df-env-fill" style={{width:s.done?"100%":curStep===s.key?"55%":"0%"}}/></div>
-                <span className="df-env-st" style={{color:s.done?"#00ff88":curStep===s.key?"#ffaa00":"rgba(200,214,232,.35)"}}>{s.done?"✓ DONE":curStep===s.key?"IN PROGRESS":"WAITING"}</span>
+                <span className="df-env-st" style={{color:s.done?"#00ff88":curStep===s.key?"#ffaa00":tc("rgba(200,214,232,.35)","rgba(20,30,80,.35)")}}>{s.done?"✓ DONE":curStep===s.key?"IN PROGRESS":"WAITING"}</span>
               </div>
             ))}
           </div>
@@ -1827,10 +2117,10 @@ export default function DevForgeDashboard() {
 
   const badgeCls  = appState==="running"?"running":appState==="gate"||appState==="prod_gate"?"gate":appState==="done"?"done":"idle";
   const badgeTxt  = appState==="running"?"● PIPELINE ACTIVE":appState==="gate"?"⏸ AWAITING REVIEW":appState==="prod_gate"?"⚠ PROD GATE":appState==="done"?"✓ COMPLETE":"STANDBY";
-  const timerColor= appState==="running"?"#00ff88":appState==="done"?"#00d4ff":appState==="gate"||appState==="prod_gate"?"#ffaa00":"#fff";
+  const timerColor= appState==="running"?"#00ff88":appState==="done"?"#00d4ff":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("#fff","#1a1d2e");
 
   return (
-    <div className="df">
+    <div className="df" data-theme={theme}>
       <style>{css}</style>
       <div className="df-scan"/>
 
@@ -1958,20 +2248,20 @@ export default function DevForgeDashboard() {
             if(pipeCollapsed) return (
               <div key={stage.id} className={`df-rail ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,cursor:clickable?"pointer":"default"}} title={`${stage.num} · ${stage.label} — ${stage.desc}`} onClick={goDetail}>
                 <span className="df-rail-num">{stage.num}</span>
-                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):"rgba(200,214,232,.25)"}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
-                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":"rgba(200,214,232,.12)",animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(200,214,232,.25)","rgba(20,30,80,.25)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
+                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
               </div>
             );
             return <div key={stage.id}>
               <div className={`df-card ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.3)":stage.glow,cursor:(isDone||isActive||isGate)?"pointer":"default"}} onClick={()=>{ if(isGate) setDetail("gate_"+stage.id); else if(isDone||isActive) setDetail(stage.id); }}>
                 <div className="df-crow">
                   <span className="df-cnum">{stage.num}</span>
-                  <span className={`df-cicon ${isActive?"spin":""}`} style={{color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):"rgba(200,214,232,.25)"}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
+                  <span className={`df-cicon ${isActive?"spin":""}`} style={{color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(200,214,232,.25)","rgba(20,30,80,.25)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
                   <div className="df-clbl">
-                    <div className="df-cname" style={{color:isActive?stage.color:isDone?"#fff":isGate?"#ffaa00":"rgba(255,255,255,.45)"}}>{stage.label}</div>
+                    <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#0d0f1f"):isGate?"#ffaa00":tc("rgba(255,255,255,.45)","rgba(20,30,80,.45)")}}>{stage.label}</div>
                     <div className="df-csub">{stage.sub}</div>
                   </div>
-                  <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":"rgba(200,214,232,.12)",animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+                  <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
                 </div>
                 {(isActive||isDone||isGate)&&<div className="df-cdesc">{isGate?"Awaiting your approval":stage.desc}</div>}
                 {(isActive||isDone)&&<div className="df-cprog"><div className="df-cfill" style={{width:`${isDone?100:p}%`,background:isGate?"#ffaa00":stage.color}}/></div>}
@@ -1999,10 +2289,15 @@ export default function DevForgeDashboard() {
             <div className={`df-tab ${tab==="observability"?"active":""}`} onClick={()=>setTab("observability")}>
               LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:8,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
-            <button className="df-tab" onClick={openSettings} style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,color:"rgba(200,214,232,.75)"}}>⚙ Settings</button>
+            <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
+              style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(255,255,255,.1)":"rgba(0,0,0,.12)",
+                color:theme==="dark"?"rgba(200,214,232,.5)":"rgba(20,30,80,.5)",
+                cursor:"pointer",width:30,height:30,borderRadius:7,fontSize:15,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",flexShrink:0,marginRight:6}}
+            >{theme==="dark"?"☀":"🌙"}</button>
+            <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(200,214,232,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
-            {tab==="pipeline"    ? renderDetail() : <ObsPanel llmCalls={llmCalls}/>}
+            {tab==="pipeline"    ? renderDetail() : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
           </div>
         </div>
 
@@ -2010,7 +2305,7 @@ export default function DevForgeDashboard() {
         <div className={`df-log ${logView==="wide"?"wide":""} ${logView==="collapsed"?"collapsed":""}`}>
           <div className="df-log-hdr" style={logView==="collapsed"?undefined:{justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:7}}>
-              <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":"rgba(200,214,232,.25)",animation:appState==="running"?"pulse 1s infinite":"none"}}/>
+              <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("rgba(200,214,232,.25)","rgba(20,30,80,.2)"),animation:appState==="running"?"pulse 1s infinite":"none"}}/>
               {logView!=="collapsed"&&<span>Live Stream</span>}
             </div>
             <div style={{display:"flex",gap:5}}>
@@ -2123,6 +2418,34 @@ export default function DevForgeDashboard() {
                         <div className="df-mc-price">${m.input_mtok}/M input · ${m.output_mtok}/M output</div>
                       </div>
                     ))}
+                    {(settingsData?.custom_models||[]).map(m=>(
+                      <div
+                        key={m.id}
+                        className={`df-model-card${activeModel===m.id?" selected":""}`}
+                        onClick={()=>setEdit("model",m.id)}
+                      >
+                        <div className="df-mc-row">
+                          <span className="df-mc-name">{m.name}</span>
+                          <span className="df-mc-badge custom">custom</span>
+                          {activeModel===m.id&&<span style={{color:"#00d4ff",fontSize:13}}>✓</span>}
+                          <button className="df-mc-remove" title="Remove" onClick={e=>{e.stopPropagation();removeCustomModel(m.id);}}>✕</button>
+                        </div>
+                        <div className="df-mc-desc" style={{fontFamily:"'SF Mono','Cascadia Code',monospace",fontSize:10,opacity:.5}}>{m.id}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="df-add-model">
+                    <div className="df-add-model-row">
+                      <input className="df-add-model-inp" placeholder="Model ID, e.g. claude-sonnet-5-20260101"
+                        value={customModelInput} onChange={e=>setCustomModelInput(e.target.value)}
+                        onKeyDown={e=>e.key==="Enter"&&addCustomModel()}/>
+                      <button className="df-add-model-btn" disabled={!customModelInput.trim()||customModelAdding} onClick={addCustomModel}>
+                        {customModelAdding?"Adding…":"+ Add"}
+                      </button>
+                    </div>
+                    <input className="df-add-model-inp" placeholder="Display name (optional)"
+                      value={customModelName} onChange={e=>setCustomModelName(e.target.value)}
+                      onKeyDown={e=>e.key==="Enter"&&addCustomModel()}/>
                   </div>
                 </div>
               </>)}
@@ -2232,11 +2555,11 @@ export default function DevForgeDashboard() {
                 </div>
                 <div className="df-set-section">
                   <div className="df-set-sec-title">What's Available</div>
-                  <div style={{fontSize:10,color:"rgba(200,214,232,.45)",lineHeight:1.8}}>
+                  <div style={{fontSize:10,color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),lineHeight:1.8}}>
                     {!settingsData?.anthropic_api_key_set&&<div style={{color:"#ff6644"}}>⚠ No Anthropic API key — pipeline will not run</div>}
                     {!settingsData?.github_token_set&&<div style={{color:"#ffaa00"}}>⚠ No GitHub token — Stage 6 deploy disabled</div>}
                     {!settingsData?.linear_api_key_set&&<div style={{color:"#ffaa00"}}>⚠ No Linear key — task tracking disabled</div>}
-                    {!settingsData?.slack_bot_token_set&&<div style={{color:"rgba(200,214,232,.4)"}}>ℹ No Slack token — notifications disabled</div>}
+                    {!settingsData?.slack_bot_token_set&&<div style={{color:tc("rgba(200,214,232,.4)","rgba(20,30,80,.45)")}}>ℹ No Slack token — notifications disabled</div>}
                     {settingsData?.anthropic_api_key_set&&settingsData?.github_token_set&&settingsData?.linear_api_key_set&&(
                       <div style={{color:"#00ff88"}}>✓ All core integrations configured — pipeline ready</div>
                     )}
@@ -2255,6 +2578,24 @@ export default function DevForgeDashboard() {
           </div>
         </div>
       )}
+
+      {/* Attribution footer */}
+      <div style={{
+        flexShrink:0,padding:"5px 20px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:12,
+        borderTop:`1px solid ${tc("rgba(255,255,255,.05)","rgba(0,0,0,.07)")}`,
+        background:tc("rgba(8,9,18,.6)","rgba(238,241,252,.7)"),
+      }}>
+        <span style={{fontSize:10,color:tc("rgba(200,214,232,.22)","rgba(20,30,80,.3)"),letterSpacing:".04em"}}>
+          Built by <strong style={{color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),fontWeight:600}}>Sushil Kumar</strong>
+        </span>
+        <a href="https://www.linkedin.com/in/sushilk001" target="_blank" rel="noreferrer"
+          style={{fontSize:10,color:"#0a66c2",textDecoration:"none",display:"flex",alignItems:"center",gap:4,fontWeight:500,opacity:.8,transition:"opacity .15s"}}
+          onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=".8"}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          linkedin.com/in/sushilk001
+        </a>
+      </div>
     </div>
   );
 }

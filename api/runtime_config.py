@@ -15,20 +15,36 @@ _overrides: dict[str, Any] = {}
 
 AVAILABLE_MODELS = [
     {
-        "id":    "claude-sonnet-4-6",
-        "name":  "Claude Sonnet 4.6",
+        "id":    "claude-sonnet-5",
+        "name":  "Claude Sonnet 5",
         "tier":  "default",
-        "desc":  "Best balance of speed and quality — recommended for all stages",
+        "desc":  "Latest and most capable — best balance of intelligence and speed",
         "input_mtok":  3.0,
         "output_mtok": 15.0,
+    },
+    {
+        "id":    "claude-fable-5",
+        "name":  "Claude Fable 5",
+        "tier":  "powerful",
+        "desc":  "Most powerful model — ideal for complex PRDs and architecture reviews",
+        "input_mtok":  15.0,
+        "output_mtok": 75.0,
     },
     {
         "id":    "claude-opus-4-8",
         "name":  "Claude Opus 4.8",
         "tier":  "powerful",
-        "desc":  "Most powerful — best for complex PRDs and architecture reviews",
+        "desc":  "High-intelligence model — excellent for deep reasoning tasks",
         "input_mtok":  15.0,
         "output_mtok": 75.0,
+    },
+    {
+        "id":    "claude-sonnet-4-6",
+        "name":  "Claude Sonnet 4.6",
+        "tier":  "balanced",
+        "desc":  "Reliable and fast — good for straightforward generation tasks",
+        "input_mtok":  3.0,
+        "output_mtok": 15.0,
     },
     {
         "id":    "claude-haiku-4-5-20251001",
@@ -39,8 +55,6 @@ AVAILABLE_MODELS = [
         "output_mtok": 4.0,
     },
 ]
-_VALID_MODEL_IDS = {m["id"] for m in AVAILABLE_MODELS}
-
 
 def _load() -> None:
     global _overrides
@@ -76,9 +90,40 @@ def get_api_key() -> str:
     return _overrides.get("anthropic_api_key") or get_settings().anthropic_api_key
 
 
+def get_custom_models() -> list:
+    return _overrides.get("custom_models", [])
+
+
+def add_custom_model(model_id: str, name: str) -> None:
+    customs = _overrides.get("custom_models", [])
+    if not any(m["id"] == model_id for m in customs):
+        customs.append({
+            "id": model_id,
+            "name": name or model_id,
+            "tier": "custom",
+            "desc": "Custom model",
+            "input_mtok": None,
+            "output_mtok": None,
+        })
+        _overrides["custom_models"] = customs
+        _save()
+
+
+def remove_custom_model(model_id: str) -> None:
+    _overrides["custom_models"] = [
+        m for m in _overrides.get("custom_models", []) if m["id"] != model_id
+    ]
+    _save()
+
+
+def get_all_models() -> list:
+    return AVAILABLE_MODELS + get_custom_models()
+
+
 def get_model() -> str:
-    m = _overrides.get("model", "claude-sonnet-4-6")
-    return m if m in _VALID_MODEL_IDS else "claude-sonnet-4-6"
+    m = _overrides.get("model", "claude-sonnet-5")
+    all_ids = {m["id"] for m in get_all_models()}
+    return m if m in all_ids else "claude-sonnet-5"
 
 
 def get_github_token() -> str:

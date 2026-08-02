@@ -3,6 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "author": "Sushil Kumar <sushil@hackerrank.com> (https://www.linkedin.com/in/sushilk001)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sushilk001"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

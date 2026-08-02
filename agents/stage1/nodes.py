@@ -36,17 +36,36 @@ def get_llm():
         model=get_model(),
         api_key=get_api_key(),
         temperature=0.3,
-        max_tokens=4096,
+        max_tokens=8192,
     )
 
 
 def _parse_json_response(content: str) -> dict:
     content = content.strip()
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-    return json.loads(content.strip())
+
+    # Strip ```json ... ``` or ``` ... ``` fences
+    import re
+    fence_match = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', content, re.DOTALL)
+    if fence_match:
+        content = fence_match.group(1).strip()
+
+    # Try direct parse first
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        pass
+
+    # Extract outermost JSON object (first { to last })
+    start = content.find('{')
+    end = content.rfind('}')
+    if start != -1 and end > start:
+        try:
+            return json.loads(content[start:end + 1])
+        except json.JSONDecodeError:
+            pass
+
+    # Re-raise with original content to surface the real error
+    return json.loads(content)
 
 
 def _context_suffix(state: AgentState) -> str:

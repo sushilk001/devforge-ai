@@ -2,7 +2,7 @@
 
 > Hackathon project · Built with Claude AI + LangGraph + FastAPI
 
-**Author & Owner:** Sushil Kumar · [github.com/sushilk001](https://github.com/sushilk001)
+**Author & Owner:** Sushil Kumar · [LinkedIn](https://www.linkedin.com/in/sushilk001) · [GitHub](https://github.com/sushilk001)
 
 ---
 

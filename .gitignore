@@ -19,3 +19,20 @@ output/
 
 # OS
 .DS_Store
+
+# Runtime config — may contain API keys
+settings_override.json
+
+# Presentation & demo recording materials
+DevForge-AI_slides.html
+slide-backups/
+PRESENTER_KIT.md
+demo-video/
+
+# Personal photos
+*.jpeg
+*.jpg
+*.png
+
+# Misc
+*.pyc

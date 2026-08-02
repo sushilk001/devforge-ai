@@ -35,6 +35,7 @@ def _current_state() -> dict:
     return {
         "model":                    rc.get_model(),
         "available_models":         rc.AVAILABLE_MODELS,
+        "custom_models":            rc.get_custom_models(),
         "anthropic_api_key_set":    bool(api_key),
         "anthropic_api_key_preview": _preview(api_key),
         "github_token_set":         bool(gh_token),
@@ -62,7 +63,7 @@ def update_settings(body: SettingsUpdate):
         else:
             rc.clear_override("anthropic_api_key")
 
-    if body.model and body.model in {m["id"] for m in rc.AVAILABLE_MODELS}:
+    if body.model and body.model in {m["id"] for m in rc.get_all_models()}:
         rc.set_override("model", body.model)
 
     for key, val in [
@@ -143,3 +144,25 @@ async def test_linear():
         return {"ok": False, "error": data.get("errors", [{}])[0].get("message", "Unknown")}
     except Exception as e:
         return {"ok": False, "error": str(e)[:120]}
+
+
+class AddCustomModelRequest(BaseModel):
+    model_id: str
+    name: Optional[str] = None
+
+
+@router_settings.post("/custom-models")
+def add_custom_model(body: AddCustomModelRequest):
+    model_id = body.model_id.strip()
+    if not model_id:
+        return {"ok": False, "error": "model_id is required"}
+    rc.add_custom_model(model_id, body.name or model_id)
+    return {**_current_state(), "ok": True}
+
+
+@router_settings.delete("/custom-models/{model_id:path}")
+def delete_custom_model(model_id: str):
+    rc.remove_custom_model(model_id)
+    if rc._overrides.get("model") == model_id:
+        rc.clear_override("model")
+    return {**_current_state(), "ok": True}
