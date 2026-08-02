@@ -330,7 +330,7 @@ const css = `
   /* Tabs */
   .df-tabs{display:flex;border-bottom:1px solid rgba(0,212,255,.1);background:rgba(0,6,20,.6);flex-shrink:0}
   .df-tab{padding:10px 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-    border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.4)}
+    border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;color:rgba(200,214,232,.4)}
   .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
   .df-tab:hover:not(.active){color:rgba(200,214,232,.7)}
 
@@ -1870,7 +1870,6 @@ export default function DevForgeDashboard() {
             ))}
           </div>
           <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
-          <button className="df-settings-btn" onClick={openSettings} title="Settings — API key, model, integrations">⚙</button>
         </div>
       </div>
 
@@ -1995,11 +1994,12 @@ export default function DevForgeDashboard() {
 
         {/* Center: tabs + content */}
         <div className="df-center">
-          <div className="df-tabs">
+          <div className="df-tabs" style={{alignItems:"center"}}>
             <div className={`df-tab ${tab==="pipeline"?"active":""}`}    onClick={()=>setTab("pipeline")}>Pipeline</div>
             <div className={`df-tab ${tab==="observability"?"active":""}`} onClick={()=>setTab("observability")}>
               LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:8,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
+            <button className="df-tab" onClick={openSettings} style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,color:"rgba(200,214,232,.75)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
             {tab==="pipeline"    ? renderDetail() : <ObsPanel llmCalls={llmCalls}/>}
