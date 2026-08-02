@@ -11,7 +11,7 @@ short_description: Autonomous end-to-end SDLC intelligence engine
 
 # DevForge AI — Autonomous SDLC Intelligence Engine
 
-> Raw feature request → structured PRD → task graph → code → PR review → QA, all driven by Claude AI
+> Raw idea → PRD → tasks → code → PR review → QA → deploy. Fully autonomous, human-in-the-loop.
 
 **Author:** Sushil Kumar · [LinkedIn](https://www.linkedin.com/in/sushilk001) · [GitHub](https://github.com/sushilk001)
 
@@ -25,7 +25,7 @@ short_description: Autonomous end-to-end SDLC intelligence engine
 
 ## Demo
 
-**Full demo video:** [https://tinyurl.com/DevForgeAI-demoVideo](https://tinyurl.com/DevForgeAI-demoVideo)
+**Demo video:** [https://tinyurl.com/DevForgeAI-demoVideo](https://tinyurl.com/DevForgeAI-demoVideo)
 
 ![DevForge AI demo](docs/demo.gif)
 
@@ -33,44 +33,44 @@ short_description: Autonomous end-to-end SDLC intelligence engine
 
 ## What It Does
 
-DevForge AI eliminates the manual coordination overhead in software delivery. Drop a raw feature request in Slack — or type it in the dashboard — and autonomous AI agents handle every stage:
+Drop a feature request in Slack or the dashboard — autonomous AI agents handle the rest:
 
 ```
 "Add forgot-password flow for enterprise users"
         │
         ▼
-  📋 Structured PRD          ← Stage 1 (Claude Sonnet)
-        │ ← human approve/reject
+  📋 Requirements PRD      ← Stage 1 · Claude Sonnet
+        │ ⏸ review gate
         ▼
-  🗂  Task graph + Linear      ← Stage 2 (Claude Sonnet + Kahn's algorithm)
-        │ ← human approve/reject
+  🗂  Tasks + Linear        ← Stage 2 · dependency graph (Kahn's algorithm)
+        │ ⏸ review gate
         ▼
-  🔍 Parallel PR review       ← Stage 3 (4× agents: security, quality, coverage, architecture)
+  🔍 PR Review              ← Stage 3 · 4 parallel agents (security, quality, coverage, arch)
         │
         ▼
-  💻 Full codebase generation  ← Stage 4 (Claude Sonnet → real files on disk)
+  💻 Code Generation        ← Stage 4 · full codebase written to disk
         │
         ▼
-  🧪 Automated QA              ← Stage 5 (test runner + pass/fail report)
+  🧪 QA                     ← Stage 5 · test runner + pass/fail report
         │
         ▼
-  🚀 Deploy pipeline           ← Stage 6 (DEV → STAGING → UAT → PROD)
+  🚀 Deploy                 ← Stage 6 · push to GitHub, open PR, notify Slack
 ```
 
-Human-in-the-loop **review gates** sit after every stage. Approvals resume the LangGraph pipeline; rejections feed the feedback directly back to the AI for revision.
+Human **review gates** after Stages 1 and 2 — approve to continue, reject with feedback to revise.
 
 ---
 
-## What's Live Today
+## Pipeline Status
 
 | Stage | Status | What it does |
 |-------|--------|-------------|
-| **1 — Requirements** | ✅ Complete | Parses intent, clarifies ambiguity, generates structured PRD (goals, user stories, acceptance criteria) |
-| **2 — Task Orchestration** | ✅ Complete | Decomposes PRD → 8–14 tasks with estimates, priorities, dependency graph via Kahn's topological sort + DP critical path; creates Linear issues |
-| **3 — PR Review** | ✅ Complete | 4 parallel reviewer agents (Security, Quality, Coverage, Architecture) each produce findings + a merged verdict |
-| **4 — Code Generation** | ✅ Complete | Generates a full working codebase to `output/<project-slug>/`; files streamed to disk |
-| **5 — QA** | ✅ Complete | Runs generated tests, reports pass/fail per test case |
-| **6 — Deploy** | 🔧 In progress | Progressive rollout DEV → STAGING → UAT → PROD with rollback gate |
+| **1 — Requirements** | ✅ | Parses intent → structured PRD (goals, user stories, acceptance criteria) |
+| **2 — Task Orchestration** | ✅ | PRD → task graph with estimates + critical path; creates Linear issues |
+| **3 — PR Review** | ✅ | 4 parallel reviewer agents produce findings + merged verdict |
+| **4 — Code Generation** | ✅ | Full working codebase generated to `output/<slug>/` |
+| **5 — QA** | ✅ | Runs generated tests, reports pass/fail per case |
+| **6 — Deploy** | ✅ | Push to GitHub branch, open PR, Slack notify, close Linear issues |
 
 ---
 
@@ -80,162 +80,101 @@ Human-in-the-loop **review gates** sit after every stage. Approvals resume the L
 Slack / Dashboard
         │
         ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Stage 1 — Requirements Agent                                    │
-│                                                                  │
-│  parse_request ──► check_completeness ──► generate_prd           │
-│                                                │                 │
-│                                        ⏸ HUMAN REVIEW GATE       │
-│                                   ┌────┴─────┐                  │
-│                                approve     reject+feedback        │
-│                                   │            │                 │
-│                             finalize_prd  revise_prd ──► loop    │
-└───────────────────────────────────┼─────────────────────────────┘
-                                    │ approved PRD
-                                    ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Stage 2 — Task Orchestration Agent                              │
-│                                                                  │
-│  decompose_tasks ──► build_dependency_graph                      │
-│  (Claude Sonnet)     (Kahn's topological sort + DP critical path)│
-│                               │                                  │
-│                       ⏸ HUMAN REVIEW GATE                        │
-│                  ┌────┴─────┐                                    │
-│               approve    reject+feedback                          │
-│                  │            │                                   │
-│      create_linear_issues  revise_tasks ──► rebuild graph ──► loop│
-│                  │                                               │
-│          notify_slack ──► END                                    │
-└───────────────────────────────┼──────────────────────────────────┘
-                                │ tasks + Linear issues
-                                ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Stage 3 — PR Review Agent                                       │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  security_reviewer  ┐                                    │   │
-│  │  quality_reviewer   ├──► merge_findings ──► final_verdict│   │
-│  │  coverage_reviewer  │                                    │   │
-│  │  arch_reviewer      ┘                                    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└───────────────────────────────┬──────────────────────────────────┘
-                                │ review verdict
-                                ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  Stage 4 — Code Generation Agent                                 │
-│                                                                  │
-│  plan_architecture ──► generate_files ──► write_to_disk          │
-│                         (Claude Sonnet)    output/<project>/     │
-└──────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│  Stage 1 — Requirements Agent           │
+│  parse → completeness_check → PRD       │
+│                    ⏸ HUMAN GATE         │
+│              approve │ reject+feedback  │
+└──────────────────────┼──────────────────┘
+                       │ approved PRD
+                       ▼
+┌─────────────────────────────────────────┐
+│  Stage 2 — Task Orchestration Agent     │
+│  decompose → dependency graph (Kahn's)  │
+│                    ⏸ HUMAN GATE         │
+│  approve → Linear issues + Slack notify │
+└──────────────────────┼──────────────────┘
+                       │ tasks
+                       ▼
+┌─────────────────────────────────────────┐
+│  Stage 3 — PR Review (4× parallel)      │
+│  security · quality · coverage · arch   │
+│  → merge findings → verdict             │
+└──────────────────────┼──────────────────┘
+                       │ verdict
+                       ▼
+┌─────────────────────────────────────────┐
+│  Stage 4 — Code Generation              │
+│  plan → generate files → write to disk  │
+└──────────────────────┼──────────────────┘
+                       │ codebase
+                       ▼
+┌─────────────────────────────────────────┐
+│  Stage 5 — QA Runner                    │
+│  run pytest → pass/fail report          │
+└──────────────────────┼──────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────┐
+│  Stage 6 — Deploy                       │
+│  GitHub push → PR → Slack → Linear done │
+└─────────────────────────────────────────┘
 ```
 
-**State persistence:** Each stage uses `LangGraph MemorySaver` — graphs pause at interrupt points and resume exactly where they left off when the human acts.
+State persisted via **LangGraph `MemorySaver`** — graphs pause at gates and resume exactly where they left off.
 
 ---
 
 ## Live Dashboard
 
-The React dashboard gives you a real-time view of every pipeline run:
-
-- **Pipeline control** — submit requests, approve/reject at each stage
-- **LLM Observability** — per-call token counts, latency, model used, cost estimate
-- **Stage cards** — live status for all 6 stages with log streaming
-- **Settings panel** — swap API keys, choose Claude model, add custom model IDs
+- **Pipeline view** — submit, approve/reject at each gate, re-run from any stage
+- **LLM Observability** — per-call token counts, latency, model, cost estimate
+- **Fullscreen code viewer** — browse generated files with syntax highlighting
+- **Debug Assistant** — ask Claude why a stage is stuck, powered by live pipeline context
+- **Settings** — swap API keys, choose Claude model, add custom model IDs
 - **Light / Dark theme** — persisted in `localStorage`
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- [Anthropic API key](https://console.anthropic.com/)
-
-### 1. Clone and install
+**Prerequisites:** Python 3.10+, Node.js 18+, Anthropic API key
 
 ```bash
-git clone <repo>
-cd DevForge-AI
+git clone https://github.com/sushilk001/devforge-ai.git
+cd devforge-ai
 
-# Backend
 pip install -r requirements.txt
-
-# Frontend
 npm install
-```
 
-### 2. Configure
-
-```bash
 cp .env.example .env
-# Edit .env — set ANTHROPIC_API_KEY (minimum required)
+# Set ANTHROPIC_API_KEY — everything else is optional
 ```
-
-```env
-# Required
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Optional — Slack notifications and human review buttons
-SLACK_BOT_TOKEN=xoxb-...
-SLACK_SIGNING_SECRET=...
-SLACK_PRD_CHANNEL=#devforge-prd
-
-# Optional — Linear issue creation (Stage 2)
-LINEAR_API_KEY=...
-LINEAR_TEAM_ID=...
-```
-
-### 3. Run
 
 ```bash
-# Terminal 1 — backend API (port 8000)
+# Terminal 1 — backend (port 8000)
 python main.py
 
-# Terminal 2 — dashboard UI (port 3000)
+# Terminal 2 — dashboard (port 3000)
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) → type a feature request → click **▶ LAUNCH**
+Open [http://localhost:3000](http://localhost:3000) → type a feature request → **▶ LAUNCH**
 
----
+### Optional integrations
 
-## Try the Full Pipeline via API
-
-```bash
-# Step 1 — submit a feature request
-curl -X POST http://localhost:8000/stage1/submit \
-  -H "Content-Type: application/json" \
-  -d '{"raw_text": "Add forgot-password flow for enterprise users via email. Success = tickets drop 80%, reset in under 2 minutes.", "requester": "alice"}'
-# Returns → { "status": "pending_review", "prd": {...}, "thread_id": "..." }
-
-# Step 2 — approve PRD → Stage 2 starts automatically
-curl -X POST http://localhost:8000/stage1/review/<thread_id> \
-  -H "Content-Type: application/json" \
-  -d '{"action": "approve"}'
-# Returns → stage2_thread_id
-
-# Step 3 — check tasks + dependency graph
-curl http://localhost:8000/stage2/tasks/<stage2_thread_id>
-
-# Step 4 — approve tasks → Linear issues created, Stage 3 queued
-curl -X POST http://localhost:8000/stage2/review/<stage2_thread_id> \
-  -H "Content-Type: application/json" \
-  -d '{"action": "approve"}'
+```env
+SLACK_BOT_TOKEN=xoxb-...          # Slack notifications + approval buttons
+LINEAR_API_KEY=lin_api_...        # Auto-create Linear issues (Stage 2)
+GITHUB_TOKEN=ghp_...              # Push code + open PR (Stage 6)
+GITHUB_REPO=owner/repo            # Target repo for generated code
 ```
-
-**Via Slack** (with bot configured):
-```
-devforge: Add forgot-password flow for enterprise users via email
-```
-DevForge responds in-thread with the PRD, then posts Approve / Request Changes buttons.
 
 ---
 
 ## API Reference
 
-Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/docs)** for the full interactive Swagger UI.
+Full interactive docs at **[http://localhost:8000/docs](http://localhost:8000/docs)**
 
 | Stage | Key Endpoints |
 |-------|--------------|
@@ -243,8 +182,9 @@ Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/
 | **Stage 2** | `POST /stage2/start/{prd_id}` · `GET /stage2/tasks/{id}` · `POST /stage2/review/{id}` |
 | **Stage 3** | `POST /stage3/start/{s2_id}` · `GET /stage3/review/{id}` |
 | **Stage 4** | `POST /stage4/start/{s2_id}` · `GET /stage4/status/{id}` |
-| **QA** | `POST /qa/run/{s4_id}` · `GET /qa/results/{id}` |
-| **Settings** | `GET /settings` · `POST /settings` · `POST /settings/custom-models` |
+| **Stage 5** | `POST /qa/run/{s4_id}` · `GET /qa/results/{id}` |
+| **Stage 6** | `POST /stage6/deploy` · `GET /stage6/status/{id}` |
+| **Settings** | `GET /settings` · `POST /settings` |
 | **Health** | `GET /health` |
 
 ---
@@ -253,13 +193,13 @@ Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/
 
 | Layer | Technology |
 |-------|-----------|
-| AI / LLM | Claude Sonnet 5 (`claude-sonnet-5`) via Anthropic API |
+| AI / LLM | Claude Sonnet 5 via Anthropic API |
 | Orchestration | LangGraph 1.x with `MemorySaver` checkpointing |
 | Backend | FastAPI + Uvicorn |
 | Schemas | Pydantic v2 |
-| Integrations | Slack SDK, Linear GraphQL API |
+| Integrations | Slack SDK · Linear GraphQL API · PyGithub |
 | Frontend | React 18 + Recharts + Vite |
-| Algorithm | Kahn's topological sort + DP critical path for task dependency graph |
+| Algorithm | Kahn's topological sort + DP critical path |
 
 ---
 
@@ -268,23 +208,25 @@ Start the backend and open **[http://localhost:8000/docs](http://localhost:8000/
 ```
 DevForge-AI/
 ├── agents/
-│   ├── stage1/          # Requirements agent (LangGraph graph + nodes + prompts)
-│   ├── stage2/          # Task orchestration agent
-│   ├── stage3/          # PR review agent (4 parallel reviewers)
-│   └── stage4/          # Code generation agent
+│   ├── stage1/           # Requirements agent
+│   ├── stage2/           # Task orchestration agent
+│   ├── stage3/           # PR review agent (4 parallel reviewers)
+│   └── stage4/           # Code generation agent
 ├── api/
-│   ├── routes.py        # Stage 1 endpoints
+│   ├── routes.py         # Stage 1 endpoints
 │   ├── stage2_routes.py
 │   ├── stage3_routes.py
 │   ├── stage4_routes.py
 │   ├── qa_routes.py
 │   ├── stage6_routes.py
-│   ├── observability.py # LLM call tracking
-│   └── runtime_config.py# Model + credentials management
-├── DevForgeDashboard.jsx# React dashboard (single-file)
-├── main.py              # FastAPI app entry point
-├── .env.example         # Credential template
-└── output/              # Generated codebases land here (gitignored)
+│   ├── observability.py  # LLM call tracking
+│   └── runtime_config.py # Model + credentials management
+├── integrations/
+│   ├── slack.py
+│   └── linear.py
+├── DevForgeDashboard.jsx # React dashboard (single file)
+├── main.py               # FastAPI entry point
+└── .env.example          # Credential template
 ```
 
 ---

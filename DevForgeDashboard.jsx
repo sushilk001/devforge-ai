@@ -1239,7 +1239,7 @@ export default function DevForgeDashboard() {
       app_state: appState,
       active_stage: activeStage || null,
       gate_stage: gateStage || null,
-      completed_stages: [...done],
+      completed_stages: [...doneStages],
       requirements: realPrd ? { title: realPrd.title, goals: realPrd.goals?.length, stories: realPrd.user_stories?.length } : null,
       tasks: realTasks.length > 0 ? { count: realTasks.length } : null,
       code_gen: realCodeGen ? { tasks_generated: realCodeGen.generated?.length || 0, total_files: realCodeGen.total_files || 0 } : null,
