@@ -12,6 +12,12 @@
 
 ---
 
+## Demo
+
+![DevForge AI demo](docs/demo.gif)
+
+---
+
 ## What It Does
 
 DevForge AI eliminates the manual coordination overhead in software delivery. Drop a raw feature request in Slack — or type it in the dashboard — and autonomous AI agents handle every stage:
