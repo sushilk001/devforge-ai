@@ -10,15 +10,12 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from config import get_settings
 from api.observability import record_llm_call
+import api.runtime_config as rc
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
 router_stage6 = APIRouter(prefix="/stage6", tags=["Stage 6 — Deploy"])
-
-_stage6_sessions: dict[str, dict] = {}
-
-MODEL = "claude-sonnet-4-6"
 
 
 def _slug(prd: dict) -> str:
@@ -34,13 +31,13 @@ def _push_to_github(output_dir: Path, branch: str) -> int:
     """Push all generated files to a GitHub branch via Trees API. Returns file count."""
     from github import Github, GithubException, InputGitTreeElement
 
-    if not settings.github_token:
+    if not rc.get_github_token():
         raise ValueError("GITHUB_TOKEN not configured in .env")
-    if not settings.github_repo:
+    if not rc.get_github_repo():
         raise ValueError("GITHUB_REPO not configured in .env (expected 'owner/repo')")
 
-    g    = Github(settings.github_token)
-    repo = g.get_repo(settings.github_repo)
+    g    = Github(rc.get_github_token())
+    repo = g.get_repo(rc.get_github_repo())
 
     files_to_push: list[tuple[str, str]] = []
     for f in sorted(output_dir.rglob("*")):
@@ -133,10 +130,11 @@ Problem: {prd.get('problem_statement', '')}
 Write sections: Summary (2–3 sentences), Changes (bullet list), Testing, Checklist.
 Under 400 words. Return only Markdown, no wrapper."""
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+    model = rc.get_model()
+    client = anthropic.Anthropic(api_key=rc.get_api_key())
     t0 = time.time()
     response = client.messages.create(
-        model=MODEL,
+        model=model,
         max_tokens=600,
         messages=[{"role": "user", "content": prompt}],
     )
@@ -144,7 +142,7 @@ Under 400 words. Return only Markdown, no wrapper."""
     record_llm_call(
         stage="deploy",
         label="stage6/pr-description",
-        model=MODEL,
+        model=model,
         input_tokens=response.usage.input_tokens,
         output_tokens=response.usage.output_tokens,
         latency_ms=latency_ms,
@@ -154,8 +152,8 @@ Under 400 words. Return only Markdown, no wrapper."""
 
 def _create_pr(branch: str, pr_title: str, pr_body: str) -> tuple[str, int]:
     from github import Github, GithubException
-    g    = Github(settings.github_token)
-    repo = g.get_repo(settings.github_repo)
+    g    = Github(rc.get_github_token())
+    repo = g.get_repo(rc.get_github_repo())
     try:
         pr = repo.create_pull(
             title=pr_title, body=pr_body,

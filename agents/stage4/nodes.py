@@ -9,6 +9,7 @@ from langchain_core.messages import HumanMessage
 from .schemas import Stage4State, GeneratedTask, GeneratedFile
 from .prompts import CODE_GEN_PROMPT, ENTRYPOINT_PROMPT
 from config import get_settings
+from api.runtime_config import get_api_key, get_model
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -31,8 +32,8 @@ def _llm_invoke(llm, messages, stage: str, label: str):
 
 def get_llm():
     return ChatAnthropic(
-        model="claude-sonnet-4-6",
-        api_key=settings.anthropic_api_key,
+        model=get_model(),
+        api_key=get_api_key(),
         temperature=0.2,
         max_tokens=4096,
         timeout=60.0,

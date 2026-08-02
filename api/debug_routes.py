@@ -4,13 +4,12 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from config import get_settings
+import api.runtime_config as rc
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
 router_debug = APIRouter(prefix="/debug", tags=["Debug Assistant"])
-
-MODEL = "claude-sonnet-4-6"
 
 SYSTEM_PROMPT = """You are a live assistant embedded inside DevForge AI — a 6-stage autonomous SDLC pipeline.
 
@@ -95,11 +94,12 @@ Recent logs (newest last):
 
 User question: {body.question or "What is currently happening?"}"""
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+    model = rc.get_model()
+    client = anthropic.Anthropic(api_key=rc.get_api_key())
     t0 = time.time()
     try:
         response = client.messages.create(
-            model=MODEL,
+            model=model,
             max_tokens=400,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_message}],
@@ -107,7 +107,7 @@ User question: {body.question or "What is currently happening?"}"""
         latency_ms = int((time.time() - t0) * 1000)
         record_llm_call(
             stage="debug", label="debug/help",
-            model=MODEL,
+            model=model,
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             latency_ms=latency_ms,
