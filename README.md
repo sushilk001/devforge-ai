@@ -1,3 +1,14 @@
+---
+title: DevForge AI
+emoji: ⚡
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Autonomous end-to-end SDLC intelligence engine
+---
+
 # DevForge AI — Autonomous SDLC Intelligence Engine
 
 > Raw feature request → structured PRD → task graph → code → PR review → QA, all driven by Claude AI

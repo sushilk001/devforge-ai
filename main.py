@@ -1,6 +1,8 @@
 import logging
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from api.routes import router
 from api.stage2_routes import router_stage2
@@ -55,6 +57,15 @@ app.include_router(router_settings)
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "DevForge AI", "stages": ["1 — Requirements Agent", "2 — Task Orchestration", "3 — PR Review Agent", "4 — Code Generation Agent", "5 — QA Runner", "6 — Deploy"]}
+
+
+# ── Serve the built dashboard (single origin) ─────────────────────────────────
+# Mounted last so it never shadows the API routers or /docs. Present only in the
+# container build (dist/ is produced by the Vite build stage); skipped in local
+# dev where the Vite dev server proxies to this API instead.
+_DIST = Path(__file__).parent / "dist"
+if _DIST.is_dir():
+    app.mount("/", StaticFiles(directory=str(_DIST), html=True), name="dashboard")
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
