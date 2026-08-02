@@ -1712,7 +1712,7 @@ export default function DevForgeDashboard() {
   const prodOK = prodCfm.toUpperCase()==="DEPLOY";
   const handleProdDeploy = () => {
     if(!prodOK) return;
-    addLog("✓ Production approved by Sushil","success");
+    addLog("✓ Production approved","success");
 
     // If thread IDs aren't in state (e.g. after page refresh), recover from sessions API
     const doFire = (s4tid, s2tid, s3tid, qtid, attempt=0) => {
