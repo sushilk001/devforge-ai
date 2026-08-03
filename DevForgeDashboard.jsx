@@ -250,11 +250,16 @@ const css = `
   }
   .df-rerun-btn:hover{border-color:rgba(0,212,255,.35);color:#00d4ff;background:rgba(0,212,255,.06)}
   .df-dbg-btn{
-    background:transparent;border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.65);
-    cursor:pointer;font-family:-apple-system,system-ui,sans-serif;font-size:11px;
-    letter-spacing:.02em;text-transform:uppercase;padding:0 14px;border-radius:10px;height:44px;transition:all .2s;
+    background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.3);color:rgba(0,210,255,.85);
+    cursor:pointer;font-family:-apple-system,system-ui,sans-serif;font-size:11px;font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;padding:0 16px;border-radius:10px;height:44px;
+    transition:all .2s;box-shadow:0 0 12px rgba(0,180,255,.1),inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .df-dbg-btn:hover{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.5);color:#00d4ff}
+  .df-dbg-btn:hover{
+    background:rgba(0,180,255,.15);border-color:rgba(0,210,255,.55);color:#00d4ff;
+    box-shadow:0 0 20px rgba(0,180,255,.2),inset 0 1px 0 rgba(255,255,255,.08);
+    transform:translateY(-1px);
+  }
   .df-dbg-panel{
     position:fixed;bottom:0;right:0;width:380px;max-height:60vh;
     background:rgba(10,12,26,.98);border:1px solid rgba(0,212,255,.2);border-radius:12px 0 0 0;
@@ -778,32 +783,46 @@ const css = `
   .abt-chip{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;opacity:.78;line-height:1.5}
 
   /* ── Log panel ───────────────────────────────────────────────────────── */
-  .df-log{width:252px;flex-shrink:0;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
+  .df-log{
+    width:260px;flex-shrink:0;display:flex;flex-direction:column;
+    transition:width .3s cubic-bezier(.25,.8,.25,1);overflow:hidden;
+    background:rgba(0,3,12,.7);border-left:1px solid rgba(0,180,255,.1);
+    backdrop-filter:blur(10px);
+  }
   .df-log.wide     {width:460px}
-  .df-log.collapsed{width:46px}
+  .df-log.collapsed{width:48px}
   .df-log-hdr{
-    padding:14px 14px;border-bottom:1px solid rgba(255,255,255,.06);
-    font-size:10px;letter-spacing:.12em;color:rgba(120,160,220,.55);text-transform:uppercase;
-    display:flex;align-items:center;gap:7px;font-weight:600;
+    padding:13px 14px;
+    border-bottom:1px solid rgba(0,180,255,.1);
+    font-size:10px;letter-spacing:.14em;color:rgba(0,200,255,.7);text-transform:uppercase;
+    display:flex;align-items:center;gap:8px;font-weight:700;flex-shrink:0;
+    background:rgba(0,20,50,.4);
+    box-shadow:0 1px 0 rgba(0,180,255,.06);
   }
   .df-log.collapsed .df-log-hdr{flex-direction:column;gap:9px;padding:11px 0}
-  .df-log-dot{width:6px;height:6px;border-radius:50%}
-  .df-log-bd{flex:1;overflow-y:auto;padding:10px}
+  .df-log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .df-log-bd{flex:1;overflow-y:auto;padding:10px 12px}
   .df-log-bd::-webkit-scrollbar{width:2px}
-  .df-log-bd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08)}
+  .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2)}
   .df-log-row{
-    font-size:11px;line-height:1.6;padding:3px 0;
-    border-bottom:1px solid rgba(255,255,255,.04);animation:slideLog .2s ease-out;
+    font-size:11px;line-height:1.65;padding:4px 0;
+    border-bottom:1px solid rgba(0,180,255,.06);
+    animation:slideLog .2s ease-out;
   }
-  .df-log-ts {color:rgba(0,212,255,.55);margin-right:5px;font-family:'SF Mono','Cascadia Code',monospace;font-size:10px}
-  .df-log-msg.info   {color:rgba(200,214,232,.75)}
-  .df-log-msg.success{color:#00ff88}
-  .df-log-msg.warn   {color:#ff9500}
-  .df-log-msg.agent  {color:#c8d6e8}
-  .df-log-msg.gate   {color:#ffaa00}
-  .df-log-msg.handoff{color:#00d4ff}
-  .df-log-msg.done   {color:#ff2d6b;font-weight:700}
-  .df-idle-hint{text-align:center;padding:56px 20px;opacity:.52;font-size:12px;line-height:2}
+  .df-log-row:hover{background:rgba(0,180,255,.03);border-radius:4px;padding-left:3px;padding-right:3px;margin:0 -3px}
+  .df-log-ts {color:rgba(0,200,255,.45);margin-right:6px;font-family:'SF Mono','Cascadia Code',monospace;font-size:9.5px;letter-spacing:.02em}
+  .df-log-msg.info   {color:rgba(200,220,255,.8)}
+  .df-log-msg.success{color:#00ff99;text-shadow:0 0 8px rgba(0,255,153,.25)}
+  .df-log-msg.warn   {color:#ffb340}
+  .df-log-msg.agent  {color:#a8c8f8}
+  .df-log-msg.gate   {color:#ffd060;text-shadow:0 0 8px rgba(255,190,0,.2)}
+  .df-log-msg.handoff{color:#00d4ff;text-shadow:0 0 8px rgba(0,212,255,.2)}
+  .df-log-msg.done   {color:#ff4d80;font-weight:700;text-shadow:0 0 10px rgba(255,45,107,.3)}
+  .df-idle-hint{
+    text-align:center;padding:48px 20px;font-size:12px;line-height:2.2;
+    color:rgba(120,180,255,.55);
+  }
+  .df-idle-hint-icon{font-size:28px;margin-bottom:10px;opacity:.4;display:block}
   .df-cursor{animation:blink 1s step-end infinite;color:#00d4ff}
 
   /* ── Fullscreen code viewer ──────────────────────────────────────────── */
@@ -940,13 +959,20 @@ const css = `
   .df[data-theme='light'] .obs-legend-item{color:rgba(20,30,80,.6);opacity:1}
   .df[data-theme='light'] .obs-empty{color:rgba(20,30,80,.3);opacity:1}
   .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:#fff!important;border-color:rgba(0,140,180,.18)!important;color:#1a1d2e!important}
-  .df[data-theme='light'] .df-log-hdr{border-bottom-color:rgba(0,0,0,.08);color:rgba(20,40,120,.5)}
-  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-log{background:rgba(240,245,255,.8);border-left-color:rgba(0,120,180,.12)}
+  .df[data-theme='light'] .df-log-hdr{background:rgba(220,235,255,.7);border-bottom-color:rgba(0,120,180,.1);color:rgba(0,100,160,.7)}
+  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,120,180,.15)}
   .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.05)}
-  .df[data-theme='light'] .df-log-ts{color:rgba(0,140,180,.35)}
-  .df[data-theme='light'] .df-log-msg.info{color:rgba(20,30,80,.55)}
-  .df[data-theme='light'] .df-log-msg.agent{color:rgba(20,30,80,.7)}
-  .df[data-theme='light'] .df-idle-hint{color:rgba(20,30,80,.52);opacity:1}
+  .df[data-theme='light'] .df-log-row:hover{background:rgba(0,120,180,.04)}
+  .df[data-theme='light'] .df-log-ts{color:rgba(0,120,180,.45)}
+  .df[data-theme='light'] .df-log-msg.info{color:rgba(20,40,100,.65)}
+  .df[data-theme='light'] .df-log-msg.agent{color:rgba(20,50,120,.75)}
+  .df[data-theme='light'] .df-log-msg.success{color:#007744;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.handoff{color:#006699;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.gate{color:#8a5a00;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.done{color:#aa1140;text-shadow:none}
+  .df[data-theme='light'] .df-idle-hint{color:rgba(20,50,120,.45);opacity:1}
+  .df[data-theme='light'] .df-dbg-btn{background:rgba(0,120,180,.07);border-color:rgba(0,120,180,.25);color:rgba(0,120,180,.8);box-shadow:none}
   .df[data-theme='light'] .df-settings-overlay{background:rgba(0,0,0,.35)}
   .df[data-theme='light'] .df-settings-drawer{background:#f5f7fe;border-left-color:rgba(0,0,0,.1)}
   .df[data-theme='light'] .df-set-hdr{border-bottom-color:rgba(0,0,0,.08)}
@@ -2650,7 +2676,7 @@ export default function DevForgeDashboard() {
           </div>
           {logView!=="collapsed"&&(
             <div className="df-log-bd" ref={logRef}>
-              {logs.length===0&&<div style={{opacity:.25,fontSize:10,textAlign:"center",marginTop:36}}>Awaiting pipeline...</div>}
+              {logs.length===0&&<div style={{opacity:.4,fontSize:10,textAlign:"center",marginTop:40,color:"rgba(0,200,255,.6)",letterSpacing:".06em"}}>⟡ Awaiting pipeline...</div>}
               {logs.map(e=><div key={e.id} className="df-log-row"><span className="df-log-ts">{e.ts}</span><span className={`df-log-msg ${e.type}`}>{e.msg}</span></div>)}
             </div>
           )}
