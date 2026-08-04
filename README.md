@@ -12,7 +12,9 @@
 
 ---
 
-## Demo
+## Live Demo
+
+**🌐 Live App:** [https://www.devforgeai.in](https://www.devforgeai.in)
 
 **Demo video:** [https://tinyurl.com/DevForgeAI-demoVideo](https://tinyurl.com/DevForgeAI-demoVideo)
 
