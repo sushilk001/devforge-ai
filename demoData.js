@@ -115,6 +115,27 @@ const ADD_FEATURE = {
     },
   },
 
+  compliance: {
+    status: "complete",
+    score: 16,
+    criticals: 0,
+    warnings_count: 2,
+    verdict: "ADVISORY — 2 warning(s), no blockers. Safe to deploy.",
+    message: "ADVISORY — 2 warning(s), no blockers. Safe to deploy.",
+    findings: [
+      { agent: "accessibility", severity: "warning",  standard: "WCAG 2.2 SC 1.3.1",    title: "Reset form missing fieldset/legend",          description: "The forgot-password form groups email input and submit without a <fieldset> and <legend>, making its purpose ambiguous to screen readers.", file: "src/ui/ForgotPassword.jsx",    recommendation: "Wrap the form fields in <fieldset><legend>Reset your password</legend>…</fieldset>." },
+      { agent: "accessibility", severity: "info",     standard: "WCAG 2.2 SC 2.5.8",    title: "Submit button below 24×24 px minimum target", description: "The Send reset link button renders at 18px height on mobile viewports, below the WCAG 2.2 minimum target size of 24×24 CSS pixels.",    file: "src/ui/ForgotPassword.jsx",    recommendation: "Add min-height: 44px (iOS HIG) or at least min-height: 24px; min-width: 24px to the button." },
+      { agent: "privacy",       severity: "warning",  standard: "GDPR Art. 5(1)(e)",     title: "No data retention policy for reset tokens",  description: "ResetToken objects are created but the codebase has no scheduled cleanup or TTL enforcement at the storage layer — tokens could persist indefinitely after use.", file: "src/models/reset_token.py",    recommendation: "Add a periodic task (e.g. Celery beat) to DELETE tokens WHERE expires_at < NOW() or used = true AND created_at < NOW() - 7d." },
+      { agent: "privacy",       severity: "info",     standard: "GDPR Art. 32",          title: "Email address logged at INFO level",         description: "send_reset_email() logs the recipient address via the default logger, which may persist to disk or a log aggregator without redaction.",              file: "src/services/email.py",        recommendation: "Mask the address in logs: log the domain only (e.g. ***@example.com) or use a separate audit log with restricted access." },
+      { agent: "security",      severity: "info",     standard: "OWASP A07:2021",        title: "No account-enumeration protection on /reset/request", description: "The request endpoint likely returns a distinguishable response when the email is not found, enabling attackers to enumerate valid accounts.", file: null,                           recommendation: "Always return the same 200 response regardless of whether the email exists. Send the email silently only if found." },
+      { agent: "licensing",     severity: "info",     standard: "Apache 2.0 / MIT",      title: "All detected dependencies are permissively licensed", description: "boto3 (Apache 2.0), FastAPI (MIT), SQLAlchemy (MIT), pytest (MIT) — no copyleft conflicts detected for a commercial deployment.",       file: null,                           recommendation: "No action required. Keep a NOTICE file updated as new dependencies are added." },
+    ],
+    debt_history: [
+      { date: "2026-07-28", score: 0,  criticals: 0, warnings: 0 },
+      { date: "2026-08-04", score: 16, criticals: 0, warnings: 2 },
+    ],
+  },
+
   deploy: {
     status: "complete",
     step: "done",
@@ -138,7 +159,11 @@ const ADD_FEATURE = {
     { id: 10, stage: "pr_review",    label: "quality",         model: "claude-sonnet-4-6", inputTok: 7608, outputTok: 1126, latencyMs: 10970, cost: 0.039714 },
     { id: 11, stage: "pr_review",    label: "architecture",    model: "claude-sonnet-4-6", inputTok: 7632, outputTok: 1172, latencyMs: 11928, cost: 0.040476 },
     { id: 12, stage: "pr_review",    label: "coverage",        model: "claude-sonnet-4-6", inputTok: 7624, outputTok: 1264, latencyMs: 12568, cost: 0.041832 },
-    { id: 13, stage: "deploy",       label: "pr-description",  model: "claude-sonnet-4-6", inputTok: 3892, outputTok: 612,  latencyMs: 6120,  cost: 0.020856 },
+    { id: 13, stage: "compliance",  label: "accessibility",   model: "claude-sonnet-4-6", inputTok: 9142, outputTok: 892,  latencyMs: 9870,  cost: 0.034146 },
+    { id: 14, stage: "compliance",  label: "privacy",         model: "claude-sonnet-4-6", inputTok: 9087, outputTok: 1034, latencyMs: 10241, cost: 0.036795 },
+    { id: 15, stage: "compliance",  label: "security",        model: "claude-sonnet-4-6", inputTok: 9203, outputTok: 761,  latencyMs: 9312,  cost: 0.031848 },
+    { id: 16, stage: "compliance",  label: "licensing",       model: "claude-sonnet-4-6", inputTok: 9054, outputTok: 583,  latencyMs: 8640,  cost: 0.028557 },
+    { id: 17, stage: "deploy",      label: "pr-description",  model: "claude-sonnet-4-6", inputTok: 3892, outputTok: 612,  latencyMs: 6120,  cost: 0.020856 },
   ],
 };
 
@@ -259,6 +284,25 @@ const NEW_SOFTWARE = {
     },
   },
 
+  compliance: {
+    status: "complete",
+    score: 31,
+    criticals: 1,
+    warnings_count: 2,
+    verdict: "REVIEW REQUIRED — 1 critical issue(s), 2 warning(s)",
+    message: "REVIEW REQUIRED — 1 critical issue(s), 2 warning(s)",
+    findings: [
+      { agent: "accessibility", severity: "info",     standard: "WCAG 2.2 SC 3.1.1",    title: "Redirect page has no visible text content",     description: "The 302 redirect page contains no accessible text — if the redirect fails, users with assistive tech see a blank frame.",                                            file: null,                            recommendation: "Add a <noscript> fallback with a plain-text link: 'Click here if not redirected automatically.'" },
+      { agent: "privacy",       severity: "critical", standard: "GDPR Art. 5(1)(a)",     title: "Click analytics collect IP without consent",    description: "The analytics handler records the visitor's IP address per click. IP addresses are personal data under GDPR; collecting them without a lawful basis or disclosure violates Art. 5.", file: "src/api/links_create.py",       recommendation: "Either (a) hash the IP before storage (SHA-256 + daily salt), (b) gate collection behind explicit consent, or (c) log only the country-level geolocation." },
+      { agent: "privacy",       severity: "warning",  standard: "GDPR Art. 13",          title: "No privacy notice for analytics data",         description: "The service collects click metadata (referrer, timestamp, IP) but exposes no privacy policy or data-processing notice to end users whose links are visited.",            file: null,                            recommendation: "Add a /privacy endpoint or footer link describing what is collected, why, and how long it's retained." },
+      { agent: "security",      severity: "warning",  standard: "OWASP A01:2021",        title: "Open redirect not fully validated",             description: "The redirect target URL is validated by format only. A crafted URL (e.g. javascript:// or data: scheme) could bypass the check depending on the regex used.",        file: "src/api/links_create.py",       recommendation: "Allowlist http:// and https:// schemes explicitly: assert parsed.scheme in {'http','https'} before storing." },
+      { agent: "licensing",     severity: "info",     standard: "LGPL-2.1",              title: "psycopg2 is LGPL — advisory for distribution", description: "psycopg2 is licensed under LGPL-2.1. Dynamic linking (the default pip install) is permissible for proprietary software, but static linking or redistribution requires disclosure.", file: "requirements.txt",              recommendation: "Use psycopg2-binary for deployment (same license, but clarifies linking intent) and document the dependency in your NOTICE file." },
+    ],
+    debt_history: [
+      { date: "2026-08-04", score: 31, criticals: 1, warnings: 2 },
+    ],
+  },
+
   deploy: {
     status: "complete",
     step: "done",
@@ -285,7 +329,11 @@ const NEW_SOFTWARE = {
     { id: 11, stage: "pr_review",    label: "quality",         model: "claude-sonnet-4-6", inputTok: 8203, outputTok: 1094, latencyMs: 10761, cost: 0.041019 },
     { id: 12, stage: "pr_review",    label: "architecture",    model: "claude-sonnet-4-6", inputTok: 8267, outputTok: 1216, latencyMs: 11588, cost: 0.043041 },
     { id: 13, stage: "pr_review",    label: "coverage",        model: "claude-sonnet-4-6", inputTok: 8255, outputTok: 1358, latencyMs: 12233, cost: 0.045135 },
-    { id: 14, stage: "deploy",       label: "pr-description",  model: "claude-sonnet-4-6", inputTok: 4318, outputTok: 689,  latencyMs: 6540,  cost: 0.023289 },
+    { id: 14, stage: "compliance",  label: "accessibility",   model: "claude-sonnet-4-6", inputTok: 9876, outputTok: 714,  latencyMs: 9120,  cost: 0.032634 },
+    { id: 15, stage: "compliance",  label: "privacy",         model: "claude-sonnet-4-6", inputTok: 9921, outputTok: 1186, latencyMs: 11043, cost: 0.039729 },
+    { id: 16, stage: "compliance",  label: "security",        model: "claude-sonnet-4-6", inputTok: 9843, outputTok: 872,  latencyMs: 9654,  cost: 0.034557 },
+    { id: 17, stage: "compliance",  label: "licensing",       model: "claude-sonnet-4-6", inputTok: 9798, outputTok: 641,  latencyMs: 8891,  cost: 0.031029 },
+    { id: 18, stage: "deploy",      label: "pr-description",  model: "claude-sonnet-4-6", inputTok: 4318, outputTok: 689,  latencyMs: 6540,  cost: 0.023289 },
   ],
 };
 
