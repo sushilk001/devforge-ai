@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 import asyncio
 import re
 import uuid
@@ -16,8 +17,12 @@ OUTPUT_DIR = Path(__file__).parent.parent / "output"
 _stage4_sessions: dict[str, Stage4State] = {}
 # Maps thread_id → absolute output path (set as soon as files are written)
 _stage4_output_paths: dict[str, Path] = {}
-# Tracks in-flight runs: thread_id → stage2_thread_id
+# Tracks in-flight initial runs: thread_id → stage2_thread_id
 _stage4_running: dict[str, str] = {}
+# Tracks active regen (changes_requested) threads: thread_id → True
+_stage4_rerunning: dict[str, bool] = {}
+# Tracks regen errors so the poller can surface them: thread_id → error_msg
+_stage4_regen_errors: dict[str, str] = {}
 
 
 def _coerce(result, cls):
@@ -116,13 +121,18 @@ def list_sessions():
 
 @router_stage4.get("/status/{thread_id}")
 def get_status(thread_id: str):
-    """Poll Stage 4 status — returns running/complete/not_found."""
+    """Poll Stage 4 status — returns running/rerunning/complete/error/not_found."""
+    if thread_id in _stage4_regen_errors:
+        return {"status": "error", "error": _stage4_regen_errors[thread_id],
+                "task_count": 0, "total_files": 0, "output_path": None}
+    if thread_id in _stage4_rerunning:
+        return {"status": "rerunning", "task_count": 0, "total_files": 0, "output_path": None}
     if thread_id in _stage4_sessions:
         s = _stage4_sessions[thread_id]
         out = _stage4_output_paths.get(thread_id)
         return {
-            "status":     "complete",
-            "task_count": len(s.generated),
+            "status":      "complete",
+            "task_count":  len(s.generated),
             "total_files": s.total_files,
             "output_path": str(out) if out else None,
         }
@@ -187,10 +197,12 @@ async def approve_code(thread_id: str, body: dict):
         state.approved       = False
         _stage4_sessions[thread_id] = state
 
+        _stage4_rerunning[thread_id] = True
+        _stage4_regen_errors.pop(thread_id, None)
+
         def _rerun():
             try:
                 s = generate_code_for_tasks(state)
-                _stage4_sessions[thread_id] = s
                 slug = _project_slug(s.prd or {})
                 out  = OUTPUT_DIR / slug / thread_id
                 _stage4_output_paths[thread_id] = out
@@ -202,12 +214,16 @@ async def approve_code(thread_id: str, body: dict):
                             fp = out / fname
                             fp.parent.mkdir(parents=True, exist_ok=True)
                             fp.write_text(file_data.get("content", ""), encoding="utf-8")
+                _stage4_sessions[thread_id] = s
                 logger.info(f"[Stage4] Re-run complete with feedback. files={s.total_files}")
             except Exception as e:
-                logger.error(f"[Stage4] Re-run failed: {e}")
+                err_msg = str(e)[:200]
+                logger.error(f"[Stage4] Re-run failed: {err_msg}")
+                _stage4_regen_errors[thread_id] = err_msg
+            finally:
+                _stage4_rerunning.pop(thread_id, None)
 
         import threading, contextvars
-        # run in the caller's context so the session's credentials propagate
         threading.Thread(target=contextvars.copy_context().run, args=(_rerun,), daemon=True).start()
 
         return CodeGenResponse(

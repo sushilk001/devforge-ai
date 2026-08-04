@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 CODE_GEN_PROMPT = """You are an expert software engineer generating production-quality code for a specific engineering task.
 
 Task Title: {task_title}

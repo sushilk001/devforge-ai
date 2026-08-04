@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 // ── Confetti ─────────────────────────────────────────────────────────────────
 // One-shot celebratory burst for the "shipped to production" moment.
 // Pieces are generated once (useState initializer) so re-renders don't restart it.

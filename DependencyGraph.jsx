@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 // ── DependencyGraph ──────────────────────────────────────────────────────────
 // Self-contained SVG DAG for Stage 2 output. Uses the backend's parallel_tracks
 // as layout levels and critical_path for highlighting. No external deps.

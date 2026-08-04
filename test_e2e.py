@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 #!/usr/bin/env python3
 """
 DevForge AI — End-to-End Test Suite
@@ -620,17 +621,32 @@ def _test_s4_changes_requested() -> None:
         check("S4-FAIL-01  changes_requested returns 200", False, str(exc))
         return
 
-    # ── poll until regen completes ────────────────────────────────────────────
-    data = poll_until(
+    # ── poll status endpoint until regen completes (status: complete) or errors ──
+    status_data = poll_until(
         "Stage 4 regen with feedback",
-        f"{BASE_URL}/stage4/code/{s4_tid}",
-        lambda d: d.get("total_files", 0) > 0 or len(d.get("generated", [])) > 0,
+        f"{BASE_URL}/stage4/status/{s4_tid}",
+        lambda d: d.get("status") in ("complete", "error"),
+        timeout=300,
+    )
+    regen_ok = (
+        status_data is not None
+        and status_data.get("status") == "complete"
+        and status_data.get("total_files", 0) > 0
     )
     check("S4-FAIL-04  regen completes with updated files",
-          data is not None and (
-              data.get("total_files", 0) > 0 or len(data.get("generated", [])) > 0
-          ),
-          f"total_files={data.get('total_files', 0) if data else 'timeout'}")
+          regen_ok,
+          f"status={status_data.get('status', 'timeout') if status_data else 'timeout'} "
+          f"total_files={status_data.get('total_files', 0) if status_data else 0}")
+
+    # fetch actual generated files for S4-FAIL-05
+    data = None
+    if regen_ok:
+        try:
+            r = requests.get(f"{BASE_URL}/stage4/code/{s4_tid}", timeout=30)
+            if r.status_code == 200:
+                data = r.json()
+        except Exception:
+            pass
     check("S4-FAIL-05  generated task list populated after regen",
           data is not None and len(data.get("generated", [])) > 0,
           f"{len(data.get('generated', [])) if data else 0} tasks")
