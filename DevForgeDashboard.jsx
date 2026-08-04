@@ -19,7 +19,8 @@ const STAGES = [
   { id:"code_gen",     num:"03",label:"Code Gen",     sub:"Agent",   icon:"◈",color:"#bf5fff",glow:"rgba(191,95,255,0.35)", desc:"Full working codebase generated to disk" },
   { id:"pr_review",    num:"04",label:"PR Review",    sub:"Panel",   icon:"◉",color:"#e066ff",glow:"rgba(224,102,255,0.35)",desc:"Security · quality · coverage · architecture" },
   { id:"qa",           num:"05",label:"QA",           sub:"Agent",   icon:"◆",color:"#2dd4bf",glow:"rgba(45,212,191,0.35)", desc:"pytest runner · pass/fail report per case" },
-  { id:"deploy",       num:"06",label:"Deploy",       sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"GitHub push · open PR · notify Slack" },
+  { id:"compliance",   num:"06",label:"Compliance",  sub:"Panel",   icon:"⚖",color:"#f59e0b",glow:"rgba(245,158,11,0.35)",  desc:"WCAG 2.2 · GDPR · OWASP · License audit" },
+  { id:"deploy",       num:"07",label:"Deploy",       sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"GitHub push · open PR · notify Slack" },
 ];
 
 // ── Pipeline log scripts ───────────────────────────────────────────────────
@@ -58,17 +59,25 @@ const PIPELINE_SCRIPT = {
     {t:3800,msg:"⟡ Parsing pytest output...",                     type:"info"},
     {t:4600,msg:"⏸ QA complete — awaiting real results",         type:"gate"},
   ],
+  compliance:[
+    {t:300, msg:"⟡ Starting compliance & governance audit...",     type:"info"},
+    {t:900, msg:"⟡ Running WCAG 2.2 / Section 508 check...",       type:"info"},
+    {t:1800,msg:"⟡ Running GDPR / privacy analysis...",            type:"info"},
+    {t:2700,msg:"⟡ Running OWASP security compliance check...",    type:"info"},
+    {t:3600,msg:"⟡ Running license & regulatory audit...",         type:"info"},
+    {t:4800,msg:"⏸ Compliance report ready — awaiting review...",  type:"gate"},
+  ],
   deploy:[
     {t:400, msg:"⟡ Pushing generated code to GitHub...",           type:"info"},
     {t:1400,msg:"⟡ Claude writing PR description...",               type:"info"},
     {t:2600,msg:"⟡ Creating GitHub Pull Request...",               type:"info"},
     {t:3600,msg:"⟡ Notifying Slack #devforge-prd...",              type:"info"},
     {t:4400,msg:"⟡ Closing Linear issues as Done...",              type:"info"},
-    {t:5900,msg:"🎉 PR CREATED — FEATURE DELIVERED",               type:"done"},
+    {t:5900,msg:"🎉 PR CREATED — DELIVERED",                       type:"done"},
   ],
 };
 
-const STAGE_DUR = { requirements:5200, tasks:4400, code_gen:6500, pr_review:5400, qa:5000, deploy:6200 };
+const STAGE_DUR = { requirements:5200, tasks:4400, code_gen:6500, pr_review:5400, qa:5000, compliance:5800, deploy:6200 };
 
 
 // ── Review summaries ───────────────────────────────────────────────────────
@@ -85,7 +94,7 @@ const REVIEW_SUMMARY = {
 const ENV_DATA =[{name:"DEV",delay:1000},{name:"STAGING",delay:1800},{name:"UAT",delay:2800}];
 
 const MODEL_COLORS = { "claude-sonnet-4-6":"#00d4ff", "claude-haiku-4-5":"#00ff88" };
-const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", code_gen:"#bf5fff", pr_review:"#e066ff", qa:"#2dd4bf", deploy:"#ff2d6b" };
+const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", code_gen:"#bf5fff", pr_review:"#e066ff", qa:"#2dd4bf", compliance:"#f59e0b", deploy:"#ff2d6b" };
 
 // ── CSS ────────────────────────────────────────────────────────────────────
 const css = `
@@ -1759,6 +1768,8 @@ export default function DevForgeDashboard() {
   const [realCodeGen, setRealCodeGen]= useState(null);
   const [realQA, setRealQA]          = useState(null);
   const [qaThreadId, setQaTid]       = useState(null);
+  const [complianceTid, setComplianceTid] = useState(null);
+  const [realCompliance, setRealCompliance] = useState(null);
   const [realDeploy, setRealDeploy]  = useState(null);
   const [expandedFile, setExpandedFile]   = useState(null);
   const [fullscreenFile, setFullscreenFile] = useState(null); // {filename, content, taskTitle, copied}
@@ -1802,6 +1813,7 @@ export default function DevForgeDashboard() {
   const inputRef    = useRef(null);
   const fileInputRef = useRef(null);
   const demoModeRef = useRef(false); // gates the observability poller during Demo Mode
+  const s4TidRef    = useRef(null);  // always holds the latest stage4ThreadId for pipeline closures
 
   // ── Settings handlers ──────────────────────────────────────────────────────
   const openSettings = () => {
@@ -1875,15 +1887,16 @@ export default function DevForgeDashboard() {
 
   // ── Re-run pipeline from a specific stage onwards ─────────────────────────
   const rerunFromStage = (fromStageId) => {
-    const stageOrder = ["requirements","tasks","code_gen","pr_review","qa","deploy"];
+    const stageOrder = ["requirements","tasks","code_gen","pr_review","qa","compliance","deploy"];
     const idx = stageOrder.indexOf(fromStageId);
     if (idx < 0) return;
 
     // Clear done + data for stages from idx onwards
     setDone(prev => { const n=new Set(prev); stageOrder.slice(idx).forEach(s=>n.delete(s)); return n; });
-    if (idx <= stageOrder.indexOf("code_gen"))  { setRealCodeGen(null); setS4Tid(null);  setApiReady(p=>({...p,code_gen:false})); }
-    if (idx <= stageOrder.indexOf("pr_review")) { setRealReview(null);  setS3Tid(null);  setApiReady(p=>({...p,pr_review:false})); }
-    if (idx <= stageOrder.indexOf("qa"))        { setRealQA(null);      setQaTid(null);  setApiReady(p=>({...p,qa:false})); }
+    if (idx <= stageOrder.indexOf("code_gen"))   { setRealCodeGen(null);    setS4Tid(null);         setApiReady(p=>({...p,code_gen:false})); }
+    if (idx <= stageOrder.indexOf("pr_review"))  { setRealReview(null);     setS3Tid(null);         setApiReady(p=>({...p,pr_review:false})); }
+    if (idx <= stageOrder.indexOf("qa"))         { setRealQA(null);         setQaTid(null);         setApiReady(p=>({...p,qa:false})); }
+    if (idx <= stageOrder.indexOf("compliance")) { setRealCompliance(null); setComplianceTid(null); setApiReady(p=>({...p,compliance:false})); }
     setRealDeploy(null);
     clearAll();
     setShowFB(false); setFb(""); setGateStage(null);
@@ -2141,6 +2154,60 @@ export default function DevForgeDashboard() {
     setTimeout(poll, 5000);
   };
 
+  const pollCompliance = (cTid, onComplete) => {
+    const deadline = Date.now() + 240_000;
+    const poll = () => {
+      if (Date.now() > deadline) {
+        addLog("⚠ Compliance check timed out — proceeding with advisory","warn");
+        setApiReady(p=>({...p, compliance:true}));
+        onComplete && onComplete();
+        return;
+      }
+      fetch(`/compliance/status/${cTid}`).then(r=>r.json()).then(d=>{
+        if (d.status==="complete") {
+          fetch(`/compliance/report/${cTid}`).then(r=>r.json()).then(rpt=>{
+            setRealCompliance(rpt);
+            setApiReady(p=>({...p, compliance:true}));
+            const c = rpt.criticals||0, w = rpt.warnings_count||0;
+            if (c===0 && w===0) addLog("✓ Compliance audit passed — no issues found","success");
+            else if (c===0)     addLog(`⚠ Compliance advisory: ${w} warning(s), no blockers`,"warn");
+            else                addLog(`⚠ Compliance: ${c} critical issue(s), ${w} warning(s) — review required`,"warn");
+            onComplete && onComplete();
+          }).catch(()=>{ setApiReady(p=>({...p,compliance:true})); onComplete&&onComplete(); });
+        } else if (d.status==="error") {
+          addLog(`⚠ Compliance check error: ${d.error||"unknown"}`,"warn");
+          setApiReady(p=>({...p, compliance:true}));
+          onComplete && onComplete();
+        } else {
+          setTimeout(poll, 4000);
+        }
+      }).catch(()=>setTimeout(poll,5000));
+    };
+    setTimeout(poll, 5000);
+  };
+
+  const runCompliance = (onComplete) => {
+    const s4Tid = s4TidRef.current;
+    runStage("compliance", ()=>{});
+    fetch(`/compliance/start/${s4Tid}`, {method:"POST"})
+      .then(r=>r.json())
+      .then(d=>{
+        if (d.thread_id) {
+          setComplianceTid(d.thread_id);
+          pollCompliance(d.thread_id, onComplete);
+        } else {
+          addLog("⚠ Compliance start failed — skipping","warn");
+          setApiReady(p=>({...p,compliance:true}));
+          onComplete && onComplete();
+        }
+      })
+      .catch(()=>{
+        addLog("⚠ Compliance API unreachable — skipping","warn");
+        setApiReady(p=>({...p,compliance:true}));
+        onComplete && onComplete();
+      });
+  };
+
   const pollDeploy = (deployTid) => {
     const deadline = Date.now() + 300_000;
     const poll = () => {
@@ -2170,7 +2237,7 @@ export default function DevForgeDashboard() {
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
-    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setRealDeploy(null); setExpandedFile(null);
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setComplianceTid(null); setRealCompliance(null); setRealDeploy(null); setExpandedFile(null);
     setGithubUrl(""); setAttachments([]);
     addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
     addLog("⟡ Source: Slack #devforge-requests","info");
@@ -2212,7 +2279,8 @@ export default function DevForgeDashboard() {
       addLog("⚠ PRODUCTION GATE — mandatory approval required","gate");
       resumeFn.current = s7;
     }
-    const s6 = () => runStage("qa",          goProdGate);
+    const s6b = () => runCompliance(goProdGate);
+    const s6 = () => runStage("qa",          s6b);
     const s5 = () => runStage("pr_review",   s6);
     const s4 = () => runStage("code_gen",    s5);
     const s3 = () => runStage("tasks",       s4);
@@ -2263,7 +2331,8 @@ export default function DevForgeDashboard() {
       // data lands ~0.6s before the gate, after the running animation has played
       T(() => { if (load[id]) load[id](); }, Math.max(800, (STAGE_DUR[id]||5000) - 600));
     };
-    const s6 = () => demoStage("qa",           goProdGate);
+    const s6b = () => demoStage("compliance",  goProdGate);
+    const s6 = () => demoStage("qa",           s6b);
     const s5 = () => demoStage("pr_review",    s6);
     const s4 = () => demoStage("code_gen",     s5);
     const s3 = () => demoStage("tasks",        s4);
@@ -2281,6 +2350,8 @@ export default function DevForgeDashboard() {
   };
 
   // Drive deploy completion from real API result — not a fixed timer
+  useEffect(() => { s4TidRef.current = stage4ThreadId; }, [stage4ThreadId]);
+
   useEffect(() => {
     if(realDeploy?.status === "complete") {
       setProgress(p=>({...p,deploy:100}));
@@ -2762,6 +2833,89 @@ export default function DevForgeDashboard() {
           })}
         </div>
       </div>);
+    }
+    if(detail==="compliance") {
+      const rpt = realCompliance;
+      const running = !rpt;
+      const criticals = rpt?.criticals || 0;
+      const warnings  = rpt?.warnings_count || 0;
+      const score     = rpt?.score || 0;
+      const scoreColor = criticals > 0 ? "#ff2d6b" : warnings > 0 ? "#f59e0b" : "#00ff88";
+      const AGENT_LABELS = { accessibility:"WCAG 2.2 / 508", privacy:"GDPR / Privacy", security:"OWASP Top 10", licensing:"License / Regulatory" };
+      const byAgent = {};
+      (rpt?.findings||[]).forEach(f => { if(!byAgent[f.agent]) byAgent[f.agent]=[];  byAgent[f.agent].push(f); });
+      const severityColor = s => s==="critical"?"#ff2d6b":s==="warning"?"#f59e0b":"#6b8ab0";
+      return (
+        <div>
+          <div className="df-dtitle" style={{color:"#f59e0b"}}>Compliance & Governance</div>
+          <div className="df-dsub">
+            {running
+              ? <span style={{animation:"pulse .8s infinite",display:"inline-block"}}>⟳ Running 4 compliance agents in parallel...</span>
+              : rpt?.verdict}
+          </div>
+          {!running && (
+            <>
+              <div style={{display:"flex",gap:10,marginTop:10,marginBottom:12}}>
+                <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"rgba(255,45,107,.08)",border:"1px solid rgba(255,45,107,.2)",textAlign:"center"}}>
+                  <div style={{fontSize:20,fontWeight:800,color:"#ff2d6b"}}>{criticals}</div>
+                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Critical</div>
+                </div>
+                <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)",textAlign:"center"}}>
+                  <div style={{fontSize:20,fontWeight:800,color:"#f59e0b"}}>{warnings}</div>
+                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Warnings</div>
+                </div>
+                <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:`rgba(${criticals>0?"255,45,107":warnings>0?"245,158,11":"0,255,136"},.08)`,border:`1px solid rgba(${criticals>0?"255,45,107":warnings>0?"245,158,11":"0,255,136"},.2)`,textAlign:"center"}}>
+                  <div style={{fontSize:20,fontWeight:800,color:scoreColor}}>{score}</div>
+                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Debt Score</div>
+                </div>
+              </div>
+              {Object.entries(byAgent).length === 0 && (
+                <div style={{color:"#00ff88",fontSize:12,padding:"8px 12px",borderRadius:6,background:"rgba(0,255,136,.06)",border:"1px solid rgba(0,255,136,.15)"}}>✓ No compliance issues detected across all standards</div>
+              )}
+              {Object.entries(byAgent).map(([agent, findings]) => (
+                <div key={agent} style={{marginBottom:10}}>
+                  <div style={{fontSize:10,fontWeight:700,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>{AGENT_LABELS[agent]||agent}</div>
+                  {findings.map((f,i) => (
+                    <div key={i} style={{padding:"7px 10px",borderRadius:6,marginBottom:4,background:`rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.06)`,border:`1px solid rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.18)`,borderLeft:`3px solid ${severityColor(f.severity)}`}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:6}}>
+                        <div style={{fontSize:11,fontWeight:700,color:tc("#c8d4f0","#1e3a5c"),flex:1}}>{f.title}</div>
+                        <span style={{fontSize:9,fontWeight:700,color:severityColor(f.severity),letterSpacing:1,textTransform:"uppercase",flexShrink:0}}>{f.severity}</span>
+                      </div>
+                      <div style={{fontSize:9,color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),marginTop:2}}>{f.standard}{f.file ? ` · ${f.file}` : ""}</div>
+                      <div style={{fontSize:10,color:tc("rgba(200,214,232,.65)","rgba(20,30,80,.7)"),marginTop:4,lineHeight:1.45}}>{f.description}</div>
+                      <div style={{fontSize:10,color:"#00d4ff",marginTop:4,lineHeight:1.4}}>↳ {f.recommendation}</div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {(rpt?.debt_history||[]).length > 1 && (
+                <div style={{marginTop:12,padding:"8px 12px",borderRadius:6,background:tc("rgba(200,214,232,.04)","rgba(20,30,80,.06)"),border:"1px solid rgba(245,158,11,.12)"}}>
+                  <div style={{fontSize:9,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Compliance Debt History</div>
+                  <div style={{display:"flex",gap:4,alignItems:"flex-end",height:32}}>
+                    {rpt.debt_history.map((h,i)=>{
+                      const maxScore = Math.max(...rpt.debt_history.map(x=>x.score),1);
+                      const h_ = Math.max(4, Math.round((h.score/maxScore)*28));
+                      const c = h.criticals>0?"#ff2d6b":h.score>0?"#f59e0b":"#00ff88";
+                      return <div key={i} title={`${h.date}: score ${h.score}`} style={{flex:1,height:h_,background:c,borderRadius:2,opacity:.75}}/>;
+                    })}
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                    <span style={{fontSize:8,color:tc("rgba(200,214,232,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[0]?.date}</span>
+                    <span style={{fontSize:8,color:tc("rgba(200,214,232,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[rpt.debt_history.length-1]?.date}</span>
+                  </div>
+                </div>
+              )}
+              <div style={{marginTop:12,padding:"9px 12px",borderRadius:6,background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.2)"}}>
+                <div style={{fontSize:10,color:"rgba(200,214,232,.55)",marginBottom:6}}>This is an optional gate — you may proceed to deploy regardless of findings.</div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>{ fetch(`/compliance/decision/${complianceTid}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"approved"})}).catch(()=>{}); addLog("✓ Compliance approved — proceeding to deploy","success"); resumeFn.current && resumeFn.current(); }} style={{flex:1,padding:"6px 10px",borderRadius:5,border:"1px solid rgba(0,255,136,.35)",background:"rgba(0,255,136,.08)",color:"#00ff88",fontSize:11,fontWeight:700,cursor:"pointer"}}>✓ Approve &amp; Deploy</button>
+                  <button onClick={()=>{ fetch(`/compliance/decision/${complianceTid}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deployed_anyway"})}).catch(()=>{}); addLog("⚠ Deployed with open compliance findings","warn"); resumeFn.current && resumeFn.current(); }} style={{flex:1,padding:"6px 10px",borderRadius:5,border:"1px solid rgba(245,158,11,.35)",background:"rgba(245,158,11,.08)",color:"#f59e0b",fontSize:11,fontWeight:700,cursor:"pointer"}}>⚡ Deploy Anyway</button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
     }
     if(detail==="deploy") {
       const deploySteps = [
