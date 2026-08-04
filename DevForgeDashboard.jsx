@@ -2321,6 +2321,7 @@ export default function DevForgeDashboard() {
       code_gen:     () => setRealCodeGen(D.codeGen),
       pr_review:    () => setRealReview(D.review),
       qa:           () => setRealQA(D.qa),
+      compliance:   () => setRealCompliance(D.compliance),
     };
 
     const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); setRealDeploy(D.deploy); pushCalls("deploy"); runDeploy(); };
