@@ -9,6 +9,7 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-1.x-orange?style=flat-square)
 ![Claude AI](https://img.shields.io/badge/Claude-Sonnet%205-blueviolet?style=flat-square)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)
+![License](https://img.shields.io/badge/License-BSL%201.1-orange?style=flat-square)
 
 ---
 
@@ -219,6 +220,18 @@ DevForge-AI/
 ├── main.py               # FastAPI entry point
 └── .env.example          # Credential template
 ```
+
+---
+
+## License
+
+This project is licensed under the **[Business Source License 1.1](LICENSE)**.
+
+- **Free to use** for personal, academic, and internal business purposes
+- **Not permitted** to run as a hosted commercial service or compete with devforgeai.in without a separate agreement
+- **Converts to Apache 2.0** automatically on 2030-08-05
+
+For commercial licensing: sushil@hackerrank.com
 
 ---
 

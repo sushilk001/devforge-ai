@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from "recharts";
 import DependencyGraph from "./DependencyGraph.jsx";
@@ -13,12 +14,12 @@ document.head.appendChild(fontLink);
 
 // ── Stages ─────────────────────────────────────────────────────────────────
 const STAGES = [
-  { id:"requirements", num:"01",label:"Requirements", sub:"Agent",   icon:"◈",color:"#00d4ff",glow:"rgba(0,212,255,0.35)",  desc:"Feature Request → PRD" },
-  { id:"tasks",        num:"02",label:"Task Orch.",   sub:"Agent",   icon:"◆",color:"#00ff88",glow:"rgba(0,255,136,0.35)",  desc:"PRD → Linear Tasks" },
-  { id:"code_gen",     num:"03",label:"Code Gen",     sub:"Agent",   icon:"◈",color:"#bf5fff",glow:"rgba(191,95,255,0.35)", desc:"Claude writes code per ticket" },
-  { id:"pr_review",    num:"04",label:"PR Review",    sub:"Panel",   icon:"◉",color:"#e066ff",glow:"rgba(224,102,255,0.35)",desc:"4 Agents review generated code" },
-  { id:"qa",           num:"05",label:"QA",           sub:"Agent",   icon:"◆",color:"#2dd4bf",glow:"rgba(45,212,191,0.35)", desc:"Automated test execution" },
-  { id:"deploy",       num:"06",label:"Deploy",       sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"Dev → Staging → UAT → Prod" },
+  { id:"requirements", num:"01",label:"Requirements", sub:"Agent",   icon:"◈",color:"#00d4ff",glow:"rgba(0,212,255,0.35)",  desc:"Natural language → structured PRD" },
+  { id:"tasks",        num:"02",label:"Task Orch.",   sub:"Agent",   icon:"◆",color:"#00ff88",glow:"rgba(0,255,136,0.35)",  desc:"Task graph · critical path · Linear issues" },
+  { id:"code_gen",     num:"03",label:"Code Gen",     sub:"Agent",   icon:"◈",color:"#bf5fff",glow:"rgba(191,95,255,0.35)", desc:"Full working codebase generated to disk" },
+  { id:"pr_review",    num:"04",label:"PR Review",    sub:"Panel",   icon:"◉",color:"#e066ff",glow:"rgba(224,102,255,0.35)",desc:"Security · quality · coverage · architecture" },
+  { id:"qa",           num:"05",label:"QA",           sub:"Agent",   icon:"◆",color:"#2dd4bf",glow:"rgba(45,212,191,0.35)", desc:"pytest runner · pass/fail report per case" },
+  { id:"deploy",       num:"06",label:"Deploy",       sub:"Pipeline",icon:"▲",color:"#ff2d6b",glow:"rgba(255,45,107,0.35)", desc:"GitHub push · open PR · notify Slack" },
 ];
 
 // ── Pipeline log scripts ───────────────────────────────────────────────────
@@ -104,8 +105,9 @@ const css = `
   @keyframes logoGlow  {0%,100%{opacity:.3;transform:scale(.88)}50%{opacity:.85;transform:scale(1.12)}}
   @keyframes nodeRing  {0%,100%{box-shadow:0 0 0 0 var(--glow),0 0 10px var(--glow)}60%{box-shadow:0 0 0 10px rgba(0,0,0,0),0 0 28px var(--glow)}}
   @keyframes shimmer   {0%{background-position:200% center}100%{background-position:-200% center}}
-  @keyframes aurora    {0%,100%{opacity:.08;transform:translateX(0) scale(1)}50%{opacity:.15;transform:translateX(-50px) scale(1.06)}}
-  @keyframes aurora2   {0%,100%{opacity:.05;transform:translateX(0) scale(1.04)}50%{opacity:.1;transform:translateX(70px) scale(1)}}
+  @keyframes aurora    {0%,100%{opacity:.18;transform:translateX(0) scale(1)}50%{opacity:.32;transform:translateX(-50px) scale(1.08)}}
+  @keyframes aurora2   {0%,100%{opacity:.12;transform:translateX(0) scale(1.04)}50%{opacity:.22;transform:translateX(70px) scale(1)}}
+  @keyframes dkBgShift {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   @keyframes ping      {0%{transform:scale(1);opacity:.6}80%,100%{transform:scale(2.6);opacity:0}}
   @keyframes stageIn   {from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
   @keyframes gateEnter {from{opacity:0;transform:scale(.97) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -118,20 +120,25 @@ const css = `
   .df*{box-sizing:border-box;margin:0;padding:0}
   .df{
     font-family:-apple-system,'SF Pro Text','Helvetica Neue',system-ui,sans-serif;
-    background:#000510;height:100vh;color:#d4daf5;overflow:hidden;position:relative;
+    background:linear-gradient(-45deg,#000510,#000d28,#00071a,#000c22,#000510);
+    background-size:400% 400%;
+    animation:dkBgShift 18s ease infinite;
+    height:100vh;color:#d4daf5;overflow:hidden;position:relative;
     display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;
   }
   .df::before,.df::after{
     content:'';position:absolute;border-radius:50%;pointer-events:none;z-index:0;
   }
   .df::before{
-    width:1000px;height:1000px;top:-340px;left:-220px;
-    background:radial-gradient(circle,rgba(0,140,255,.18) 0%,rgba(0,60,180,.06) 45%,transparent 70%);
+    width:1100px;height:1100px;top:-360px;left:-240px;
+    background:radial-gradient(circle,rgba(0,160,255,.28) 0%,rgba(0,80,220,.12) 40%,transparent 70%);
+    filter:blur(40px);
     animation:aurora 14s ease-in-out infinite;
   }
   .df::after{
-    width:800px;height:800px;bottom:-240px;right:-120px;
-    background:radial-gradient(circle,rgba(30,0,200,.14) 0%,rgba(0,100,255,.06) 45%,transparent 70%);
+    width:900px;height:900px;bottom:-260px;right:-140px;
+    background:radial-gradient(circle,rgba(30,20,240,.22) 0%,rgba(0,120,255,.10) 45%,transparent 70%);
+    filter:blur(36px);
     animation:aurora2 18s ease-in-out infinite;
   }
   .df-scan{display:none}
@@ -179,11 +186,11 @@ const css = `
     box-shadow:0 1px 0 rgba(0,212,255,.04);
   }
   .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-  .df-inp-lbl{font-size:11px;letter-spacing:.06em;color:rgba(120,160,220,.7);font-weight:500}
+  .df-inp-lbl{font-size:13px;letter-spacing:.06em;color:rgba(120,160,220,.7);font-weight:500}
   .df-mode-row{display:flex;gap:6px;margin-bottom:8px}
   .df-mode-btn{
-    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;
-    padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.1);
+    font-family:-apple-system,system-ui,sans-serif;font-size:13px;letter-spacing:.02em;
+    padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.1);
     background:transparent;color:rgba(200,214,232,.65);transition:all .15s;font-weight:500;
   }
   .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.45);color:#00d4ff}
@@ -243,10 +250,10 @@ const css = `
   }
   .df-stop:hover{background:rgba(255,60,60,.1);border-color:#ff5555}
   .df-rerun-btn{
-    display:flex;align-items:center;gap:4px;margin-top:4px;padding:3px 8px;
-    font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:.02em;
-    background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:6px;
-    color:rgba(200,214,232,.58);cursor:pointer;transition:all .15s;width:100%;
+    display:flex;align-items:center;gap:4px;margin-top:5px;padding:4px 10px;
+    font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;font-weight:500;
+    background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;
+    color:rgba(200,214,232,.65);cursor:pointer;transition:all .15s;width:100%;
   }
   .df-rerun-btn:hover{border-color:rgba(0,212,255,.35);color:#00d4ff;background:rgba(0,212,255,.06)}
   .df-dbg-btn{
@@ -404,7 +411,15 @@ const css = `
   .df-set-cancel:hover{border-color:rgba(255,255,255,.2);color:#d4daf5}
 
   /* ── Main layout ─────────────────────────────────────────────────────── */
-  .df-main{display:flex;flex:1;min-height:0;overflow:hidden}
+  .df-main{display:flex;flex:1;min-height:0;overflow:hidden;position:relative}
+  .df[data-theme='light'] .df-main::before{
+    content:'';position:absolute;pointer-events:none;z-index:0;border-radius:50%;
+    width:700px;height:700px;bottom:-100px;left:30%;
+    background:radial-gradient(circle,rgba(249,168,212,.75) 0%,rgba(253,186,116,.45) 40%,transparent 65%);
+    filter:blur(70px);
+    animation:lBlob3 20s ease-in-out infinite;
+  }
+  .df[data-theme='light'] .df-main>*{position:relative;z-index:1}
 
   /* ── Pipeline sidebar ────────────────────────────────────────────────── */
   .df-pipe{
@@ -417,7 +432,7 @@ const css = `
   .df-pipe::-webkit-scrollbar{width:2px}
   .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,212,255,.15)}
   .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;min-height:20px}
-  .df-pipe-hdr-lbl{font-size:10px;letter-spacing:.14em;color:rgba(120,160,220,.55);text-transform:uppercase;font-weight:600}
+  .df-pipe-hdr-lbl{font-size:12px;letter-spacing:.14em;color:rgba(120,160,220,.55);text-transform:uppercase;font-weight:600}
   .df-pipe-btn{
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);cursor:pointer;
     width:26px;height:26px;border-radius:6px;font-size:13px;line-height:1;
@@ -432,14 +447,21 @@ const css = `
   .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35)}
   .df-rail.done{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
   .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.04)}
-  .df-rail-num{font-size:10px;letter-spacing:.06em;opacity:.6;font-weight:600}
+  .df-rail-num{font-size:12px;letter-spacing:.06em;opacity:.6;font-weight:600}
   .df-rail-dot{width:6px;height:6px;border-radius:50%}
   .df-card{
-    border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;margin-bottom:4px;
-    background:rgba(255,255,255,.04);transition:all .3s;position:relative;overflow:hidden;
+    border:1px solid rgba(255,255,255,.07);
+    border-left:3px solid color-mix(in srgb,var(--c,#00d4ff) 50%,transparent);
+    border-radius:12px;padding:10px 12px;margin-bottom:4px;
+    background:color-mix(in srgb,var(--c,#00d4ff) 4%,rgba(0,3,12,.45));
+    transition:all .3s;position:relative;overflow:hidden;
     animation:stageIn .35s ease-out both;
   }
-  .df-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}
+  .df-card:hover{
+    background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(0,3,12,.5));
+    border-left-color:color-mix(in srgb,var(--c,#00d4ff) 75%,transparent);
+    border-color:rgba(255,255,255,.12);
+  }
   .df-card.active{
     border-color:var(--c);
     background:linear-gradient(135deg,rgba(0,0,0,.2),rgba(0,212,255,.06));
@@ -459,16 +481,16 @@ const css = `
   }
   .df-card.active::after{
     content:'';position:absolute;inset:0;border-radius:12px;
-    background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,.08),transparent 60%);
+    background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c,#00d4ff) 12%,transparent),transparent 60%);
     pointer-events:none;
   }
   .df-crow{display:flex;align-items:center;gap:7px}
-  .df-cnum{font-size:10px;letter-spacing:.06em;opacity:.58;font-weight:600}
-  .df-cicon{font-size:13px;transition:color .3s}
+  .df-cnum{font-size:11px;letter-spacing:.06em;color:var(--c,rgba(200,214,232,.6));opacity:.7;font-weight:700}
+  .df-cicon{font-size:15px;transition:color .3s}
   .df-cicon.spin{animation:spin 1s linear infinite}
   .df-clbl{flex:1}
-  .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:12px;font-weight:700;color:#fff;transition:color .3s}
-  .df-csub{font-size:10px;letter-spacing:.06em;opacity:.65;font-weight:500}
+  .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:14px;font-weight:700;color:#fff;transition:color .3s}
+  .df-csub{font-size:12px;letter-spacing:.06em;opacity:.65;font-weight:500}
   .df-cdot{width:7px;height:7px;border-radius:50%;transition:background .3s}
   .df-cdesc{font-size:10px;opacity:.65;margin-top:3px;line-height:1.4}
   .df-cprog{height:2px;background:rgba(255,255,255,.06);margin-top:5px;border-radius:1px;overflow:hidden}
@@ -479,7 +501,7 @@ const css = `
   .df-conn{display:flex;align-items:center;justify-content:center;height:7px}
   .df-cline{width:1px;height:100%;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
   .df-cline.flow::after{content:'';position:absolute;top:0;left:0;width:100%;height:35%;
-    background:#00d4ff;animation:flowLine 1.2s ease-in-out infinite}
+    background:var(--c,#00d4ff);animation:flowLine 1.2s ease-in-out infinite}
 
   /* ── Stage node (circular) ───────────────────────────────────────────── */
   .df-sn-row{display:flex;align-items:flex-start;gap:0;animation:stageIn .35s ease-out both}
@@ -510,13 +532,13 @@ const css = `
   }
   .df-sn-line.flow::after{
     content:'';position:absolute;left:0;width:100%;height:40%;
-    background:linear-gradient(to bottom,transparent,#00d4ff,transparent);
+    background:linear-gradient(to bottom,transparent,var(--c,#00d4ff),transparent);
     animation:dotTravel 1.4s ease-in-out infinite;
   }
   .df-sn-dot{
     width:4px;height:4px;border-radius:50%;
-    background:#00d4ff;position:absolute;left:50%;transform:translateX(-50%);
-    animation:dotTravel 1.4s ease-in-out infinite;box-shadow:0 0 6px #00d4ff;
+    background:var(--c,#00d4ff);position:absolute;left:50%;transform:translateX(-50%);
+    animation:dotTravel 1.4s ease-in-out infinite;box-shadow:0 0 6px var(--c,#00d4ff);
   }
   .df-sn-content{flex:1;min-width:0;padding-bottom:4px}
 
@@ -529,7 +551,7 @@ const css = `
     background:rgba(0,3,12,.72);flex-shrink:0;padding:0 8px;
   }
   .df-tab{
-    padding:12px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+    padding:12px 20px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
     border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;
     color:rgba(200,214,232,.62);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
   }
@@ -805,12 +827,12 @@ const css = `
   .df-log-bd::-webkit-scrollbar{width:2px}
   .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2)}
   .df-log-row{
-    font-size:11px;line-height:1.65;padding:4px 0;
+    font-size:12px;line-height:1.7;padding:5px 0;
     border-bottom:1px solid rgba(0,180,255,.06);
     animation:slideLog .2s ease-out;
   }
-  .df-log-row:hover{background:rgba(0,180,255,.03);border-radius:4px;padding-left:3px;padding-right:3px;margin:0 -3px}
-  .df-log-ts {color:rgba(0,200,255,.45);margin-right:6px;font-family:'SF Mono','Cascadia Code',monospace;font-size:9.5px;letter-spacing:.02em}
+  .df-log-row:hover{background:rgba(0,180,255,.04);border-radius:4px;padding-left:3px;padding-right:3px;margin:0 -3px}
+  .df-log-ts {color:rgba(0,200,255,.6);margin-right:7px;font-family:'SF Mono','Cascadia Code',monospace;font-size:10px;letter-spacing:.02em}
   .df-log-msg.info   {color:rgba(200,220,255,.8)}
   .df-log-msg.success{color:#00ff99;text-shadow:0 0 8px rgba(0,255,153,.25)}
   .df-log-msg.warn   {color:#ffb340}
@@ -818,12 +840,100 @@ const css = `
   .df-log-msg.gate   {color:#ffd060;text-shadow:0 0 8px rgba(255,190,0,.2)}
   .df-log-msg.handoff{color:#00d4ff;text-shadow:0 0 8px rgba(0,212,255,.2)}
   .df-log-msg.done   {color:#ff4d80;font-weight:700;text-shadow:0 0 10px rgba(255,45,107,.3)}
-  .df-idle-hint{
-    text-align:center;padding:48px 20px;font-size:12px;line-height:2.2;
-    color:rgba(120,180,255,.55);
+  /* ── Idle hero ── */
+  @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes stagePop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pipeFlow{0%{background-position:-60px 0}100%{background-position:60px 0}}
+  .df-idle-hero{
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    height:100%;min-height:0;padding:36px 20px 20px;box-sizing:border-box;overflow-y:auto;
   }
-  .df-idle-hint-icon{font-size:28px;margin-bottom:10px;opacity:.4;display:block}
+  .df-idle-hero-title{
+    font-size:36px;font-weight:900;letter-spacing:-.04em;color:#c8d4f0;
+    margin-bottom:6px;text-align:center;animation:heroFloat 4s ease-in-out infinite;
+  }
+  .df-idle-hero-title em{
+    font-style:normal;
+    background:linear-gradient(90deg,#00d4ff,#bf5fff,#e066ff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df-idle-hero-sub{
+    font-size:14px;color:rgba(150,180,240,.6);letter-spacing:.1em;
+    margin-bottom:28px;text-transform:uppercase;text-align:center;
+  }
+  .df-idle-pipeline{
+    display:flex;align-items:stretch;gap:0;margin-bottom:22px;
+    flex-wrap:nowrap;justify-content:center;
+  }
+  .df-idle-scard{
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+    padding:14px 11px;border-radius:10px;
+    border:1px solid color-mix(in srgb,var(--c,rgba(255,255,255,.15)) 28%,rgba(255,255,255,.05));
+    background:color-mix(in srgb,var(--c,rgba(255,255,255,.04)) 6%,rgba(0,3,12,.3));
+    min-width:94px;animation:stagePop .4s ease-out both;
+    transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;cursor:default;
+  }
+  .df-idle-scard:hover{
+    transform:translateY(-5px);background:rgba(255,255,255,.08);
+    border-color:var(--c,rgba(255,255,255,.15));
+    box-shadow:0 8px 28px rgba(0,0,0,.4),0 0 0 1px var(--c,rgba(255,255,255,.1));
+  }
+  .df-idle-scard-icon{font-size:28px;line-height:1}
+  .df-idle-scard-num{font-size:11px;color:rgba(150,180,240,.4);letter-spacing:.06em;font-weight:700}
+  .df-idle-scard-name{font-size:15px;font-weight:700;color:#c8d4f0;text-align:center;line-height:1.2}
+  .df-idle-scard-sub{font-size:12px;color:rgba(150,180,240,.5);text-align:center;line-height:1.35;max-width:96px}
+  .df-idle-arrow{
+    width:22px;height:2px;flex-shrink:0;position:relative;align-self:center;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.15),rgba(255,255,255,0));
+    background-size:44px 2px;animation:pipeFlow 2s linear infinite;
+  }
+  .df-idle-arrow::after{
+    content:'›';position:absolute;top:50%;right:-6px;transform:translateY(-50%);
+    font-size:13px;color:rgba(255,255,255,.22);line-height:1;
+  }
+  .df-idle-hint{font-size:15px;color:rgba(120,180,255,.55);text-align:center;letter-spacing:.02em;margin-bottom:28px}
   .df-cursor{animation:blink 1s step-end infinite;color:#00d4ff}
+  .df-idle-features{
+    display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;justify-content:center;max-width:720px;
+  }
+  .df-idle-feat{
+    display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:10px;
+    background:color-mix(in srgb,var(--fi-color,rgba(255,255,255,.04)) 6%,rgba(0,3,12,.3));
+    border:1px solid color-mix(in srgb,var(--fi-color,rgba(255,255,255,.07)) 22%,rgba(255,255,255,.05));
+    border-left:3px solid color-mix(in srgb,var(--fi-color,#00d4ff) 55%,transparent);
+    flex:1;min-width:190px;max-width:225px;
+  }
+  .df-idle-feat-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+  .df-idle-feat-title{font-size:14px;font-weight:700;color:#c8d4f0;margin-bottom:4px}
+  .df-idle-feat-desc{font-size:12px;color:rgba(150,180,240,.5);line-height:1.55}
+  .df-idle-stack{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:640px}
+  .df-idle-chip{
+    font-size:12px;font-weight:600;letter-spacing:.04em;padding:5px 13px;border-radius:20px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+    color:rgba(150,180,240,.55);
+  }
+  .df-log-empty{opacity:.5;font-size:11px;text-align:center;margin-top:44px;color:rgba(0,200,255,.7);letter-spacing:.06em}
+
+  /* ── Footer ── */
+  .df-foot{
+    flex-shrink:0;height:30px;display:flex;align-items:center;justify-content:center;
+    gap:8px;position:relative;overflow:hidden;
+    background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.04);
+  }
+  .df-foot::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,rgba(255,255,255,.022) 23px,rgba(255,255,255,.022) 24px);
+  }
+  .df-foot-brand{font-size:11px;font-weight:700;color:rgba(200,214,232,.35);letter-spacing:.01em;position:relative}
+  .df-foot-brand em{
+    font-style:normal;
+    background:linear-gradient(90deg,#00d4ff,#bf5fff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df-foot-dots{display:flex;align-items:center;gap:4px;position:relative}
+  .df-foot-dot{width:5px;height:5px;border-radius:50%;opacity:.5}
+  .df-foot-sep{font-size:10px;color:rgba(200,214,232,.18);position:relative}
+  .df-foot-tag{font-size:9px;color:rgba(200,214,232,.28);letter-spacing:.07em;text-transform:uppercase;position:relative}
 
   /* ── Fullscreen code viewer ──────────────────────────────────────────── */
   .df-fsv{position:fixed;inset:0;z-index:3000;background:rgba(4,5,14,.97);display:flex;flex-direction:column;animation:fadeUp .15s ease-out}
@@ -863,165 +973,480 @@ const css = `
     border-radius:8px!important;
   }
 
-  /* ── Light Theme ────────────────────────────────────────────────────────── */
-  .df[data-theme='light']{background:#eef0f9;color:#1a1d2e}
-  .df[data-theme='light']::before{background:radial-gradient(circle,rgba(0,140,200,.06) 0%,transparent 68%)}
-  .df[data-theme='light']::after{background:radial-gradient(circle,rgba(80,50,220,.04) 0%,transparent 68%)}
-  .df[data-theme='light'] .df-hdr{background:rgba(236,240,253,.95);border-bottom-color:rgba(0,0,0,.08);box-shadow:0 1px 0 rgba(0,120,180,.06),0 2px 16px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .df-lname{color:#0d0f1f}
-  .df[data-theme='light'] .df-ltag{color:rgba(20,40,120,.55)}
-  .df[data-theme='light'] .df-timer{color:#1a1d2e}
-  .df[data-theme='light'] .df-badge.idle{color:rgba(20,30,80,.65);border-color:rgba(20,30,80,.22)}
-  .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
-  .df[data-theme='light'] .df-settings-btn:hover{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.2);color:#1a1d2e}
-  .df[data-theme='light'] .df-int-dot.off{background:rgba(0,0,0,.18)}
-  .df[data-theme='light'] .df-int-dot-lbl{color:rgba(20,30,80,.35)}
-  .df[data-theme='light'] .df-inp-area{background:rgba(232,235,250,.85);border-bottom-color:rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-inp-lbl{color:rgba(20,40,120,.6)}
-  .df[data-theme='light'] .df-mode-btn{border-color:rgba(0,0,0,.12);color:rgba(20,30,80,.5)}
-  .df[data-theme='light'] .df-mode-btn.active{background:rgba(0,140,180,.1);border-color:rgba(0,140,180,.4);color:#007799}
-  .df[data-theme='light'] .df-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-inp::placeholder{color:rgba(20,30,80,.38)}
-  .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.8);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-ctx-gh::placeholder{color:rgba(20,30,80,.38)}
-  .df[data-theme='light'] .df-ctx-attach{border-color:rgba(0,140,180,.3);color:rgba(0,140,180,.65)}
-  .df[data-theme='light'] .df-ctx-attach:hover{border-color:rgba(0,140,180,.6);color:#007799}
-  .df[data-theme='light'] .df-ctx-chip{background:rgba(0,140,180,.06);border-color:rgba(0,140,180,.2);color:rgba(20,30,80,.7)}
-  .df[data-theme='light'] .df-ctx-chip button{color:rgba(20,30,80,.4)}
-  .df[data-theme='light'] .df-rerun-btn{border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.4)}
-  .df[data-theme='light'] .df-rerun-btn:hover{border-color:rgba(0,140,180,.35);color:#007799;background:rgba(0,140,180,.06)}
-  .df[data-theme='light'] .df-dbg-btn{border-color:rgba(0,140,180,.25);color:rgba(0,140,180,.65)}
-  .df[data-theme='light'] .df-dbg-panel{background:rgba(241,244,255,.99);border-color:rgba(0,140,180,.2);box-shadow:-8px -8px 40px rgba(0,0,0,.16)}
-  .df[data-theme='light'] .df-dbg-title{color:rgba(0,140,180,.8)}
-  .df[data-theme='light'] .df-dbg-close{color:rgba(20,30,80,.4)}
-  .df[data-theme='light'] .df-dbg-ctx{color:rgba(20,30,80,.4);background:rgba(0,0,0,.04)}
-  .df[data-theme='light'] .df-dbg-inp{background:rgba(255,255,255,.9);border-color:rgba(0,140,180,.18);color:#1a1d2e}
-  .df[data-theme='light'] .df-dbg-inp::placeholder{color:rgba(20,30,80,.2)}
-  .df[data-theme='light'] .df-dbg-answer{color:rgba(20,30,80,.88);background:rgba(0,140,180,.04);border-color:rgba(0,140,180,.12)}
-  .df[data-theme='light'] .df-tabs{background:rgba(238,241,252,.9);border-bottom-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-tab{color:rgba(20,30,80,.38)}
-  .df[data-theme='light'] .df-tab.active{color:#007799;border-bottom-color:#007799}
-  .df[data-theme='light'] .df-tab:hover:not(.active){color:rgba(20,30,80,.7)}
-  .df[data-theme='light'] .df-pipe{background:rgba(238,242,253,.7);border-right-color:rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1)}
-  .df[data-theme='light'] .df-pipe-hdr-lbl{color:rgba(20,40,120,.45)}
-  .df[data-theme='light'] .df-pipe-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.6)}
-  .df[data-theme='light'] .df-pipe-btn:hover{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#1a1d2e}
-  .df[data-theme='light'] .df-rail{border-color:rgba(0,0,0,.07);background:rgba(0,0,0,.01)}
-  .df[data-theme='light'] .df-rail:hover{background:rgba(0,0,0,.04)}
-  .df[data-theme='light'] .df-rail.active{background:rgba(0,0,0,.2)}
-  .df[data-theme='light'] .df-card{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.09);box-shadow:0 1px 4px rgba(0,0,0,.04)}
-  .df[data-theme='light'] .df-card:hover{background:rgba(255,255,255,.85);border-color:rgba(0,140,180,.2)}
-  .df[data-theme='light'] .df-card.active{background:rgba(255,255,255,.8);box-shadow:0 4px 20px rgba(0,140,180,.1)}
-  .df[data-theme='light'] .df-card.active::after{background:radial-gradient(ellipse at 50% 0%,rgba(0,140,180,.06),transparent 60%)}
-  .df[data-theme='light'] .df-card.done{background:rgba(240,255,248,.7);border-color:rgba(0,180,100,.2)}
-  .df[data-theme='light'] .df-cnum{opacity:.35;color:#1a1d2e}
-  .df[data-theme='light'] .df-cname{color:#0d0f1f}
-  .df[data-theme='light'] .df-csub{opacity:.4;color:#1a1d2e}
-  .df[data-theme='light'] .df-cdesc{opacity:.45;color:#1a1d2e}
-  .df[data-theme='light'] .df-cprog{background:rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-cline{background:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-center{border-right-color:rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-detail::-webkit-scrollbar-thumb{background:rgba(0,140,180,.12)}
-  .df[data-theme='light'] .df-dtitle{color:#0d0f1f}
-  .df[data-theme='light'] .df-dsub{color:rgba(0,140,180,.55)}
-  .df[data-theme='light'] .df-prd{background:rgba(0,140,180,.03);border-color:rgba(0,140,180,.12)}
-  .df[data-theme='light'] .df-pt{color:rgba(20,30,80,.75);opacity:1}
-  .df[data-theme='light'] .df-pi{color:rgba(20,30,80,.75);opacity:1}
-  .df[data-theme='light'] .df-task{background:rgba(0,200,100,.03);border-color:rgba(0,200,100,.14)}
-  .df[data-theme='light'] .df-agent{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-agname{color:#0d0f1f}
-  .df[data-theme='light'] .df-agst{color:rgba(20,30,80,.5);opacity:1}
-  .df[data-theme='light'] .df-agf{color:rgba(20,30,80,.65);opacity:1}
-  .df[data-theme='light'] .df-qa-row{background:rgba(140,60,220,.03);border-color:rgba(140,60,220,.14)}
-  .df[data-theme='light'] .df-env{background:rgba(200,30,80,.02);border-color:rgba(200,30,80,.1)}
-  .df[data-theme='light'] .df-env-name{color:#0d0f1f}
-  .df[data-theme='light'] .df-env-bar{background:rgba(200,30,80,.08)}
-  .df[data-theme='light'] .df-env-st{color:rgba(20,30,80,.5)}
-  .df[data-theme='light'] .df-gate{background:rgba(255,220,100,.04);border-color:rgba(190,140,0,.32);box-shadow:0 4px 20px rgba(200,150,0,.08)}
-  .df[data-theme='light'] .df-gate-title{color:#a06a00}
-  .df[data-theme='light'] .df-gate-verdict{color:rgba(20,30,80,.7);opacity:1}
-  .df[data-theme='light'] .df-gate-pt{color:rgba(20,30,80,.7);opacity:1}
-  .df[data-theme='light'] .df-gate-ok{color:#031a0e;box-shadow:0 4px 16px rgba(0,180,100,.25)}
-  .df[data-theme='light'] .df-gate-rej{color:#cc3333;border-color:rgba(200,60,60,.3)}
-  .df[data-theme='light'] .df-fb-inp{background:rgba(220,50,50,.03);border-color:rgba(200,60,60,.2);color:#1a1d2e}
-  .df[data-theme='light'] .df-done-t{-webkit-text-fill-color:transparent;background:linear-gradient(135deg,#007755,#0099bb,#5566cc);-webkit-background-clip:text;background-clip:text}
-  .df[data-theme='light'] .df-done-s{color:rgba(0,140,180,.6)}
-  .df[data-theme='light'] .df-metric{background:rgba(255,255,255,.7);border-color:rgba(0,140,180,.18)}
-  .df[data-theme='light'] .obs-stat{background:rgba(0,140,180,.03);border-color:rgba(0,140,180,.12)}
-  .df[data-theme='light'] .obs-sh{color:rgba(0,140,180,.55)}
-  .df[data-theme='light'] .obs-sh::after{background:rgba(0,140,180,.1)}
-  .df[data-theme='light'] .obs-table th{color:rgba(0,140,180,.5);border-bottom-color:rgba(0,140,180,.1)}
-  .df[data-theme='light'] .obs-table td{border-bottom-color:rgba(0,0,0,.05)}
-  .df[data-theme='light'] .obs-table tr:hover td{background:rgba(0,140,180,.03)}
-  .df[data-theme='light'] .obs-chart-box{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .obs-chart-title{color:rgba(0,140,180,.5)}
-  .df[data-theme='light'] .obs-legend-item{color:rgba(20,30,80,.6);opacity:1}
-  .df[data-theme='light'] .obs-empty{color:rgba(20,30,80,.3);opacity:1}
-  .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:#fff!important;border-color:rgba(0,140,180,.18)!important;color:#1a1d2e!important}
-  .df[data-theme='light'] .df-log{background:rgba(240,245,255,.8);border-left-color:rgba(0,120,180,.12)}
-  .df[data-theme='light'] .df-log-hdr{background:rgba(220,235,255,.7);border-bottom-color:rgba(0,120,180,.1);color:rgba(0,100,160,.7)}
-  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(0,120,180,.15)}
-  .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.05)}
-  .df[data-theme='light'] .df-log-row:hover{background:rgba(0,120,180,.04)}
-  .df[data-theme='light'] .df-log-ts{color:rgba(0,120,180,.45)}
-  .df[data-theme='light'] .df-log-msg.info{color:rgba(20,40,100,.65)}
-  .df[data-theme='light'] .df-log-msg.agent{color:rgba(20,50,120,.75)}
-  .df[data-theme='light'] .df-log-msg.success{color:#007744;text-shadow:none}
-  .df[data-theme='light'] .df-log-msg.handoff{color:#006699;text-shadow:none}
-  .df[data-theme='light'] .df-log-msg.gate{color:#8a5a00;text-shadow:none}
-  .df[data-theme='light'] .df-log-msg.done{color:#aa1140;text-shadow:none}
-  .df[data-theme='light'] .df-idle-hint{color:rgba(20,50,120,.45);opacity:1}
-  .df[data-theme='light'] .df-dbg-btn{background:rgba(0,120,180,.07);border-color:rgba(0,120,180,.25);color:rgba(0,120,180,.8);box-shadow:none}
-  .df[data-theme='light'] .df-settings-overlay{background:rgba(0,0,0,.35)}
-  .df[data-theme='light'] .df-settings-drawer{background:#f5f7fe;border-left-color:rgba(0,0,0,.1)}
-  .df[data-theme='light'] .df-set-hdr{border-bottom-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-set-title{color:#0d0f1f}
-  .df[data-theme='light'] .df-set-close{color:rgba(20,30,80,.4)}
-  .df[data-theme='light'] .df-set-tabs{border-bottom-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-set-tab{color:rgba(20,30,80,.4)}
-  .df[data-theme='light'] .df-set-tab.active{color:#007799;border-bottom-color:#007799}
-  .df[data-theme='light'] .df-set-body::-webkit-scrollbar-thumb{background:rgba(0,140,180,.12)}
-  .df[data-theme='light'] .df-set-sec-title{color:rgba(0,140,180,.6)}
-  .df[data-theme='light'] .df-set-lbl{color:rgba(20,30,80,.6)}
-  .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-set-inp::placeholder{color:rgba(20,30,80,.38)}
-  .df[data-theme='light'] .df-set-inp:focus{border-color:rgba(0,140,180,.4)}
-  .df[data-theme='light'] .df-set-preview{color:rgba(20,30,80,.35)}
-  .df[data-theme='light'] .df-model-card{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-model-card:hover{background:rgba(0,140,180,.04);border-color:rgba(0,140,180,.22)}
-  .df[data-theme='light'] .df-model-card.selected{background:rgba(0,140,180,.07);border-color:rgba(0,140,180,.45)}
-  .df[data-theme='light'] .df-mc-name{color:#0d0f1f}
-  .df[data-theme='light'] .df-mc-desc{color:rgba(20,30,80,.5)}
-  .df[data-theme='light'] .df-mc-price{color:rgba(20,30,80,.32)}
-  .df[data-theme='light'] .df-add-model-inp{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.1);color:#1a1d2e}
-  .df[data-theme='light'] .df-add-model-inp::placeholder{color:rgba(20,30,80,.2)}
-  .df[data-theme='light'] .df-int-status-row{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-int-status-name{color:rgba(20,30,80,.65)}
-  .df[data-theme='light'] .df-int-status-val{color:rgba(20,30,80,.35)}
-  .df[data-theme='light'] .df-set-footer{border-top-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-set-cancel{border-color:rgba(0,0,0,.1);color:rgba(20,30,80,.5)}
-  .df[data-theme='light'] .df-set-cancel:hover{border-color:rgba(0,0,0,.2);color:#1a1d2e}
-  .df[data-theme='light'] .df-set-result.ok{background:rgba(0,180,100,.05);border-color:rgba(0,180,100,.2);color:#008855}
-  .df[data-theme='light'] .df-set-result.err{background:rgba(200,50,50,.05);border-color:rgba(200,50,50,.2);color:#cc3333}
+  /* ════════════════════════════════════════════════════════════════════════
+     LIGHT THEME — animated aurora, glassmorphism, full colour coding
+     Stage colours (from STAGES array, used via var(--c)):
+       Requirements #00d4ff  Tasks #00ff88  Code Gen #bf5fff
+       PR Review    #e066ff  QA    #2dd4bf  Deploy   #ff2d6b
+  ══════════════════════════════════════════════════════════════════════════ */
 
-  /* Light theme — stage nodes */
-  .df[data-theme='light'] .df-sn{border-color:rgba(0,0,0,.15);background:rgba(255,255,255,.7)}
-  .df[data-theme='light'] .df-sn.done{border-color:rgba(0,160,90,.4);background:rgba(0,200,110,.08);color:#007744}
-  .df[data-theme='light'] .df-sn-line{background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(0,0,0,.04))}
-  .df[data-theme='light'] .df-sn-line.flow::after{background:linear-gradient(to bottom,transparent,rgba(0,140,180,.6),transparent)}
+  /* ── Light-mode blob animations (defined here, usable globally) ── */
+  @keyframes lBgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  @keyframes lBlob1{
+    0%,100%{transform:translate(0,0) scale(1);opacity:.82}
+    20%{transform:translate(90px,-60px) scale(1.22);opacity:1}
+    50%{transform:translate(20px,80px) scale(.86);opacity:.72}
+    75%{transform:translate(-70px,25px) scale(1.1);opacity:.9}
+  }
+  @keyframes lBlob2{
+    0%,100%{transform:translate(0,0) scale(1);opacity:.78}
+    30%{transform:translate(-80px,60px) scale(1.18);opacity:.98}
+    62%{transform:translate(60px,-70px) scale(.88);opacity:.68}
+    82%{transform:translate(15px,35px) scale(1.08);opacity:.88}
+  }
+  @keyframes lBlob3{
+    0%,100%{transform:translate(0,0) scale(1);opacity:.6}
+    35%{transform:translate(60px,50px) scale(1.15);opacity:.82}
+    70%{transform:translate(-50px,-40px) scale(.9);opacity:.55}
+  }
 
-  /* Light theme — about */
-  .df[data-theme='light'] .abt-wrap{color:#1a1d2e}
-  .df[data-theme='light'] .abt-hero{background:rgba(255,255,255,.7);border-color:rgba(0,140,180,.14)}
-  .df[data-theme='light'] .abt-title{color:#0d0f1f}
-  .df[data-theme='light'] .abt-tagline{color:rgba(0,140,180,.7)}
-  .df[data-theme='light'] .abt-desc{color:rgba(20,30,80,.65);opacity:1}
-  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.08)}
-  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.5);border-color:rgba(0,0,0,.07)}
+  /* ── Base — animated aurora background ── */
+  .df[data-theme='light']{
+    background:linear-gradient(-45deg,#a8d4ff,#d0b0ff,#a2f0d0,#ffb0cc,#b8d8ff,#a8d4ff);
+    background-size:500% 500%;
+    animation:lBgShift 14s ease infinite;
+    color:#0d1526;
+  }
+  .df[data-theme='light']::before{
+    width:1100px;height:1100px;top:-320px;left:-260px;
+    background:radial-gradient(circle,rgba(56,189,248,.9) 0%,rgba(103,232,249,.55) 38%,transparent 65%);
+    filter:blur(72px);
+    animation:lBlob1 16s ease-in-out infinite;
+  }
+  .df[data-theme='light']::after{
+    width:950px;height:950px;bottom:-260px;right:-200px;
+    background:radial-gradient(circle,rgba(196,181,253,.95) 0%,rgba(167,139,250,.6) 38%,transparent 65%);
+    filter:blur(62px);
+    animation:lBlob2 12s ease-in-out infinite;
+  }
 
-  /* Light theme — pipe */
-  .df[data-theme='light'] .df-pipe{background:rgba(235,238,252,.75);backdrop-filter:none}
+  /* ── Header — frosted glass ── */
+  .df[data-theme='light'] .df-hdr{
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(24px) saturate(180%);
+    border-bottom:1px solid rgba(255,255,255,.7);
+    box-shadow:0 1px 0 rgba(0,0,0,.07),0 4px 24px rgba(0,0,0,.08);
+  }
+  .df[data-theme='light'] .df-lname{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-lname span{
+    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df[data-theme='light'] .df-ltag{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-timer{color:#0d1526;font-weight:800;letter-spacing:.03em}
+  .df[data-theme='light'] .df-badge.idle   {color:#4e607f;border-color:rgba(78,96,127,.3);background:rgba(255,255,255,.6)}
+  .df[data-theme='light'] .df-badge.running{color:#15803d;border-color:rgba(22,163,74,.4);background:rgba(240,253,244,.8)}
+  .df[data-theme='light'] .df-badge.gate   {color:#92400e;border-color:rgba(217,119,6,.4);background:rgba(255,251,235,.8)}
+  .df[data-theme='light'] .df-badge.done   {color:#0055c8;border-color:rgba(0,85,200,.4);background:rgba(239,246,255,.8)}
+  .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.15);color:#2c3a56;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);font-weight:600}
+  .df[data-theme='light'] .df-settings-btn:hover{background:rgba(255,255,255,.9);border-color:#0055c8;color:#0055c8}
+  .df[data-theme='light'] .df-int-dot.off{background:#aab6d0}
+  .df[data-theme='light'] .df-int-dot-lbl{color:#4e607f;font-weight:500}
+
+  /* ── Input area — frosted glass ── */
+  .df[data-theme='light'] .df-inp-area{
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(20px) saturate(160%);
+    border-bottom:1px solid rgba(255,255,255,.65);
+    box-shadow:0 2px 12px rgba(0,0,0,.07);
+  }
+  .df[data-theme='light'] .df-inp-lbl{color:#0d1526;font-weight:700;font-size:13px;letter-spacing:.01em}
+  .df[data-theme='light'] .df-mode-btn{border:1.5px solid rgba(0,0,0,.14);color:#2c3a56;background:rgba(255,255,255,.65);font-weight:600;backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-mode-btn:hover{border-color:#0055c8;color:#0055c8;background:rgba(239,246,255,.9)}
+  .df[data-theme='light'] .df-mode-btn.active{background:linear-gradient(135deg,#0055c8,#7c3aed);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 2px 14px rgba(0,85,200,.35)}
+  .df[data-theme='light'] .df-inp{
+    background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:14px;
+  }
+  .df[data-theme='light'] .df-inp:focus{border-color:#0055c8;box-shadow:0 0 0 3px rgba(0,85,200,.14)}
+  .df[data-theme='light'] .df-inp::placeholder{color:#8899b4}
+  .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
+  .df[data-theme='light'] .df-ctx-gh::placeholder{color:#8899b4}
+  .df[data-theme='light'] .df-ctx-gh:focus{border-color:#0055c8}
+  .df[data-theme='light'] .df-ctx-attach{border:1.5px solid #0055c8;color:#0055c8;background:rgba(239,246,255,.85);font-weight:600}
+  .df[data-theme='light'] .df-ctx-attach:hover{background:rgba(219,238,255,.95)}
+  .df[data-theme='light'] .df-ctx-chip{background:rgba(219,238,255,.85);border-color:#93c5fd;color:#0055c8;font-weight:600}
+  .df[data-theme='light'] .df-ctx-chip button{color:#8899b4}
+  .df[data-theme='light'] .df-rerun-btn{border:1.5px solid rgba(0,0,0,.14);color:#2c3a56;background:rgba(255,255,255,.65);font-weight:600}
+  .df[data-theme='light'] .df-rerun-btn:hover{border-color:#0055c8;color:#0055c8;background:rgba(219,238,255,.9)}
+  .df[data-theme='light'] .df-launch{
+    background:linear-gradient(135deg,#0055c8,#5b21b6);
+    box-shadow:0 4px 22px rgba(0,85,200,.45),0 0 0 1px rgba(255,255,255,.2);
+  }
+  .df[data-theme='light'] .df-launch:hover:not(:disabled){
+    background:linear-gradient(135deg,#0043aa,#4c1d95);
+    box-shadow:0 8px 30px rgba(0,85,200,.6);
+  }
+  .df[data-theme='light'] .df-stop{border:1.5px solid rgba(159,18,57,.4);color:#9f1239;background:rgba(255,241,243,.85);font-weight:600}
+  .df[data-theme='light'] .df-stop:hover{background:rgba(255,228,235,.95);border-color:#9f1239}
+
+  /* ── Debug button & panel ── */
+  .df[data-theme='light'] .df-dbg-btn{
+    background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.3);color:#0055c8;
+    font-weight:700;box-shadow:0 2px 10px rgba(0,85,200,.15);backdrop-filter:blur(8px);
+  }
+  .df[data-theme='light'] .df-dbg-btn:hover{background:rgba(219,238,255,.95);box-shadow:0 4px 16px rgba(0,85,200,.25)}
+  .df[data-theme='light'] .df-dbg-panel{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);box-shadow:-12px -12px 48px rgba(0,0,0,.14)}
+  .df[data-theme='light'] .df-dbg-title{color:#0055c8;font-weight:800}
+  .df[data-theme='light'] .df-dbg-close{color:#8899b4}
+  .df[data-theme='light'] .df-dbg-ctx{color:#4e607f;background:rgba(239,246,255,.7);border-radius:6px}
+  .df[data-theme='light'] .df-dbg-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
+  .df[data-theme='light'] .df-dbg-inp::placeholder{color:#8899b4}
+  .df[data-theme='light'] .df-dbg-inp:focus{border-color:#0055c8}
+  .df[data-theme='light'] .df-dbg-answer{color:#2c3a56;background:rgba(239,246,255,.7);border:1px solid rgba(0,85,200,.15)}
+
+  /* ── Tabs — frosted ── */
+  .df[data-theme='light'] .df-tabs{background:rgba(255,255,255,.75);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-tab{color:#4e607f;font-weight:600}
+  .df[data-theme='light'] .df-tab.active{color:#0055c8;border-bottom-color:#0055c8;font-weight:800}
+  .df[data-theme='light'] .df-tab:hover:not(.active){color:#0d1526;background:rgba(0,85,200,.05)}
+
+  /* ── Pipeline sidebar — deep frosted glass with colour coding ── */
+  .df[data-theme='light'] .df-pipe{
+    background:rgba(210,224,252,.6);
+    backdrop-filter:blur(22px) saturate(160%);
+    border-right:1px solid rgba(255,255,255,.6);
+  }
+  .df[data-theme='light'] .df-pipe::-webkit-scrollbar-thumb{background:rgba(170,182,208,.6)}
+  .df[data-theme='light'] .df-pipe-hdr-lbl{color:#0d1526;font-weight:800;font-size:11px;letter-spacing:.08em}
+  .df[data-theme='light'] .df-pipe-btn{background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);color:#2c3a56;font-weight:600;backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-pipe-btn:hover{background:rgba(255,255,255,.9);color:#0055c8}
+  .df[data-theme='light'] .df-rail{border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.5);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-rail:hover{background:rgba(255,255,255,.75)}
+  .df[data-theme='light'] .df-rail.active{border-color:var(--c);background:rgba(255,255,255,.9);box-shadow:0 0 0 1px var(--c),0 4px 14px rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-rail.done{border-color:rgba(22,163,74,.5);background:rgba(240,253,244,.8)}
+  .df[data-theme='light'] .df-rail.gate{border-color:rgba(217,119,6,.5);background:rgba(255,251,235,.8)}
+
+  /* ── Stage cards — glass with stage colour accent ── */
+  .df[data-theme='light'] .df-sn-row{animation:none;opacity:1}
+  .df[data-theme='light'] .df-card{
+    background:rgba(255,255,255,.76);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.72);
+    border-left:3px solid var(--c,#6366f1);
+    background-image:linear-gradient(135deg,rgba(255,255,255,.9) 0%,color-mix(in srgb,var(--c,#6366f1) 6%,rgba(255,255,255,.65)) 100%);
+    box-shadow:0 2px 14px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.04);
+    animation:none;opacity:1;
+  }
+  .df[data-theme='light'] .df-card:hover{
+    background-image:linear-gradient(135deg,rgba(255,255,255,.96) 0%,color-mix(in srgb,var(--c,#6366f1) 10%,rgba(255,255,255,.85)) 100%);
+    border-left-color:var(--c);
+    box-shadow:0 6px 22px rgba(0,0,0,.1),0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent);
+  }
+  .df[data-theme='light'] .df-card.active{
+    background-image:linear-gradient(135deg,rgba(255,255,255,.98) 0%,color-mix(in srgb,var(--c,#6366f1) 14%,rgba(255,255,255,.88)) 100%);
+    border-left:4px solid var(--c);
+    box-shadow:0 0 0 1.5px var(--c),0 8px 28px color-mix(in srgb,var(--c) 15%,rgba(0,0,0,.08));
+    animation:none;
+  }
+  .df[data-theme='light'] .df-card.active::after{
+    background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c) 10%,transparent),transparent 60%);
+  }
+  .df[data-theme='light'] .df-card.done{
+    background:rgba(240,253,244,.88);
+    border-left:4px solid #16a34a;
+    box-shadow:0 2px 12px rgba(22,163,74,.1);
+  }
+  .df[data-theme='light'] .df-card.gate{
+    background:rgba(255,251,235,.88);
+    border-left:4px solid #d97706;
+    box-shadow:0 4px 18px rgba(217,119,6,.1);animation:none;
+  }
+  .df[data-theme='light'] .df-cnum{color:#8899b4!important;font-weight:700;opacity:1!important}
+  .df[data-theme='light'] .df-cname{color:#0d1526!important;font-weight:800}
+  .df[data-theme='light'] .df-csub{color:#4e607f!important;font-weight:600;opacity:1!important}
+  .df[data-theme='light'] .df-cdesc{color:#4e607f!important;opacity:1!important}
+  .df[data-theme='light'] .df-cprog{background:rgba(0,0,0,.08)!important}
+  .df[data-theme='light'] .df-crev.approved{background:rgba(220,252,231,.8);color:#15803d;border-color:rgba(21,128,61,.3)}
+  .df[data-theme='light'] .df-crev.changes {background:rgba(254,226,226,.8);color:#b91c1c;border-color:rgba(185,28,28,.25)}
+
+  /* ── Stage node circles — colour coded per stage ── */
+  .df[data-theme='light'] .df-sn{
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(8px);
+    border:2px solid var(--c,#6366f1);
+    color:var(--c,#6366f1);
+    box-shadow:0 2px 8px rgba(0,0,0,.1),0 0 0 3px rgba(255,255,255,.5);
+  }
+  .df[data-theme='light'] .df-sn.active{
+    background:rgba(255,255,255,.95);
+    border-color:var(--c);
+    box-shadow:0 0 18px var(--glow,rgba(0,85,200,.4)),0 2px 8px rgba(0,0,0,.1);
+    color:var(--c);
+  }
+  .df[data-theme='light'] .df-sn.done{
+    background:rgba(220,252,231,.9);border-color:#16a34a;
+    box-shadow:0 2px 10px rgba(22,163,74,.25);color:#15803d;
+  }
+  .df[data-theme='light'] .df-sn.gate{background:rgba(255,251,235,.9);border-color:#d97706;color:#92400e}
+  .df[data-theme='light'] .df-sn-line{background:linear-gradient(to bottom,rgba(0,0,0,.12),rgba(0,0,0,.06))}
+  .df[data-theme='light'] .df-sn-line.flow::after{background:linear-gradient(to bottom,transparent,#0055c8,transparent)}
+  .df[data-theme='light'] .df-sn-dot{background:#0055c8;box-shadow:0 0 8px rgba(0,85,200,.7)}
+  .df[data-theme='light'] .df-cline{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .df-cline.flow::after{background:#0055c8}
+  .df[data-theme='light'] .df-conn{opacity:1}
+
+  /* ── Center panel — frosted ── */
+  .df[data-theme='light'] .df-center{border-right:1px solid rgba(255,255,255,.5)}
+  .df[data-theme='light'] .df-detail{background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .df-detail::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
+  .df[data-theme='light'] .df-dtitle{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-dsub{
+    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    font-weight:800;
+  }
+
+  /* ── PRD ── */
+  .df[data-theme='light'] .df-prd{background:rgba(239,246,255,.85);border:1px solid rgba(147,197,253,.5);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-prd-h{color:#0055c8;font-weight:700}
+  .df[data-theme='light'] .df-pl{color:#0055c8}
+  .df[data-theme='light'] .df-pt{color:#2c3a56;opacity:1}
+  .df[data-theme='light'] .df-pi{color:#2c3a56;opacity:1}
+  .df[data-theme='light'] .df-pi::before{color:#0055c8}
+
+  /* ── Tasks ── */
+  .df[data-theme='light'] .df-task{background:rgba(240,253,244,.85);border:1px solid rgba(22,163,74,.25);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-tid {color:#15803d;font-weight:700}
+  .df[data-theme='light'] .df-tname{color:#0d1526;font-weight:700}
+  .df[data-theme='light'] .df-tpts {color:#15803d;font-weight:700}
+
+  /* ── Agents ── */
+  .df[data-theme='light'] .df-agent{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-agent.running{border-color:var(--ac);background:rgba(239,246,255,.85)}
+  .df[data-theme='light'] .df-agent.passed {border-color:rgba(22,163,74,.35);background:rgba(240,253,244,.85)}
+  .df[data-theme='light'] .df-agname{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-agst{color:#4e607f;font-weight:500;opacity:1}
+  .df[data-theme='light'] .df-agf{color:#2c3a56;opacity:1;line-height:1.7}
+
+  /* ── QA ── */
+  .df[data-theme='light'] .df-qa-row{background:rgba(250,245,255,.85);border:1px solid rgba(109,40,217,.18);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-qa-type {color:#7c3aed;font-weight:700}
+  .df[data-theme='light'] .df-qa-count{color:#2c3a56;font-weight:600}
+  .df[data-theme='light'] .df-qa-badge{background:rgba(220,252,231,.85);color:#15803d;border-color:rgba(22,163,74,.3)}
+
+  /* ── Deploy environments ── */
+  .df[data-theme='light'] .df-env{background:rgba(255,241,243,.85);border:1px solid rgba(159,18,57,.18);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-env.live{background:rgba(240,253,244,.85);border-color:rgba(22,163,74,.3)}
+  .df[data-theme='light'] .df-env-name{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-env-bar{background:rgba(252,213,224,.7)}
+  .df[data-theme='light'] .df-env.live .df-env-fill{background:#16a34a}
+  .df[data-theme='light'] .df-env-st{color:#4e607f;font-weight:600}
+
+  /* ── Gate panel ── */
+  .df[data-theme='light'] .df-gate{
+    background:rgba(255,251,235,.88);
+    backdrop-filter:blur(16px);
+    border:2px solid #d97706;
+    box-shadow:0 8px 32px rgba(217,119,6,.14);animation:none;
+  }
+  .df[data-theme='light'] .df-gate::before{background:linear-gradient(90deg,transparent,#b45309,#d97706,#b45309,transparent)}
+  .df[data-theme='light'] .df-gate-icon{filter:none}
+  .df[data-theme='light'] .df-gate-title{color:#78350f;font-weight:800}
+  .df[data-theme='light'] .df-gate-verdict{color:#44403c;font-weight:500;opacity:1}
+  .df[data-theme='light'] .df-gate-pt{color:#44403c;opacity:1}
+  .df[data-theme='light'] .df-gate-pt::before{color:#b45309}
+  .df[data-theme='light'] .df-gate-ok{background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 18px rgba(22,163,74,.35)}
+  .df[data-theme='light'] .df-gate-ok:hover{box-shadow:0 8px 30px rgba(22,163,74,.5)}
+  .df[data-theme='light'] .df-gate-rej{color:#9f1239;border-color:rgba(159,18,57,.35);background:rgba(255,241,243,.85);font-weight:700}
+  .df[data-theme='light'] .df-gate-rej:hover{background:rgba(255,228,235,.95)}
+  .df[data-theme='light'] .df-fb-lbl{color:#9f1239;font-weight:700}
+  .df[data-theme='light'] .df-fb-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(159,18,57,.3);color:#0d1526}
+  .df[data-theme='light'] .df-fb-inp:focus{border-color:#9f1239}
+  .df[data-theme='light'] .df-fb-sub{background:rgba(255,241,243,.85);color:#9f1239;border-color:rgba(159,18,57,.35);font-weight:700}
+  .df[data-theme='light'] .df-fb-sub:hover{background:rgba(255,228,235,.95)}
+
+  /* ── Prod gate ── */
+  .df[data-theme='light'] .df-prod-gate{
+    background:rgba(255,241,243,.9);backdrop-filter:blur(20px);
+    border:2px solid rgba(159,18,57,.45);
+    box-shadow:0 8px 40px rgba(159,18,57,.12);animation:none;
+  }
+  .df[data-theme='light'] .df-prod-gate::before{background:linear-gradient(90deg,transparent,#9f1239,#e11d48,#9f1239,transparent)}
+  .df[data-theme='light'] .df-pg-title{color:#881337;font-weight:800}
+  .df[data-theme='light'] .df-pg-sub{color:rgba(136,19,55,.7);font-weight:500}
+  .df[data-theme='light'] .df-pg-check{color:#2c3a56;border-bottom-color:rgba(159,18,57,.1)}
+  .df[data-theme='light'] .df-pg-cinp{background:rgba(255,255,255,.9);border:1.5px solid rgba(159,18,57,.35);color:#881337}
+  .df[data-theme='light'] .df-pg-btn.unlocked{background:linear-gradient(135deg,#881337,#9f1239)}
+  .df[data-theme='light'] .df-pg-btn.unlocked:hover{box-shadow:0 8px 24px rgba(136,19,55,.35)}
+
+  /* ── Done state ── */
+  .df[data-theme='light'] .df-done-ic{filter:drop-shadow(0 0 18px rgba(22,163,74,.45))}
+  .df[data-theme='light'] .df-done-t{
+    background:linear-gradient(135deg,#0055c8,#7c3aed,#15803d);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:none;
+  }
+  .df[data-theme='light'] .df-done-s{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-metric{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-metric:hover{box-shadow:0 6px 22px rgba(0,85,200,.14)}
+  .df[data-theme='light'] .df-mv{color:#0055c8;font-weight:800}
+  .df[data-theme='light'] .df-ml{color:#4e607f;font-weight:500}
+
+  .df[data-theme='light'] .df-cursor{color:#0055c8}
+
+  /* ── Observability — frosted stats ── */
+  .df[data-theme='light'] .obs-wrap{background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .obs-stat{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .obs-stat:hover{box-shadow:0 6px 20px rgba(0,85,200,.12)}
+  .df[data-theme='light'] .obs-stat-val{color:#0055c8;font-weight:800}
+  .df[data-theme='light'] .obs-stat-lbl{color:#4e607f;font-weight:600;opacity:1}
+  .df[data-theme='light'] .obs-sh{
+    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;
+  }
+  .df[data-theme='light'] .obs-sh::after{background:rgba(0,0,0,.1)}
+  .df[data-theme='light'] .obs-table th{color:#2c3a56;border-bottom:2px solid rgba(0,0,0,.08);font-weight:800}
+  .df[data-theme='light'] .obs-table td{border-bottom-color:rgba(0,0,0,.05);color:#2c3a56}
+  .df[data-theme='light'] .obs-table tr:hover td{background:rgba(239,246,255,.6)}
+  .df[data-theme='light'] .obs-chart-box{background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .obs-chart-title{color:#2c3a56;font-weight:800}
+  .df[data-theme='light'] .obs-legend-item{color:#4e607f;font-weight:500;opacity:1}
+  .df[data-theme='light'] .obs-empty{color:#8899b4;opacity:1}
+  .df[data-theme='light'] .obs-drift-banner{background:rgba(255,251,235,.85);border-color:#d97706}
+  .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:rgba(255,255,255,.95)!important;border-color:rgba(0,0,0,.1)!important;color:#0d1526!important;box-shadow:0 8px 24px rgba(0,0,0,.14)!important;backdrop-filter:blur(12px)!important}
+
+  /* ── Log panel — tinted frosted glass ── */
+  .df[data-theme='light'] .df-log{background:rgba(220,232,255,.6);backdrop-filter:blur(18px) saturate(140%);border-left:1px solid rgba(255,255,255,.6)}
+  .df[data-theme='light'] .df-log-hdr{
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,.65);
+    color:#0055c8;font-weight:800;
+  }
+  .df[data-theme='light'] .df-log-dot{background:#0055c8;box-shadow:0 0 8px rgba(0,85,200,.5)}
+  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
+  .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-log-row:hover{background:rgba(255,255,255,.4)}
+  .df[data-theme='light'] .df-log-ts{color:#6677a0;font-weight:600;font-size:10px}
+  .df[data-theme='light'] .df-log-msg.info   {color:#1a2742;font-weight:500;font-size:12px}
+  .df[data-theme='light'] .df-log-msg.agent  {color:#1e40af;font-weight:600}
+  .df[data-theme='light'] .df-log-msg.success{color:#15803d;font-weight:600;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.handoff{color:#0055c8;font-weight:600;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.warn   {color:#92400e;font-weight:600;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.gate   {color:#78350f;font-weight:700;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.done   {color:#9f1239;font-weight:700;text-shadow:none}
+
+  /* ── Settings drawer — frosted glass ── */
+  .df[data-theme='light'] .df-settings-overlay{background:rgba(13,21,38,.3)}
+  .df[data-theme='light'] .df-settings-drawer{background:rgba(248,251,255,.92);backdrop-filter:blur(24px);border-left:1px solid rgba(255,255,255,.7);box-shadow:-20px 0 60px rgba(0,0,0,.14)}
+  .df[data-theme='light'] .df-set-hdr{background:rgba(255,255,255,.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-set-title{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-set-close{color:#8899b4;font-size:22px;font-weight:700}
+  .df[data-theme='light'] .df-set-close:hover{color:#9f1239;background:rgba(255,241,243,.8)}
+  .df[data-theme='light'] .df-set-tabs{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-set-tab{color:#4e607f;font-weight:600}
+  .df[data-theme='light'] .df-set-tab.active{color:#0055c8;border-bottom-color:#0055c8;font-weight:800}
+  .df[data-theme='light'] .df-set-tab:hover{color:#0d1526}
+  .df[data-theme='light'] .df-set-body{background:rgba(255,255,255,.7);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .df-set-body::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
+  .df[data-theme='light'] .df-set-sec-title{
+    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;
+  }
+  .df[data-theme='light'] .df-set-lbl{color:#2c3a56;font-weight:700}
+  .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
+  .df[data-theme='light'] .df-set-inp:focus{border-color:#0055c8;box-shadow:0 0 0 3px rgba(0,85,200,.12)}
+  .df[data-theme='light'] .df-set-inp::placeholder{color:#8899b4}
+  .df[data-theme='light'] .df-set-preview{color:#8899b4}
+  .df[data-theme='light'] .df-set-test-btn{background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.25);color:#0055c8;font-weight:700}
+  .df[data-theme='light'] .df-set-test-btn:hover{background:rgba(219,238,255,.95)}
+  .df[data-theme='light'] .df-set-result.ok {background:rgba(220,252,231,.85);border-color:rgba(22,163,74,.35);color:#15803d;font-weight:700}
+  .df[data-theme='light'] .df-set-result.err{background:rgba(254,226,226,.85);border-color:rgba(185,28,28,.35);color:#b91c1c;font-weight:700}
+  .df[data-theme='light'] .df-model-card{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-model-card:hover{background:rgba(255,255,255,.94);box-shadow:0 4px 16px rgba(0,85,200,.1)}
+  .df[data-theme='light'] .df-model-card.selected{background:rgba(239,246,255,.92);border-color:#0055c8;box-shadow:0 0 0 2px rgba(0,85,200,.2)}
+  .df[data-theme='light'] .df-model-card.selected::before{background:linear-gradient(to right,transparent,#0055c8,transparent)}
+  .df[data-theme='light'] .df-mc-name{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-mc-desc{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-mc-price{color:#8899b4}
+  .df[data-theme='light'] .df-mc-remove{color:rgba(159,18,57,.55)}
+  .df[data-theme='light'] .df-mc-remove:hover{color:#9f1239}
+  .df[data-theme='light'] .df-add-model-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
+  .df[data-theme='light'] .df-add-model-inp::placeholder{color:#8899b4}
+  .df[data-theme='light'] .df-add-model-btn{background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.25);color:#0055c8;font-weight:700}
+  .df[data-theme='light'] .df-add-model-btn:hover{background:rgba(219,238,255,.95)}
+  .df[data-theme='light'] .df-int-status-row{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.75)}
+  .df[data-theme='light'] .df-int-status-dot.on{box-shadow:0 0 6px rgba(22,163,74,.55)}
+  .df[data-theme='light'] .df-int-status-dot.off{background:#aab6d0}
+  .df[data-theme='light'] .df-int-status-name{color:#2c3a56;font-weight:700}
+  .df[data-theme='light'] .df-int-status-val{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-set-footer{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-set-save{background:linear-gradient(135deg,#0055c8,#5b21b6);box-shadow:0 4px 16px rgba(0,85,200,.35)}
+  .df[data-theme='light'] .df-set-cancel{background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.12);color:#2c3a56;font-weight:600}
+  .df[data-theme='light'] .df-set-cancel:hover{border-color:#0055c8;color:#0055c8;background:rgba(239,246,255,.9)}
+
+  /* ── About panel — frosted ── */
+  .df[data-theme='light'] .abt-wrap{color:#0d1526;background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .abt-hero{background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.8);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+  .df[data-theme='light'] .abt-title{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .abt-tagline{background:linear-gradient(90deg,#0055c8,#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+  .df[data-theme='light'] .abt-desc{color:#2c3a56;opacity:1;line-height:1.8}
+  .df[data-theme='light'] .abt-link{color:#0055c8;border-color:rgba(0,85,200,.3);background:rgba(239,246,255,.8);font-weight:600}
+  .df[data-theme='light'] .abt-link:hover{background:rgba(219,238,255,.95)}
+  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 18px rgba(0,85,200,.1)}
+  .df[data-theme='light'] .abt-stage-num{color:#0369a1;font-weight:700}
+  .df[data-theme='light'] .abt-stage-lbl{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .abt-stage-sub{color:#4e607f;font-weight:500;opacity:1}
+  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.2)}
+  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.85);border-color:#d97706;color:#78350f;font-weight:700}
+  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8)}
+  .df[data-theme='light'] .abt-chip{opacity:1;font-weight:600;font-size:11px}
+
+  /* ── Idle hero — light mode ── */
+  .df[data-theme='light'] .df-idle-hero-title{color:#0d1526}
+  .df[data-theme='light'] .df-idle-hero-title em{
+    background:linear-gradient(90deg,#0055c8,#7c3aed,#e066ff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df[data-theme='light'] .df-idle-hero-sub{color:rgba(78,96,127,.72);font-size:13px}
+  .df[data-theme='light'] .df-idle-scard{
+    background:rgba(255,255,255,.82);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.9);box-shadow:0 2px 12px rgba(0,0,0,.07);
+    animation:none;opacity:1;
+  }
+  .df[data-theme='light'] .df-idle-scard:hover{
+    background:rgba(255,255,255,.97);
+    box-shadow:0 10px 28px rgba(0,0,0,.1),0 0 0 2px var(--c);
+    border-color:var(--c);
+  }
+  .df[data-theme='light'] .df-idle-scard-num{color:rgba(78,96,127,.5);font-size:11px}
+  .df[data-theme='light'] .df-idle-scard-name{color:#0d1526;font-weight:800;font-size:15px}
+  .df[data-theme='light'] .df-idle-scard-sub{color:rgba(78,96,127,.65);font-size:12px}
+  .df[data-theme='light'] .df-idle-arrow{background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.12),rgba(0,0,0,0));animation:none}
+  .df[data-theme='light'] .df-idle-arrow::after{color:rgba(0,0,0,.2)}
+  .df[data-theme='light'] .df-idle-hint{color:#2c3a56;font-size:15px;font-weight:500}
+  .df[data-theme='light'] .df-cursor{color:#0055c8}
+  .df[data-theme='light'] .df-idle-feat{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-idle-feat-title{color:#0d1526;font-weight:800;font-size:14px}
+  .df[data-theme='light'] .df-idle-feat-desc{color:rgba(78,96,127,.72);font-size:12px}
+  .df[data-theme='light'] .df-idle-chip{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.1);color:#4e607f;font-size:12px}
+  .df[data-theme='light'] .df-log-empty{color:#4e607f;opacity:.7}
+
+  /* ── Footer — light mode ── */
+  .df[data-theme='light'] .df-foot{
+    background:rgba(255,255,255,.75);backdrop-filter:blur(16px) saturate(150%);
+    border-top:1px solid rgba(255,255,255,.65);box-shadow:0 -1px 0 rgba(0,0,0,.04);
+  }
+  .df[data-theme='light'] .df-foot::before{
+    background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,rgba(0,0,0,.025) 23px,rgba(0,0,0,.025) 24px);
+  }
+  .df[data-theme='light'] .df-foot-brand{color:rgba(13,21,38,.5)}
+  .df[data-theme='light'] .df-foot-brand em{
+    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .df[data-theme='light'] .df-foot-sep{color:rgba(13,21,38,.2)}
+  .df[data-theme='light'] .df-foot-tag{color:rgba(13,21,38,.38)}
+  .df[data-theme='light'] .df-foot-dot{opacity:.75}
+
+  /* ── Fullscreen viewer ── */
+  .df[data-theme='light'] .df-fsv{background:rgba(248,251,255,.96);backdrop-filter:blur(20px)}
+  .df[data-theme='light'] .df-fsv-hdr{background:rgba(255,255,255,.82);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-fsv-fname{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-fsv-task{color:#7c3aed;font-weight:700}
+  .df[data-theme='light'] .df-fsv-copy{background:rgba(245,240,255,.85);border:1px solid rgba(124,58,237,.3);color:#7c3aed;font-weight:700}
+  .df[data-theme='light'] .df-fsv-close{border:1px solid rgba(0,0,0,.12);color:#4e607f;background:rgba(255,255,255,.8)}
 
 `;
 
@@ -1240,12 +1665,12 @@ function AboutPanel({ theme }) {
     { num:6, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
   ];
   const STACK = [
-    { cat:"AI / LLM",      color:"#bf7fff", items:["Claude Sonnet 5", "Anthropic API"] },
-    { cat:"Orchestration", color:"#00d4ff", items:["LangGraph 1.x", "MemorySaver checkpointing"] },
-    { cat:"Backend",       color:"#00ff88", items:["FastAPI", "Uvicorn", "Pydantic v2"] },
-    { cat:"Frontend",      color:"#ffaa00", items:["React 18", "Recharts", "Vite"] },
-    { cat:"Integrations",  color:"#ff6b9d", items:["Slack SDK", "Linear GraphQL", "PyGithub"] },
-    { cat:"Algorithm",     color:"#ff9500", items:["Kahn's topological sort", "DP critical path"] },
+    { cat:"AI / LLM",      color:"#bf7fff", lc:"#6d28d9", items:["Claude Sonnet 5", "Anthropic API"] },
+    { cat:"Orchestration", color:"#00d4ff", lc:"#0369a1", items:["LangGraph 1.x", "MemorySaver checkpointing"] },
+    { cat:"Backend",       color:"#00ff88", lc:"#065f46", items:["FastAPI", "Uvicorn", "Pydantic v2"] },
+    { cat:"Frontend",      color:"#ffaa00", lc:"#92400e", items:["React 18", "Recharts", "Vite"] },
+    { cat:"Integrations",  color:"#ff6b9d", lc:"#9d174d", items:["Slack SDK", "Linear GraphQL", "PyGithub"] },
+    { cat:"Algorithm",     color:"#ff9500", lc:"#7c2d12", items:["Kahn's topological sort", "DP critical path"] },
   ];
   return (
     <div className="abt-wrap">
@@ -1287,16 +1712,19 @@ function AboutPanel({ theme }) {
       <div>
         <div className="obs-sh">Tech Stack</div>
         <div className="abt-stack">
-          {STACK.map(g => (
-            <div key={g.cat} className="abt-stack-group">
-              <div className="abt-stack-cat" style={{color:g.color}}>{g.cat}</div>
-              <div className="abt-stack-items">
-                {g.items.map(item => (
-                  <span key={item} className="abt-chip" style={{borderColor:g.color+"33",color:g.color}}>{item}</span>
-                ))}
+          {STACK.map(g => {
+            const sc = theme === "light" ? g.lc : g.color;
+            return (
+              <div key={g.cat} className="abt-stack-group">
+                <div className="abt-stack-cat" style={{color:sc}}>{g.cat}</div>
+                <div className="abt-stack-items">
+                  {g.items.map(item => (
+                    <span key={item} className="abt-chip" style={{borderColor:sc+"44",color:sc}}>{item}</span>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -1388,8 +1816,9 @@ export default function DevForgeDashboard() {
     if (!Object.keys(settingsEdits).length) { closeSettings(); return; }
     setSettingsSaving(true);
     fetch("/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(settingsEdits)})
-      .then(r=>r.json()).then(d=>{ setSettingsData(d); setSettingsSaving(false); closeSettings(); })
-      .catch(()=>setSettingsSaving(false));
+      .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then(d=>{ setSettingsData(d); setSettingsSaving(false); closeSettings(); })
+      .catch(e=>{ setSettingsSaving(false); setSettingsTestResult(p=>({...p,_save:{ok:false,error:"Save failed: "+e.message}})); });
   };
   const testConnection = (service) => {
     setSettingsTestResult(p=>({...p,[service]:{loading:true}}));
@@ -2111,7 +2540,46 @@ export default function DevForgeDashboard() {
 
   // ── Detail renderer ────────────────────────────────────────────────────
   const renderDetail = () => {
-    if(!detail) return <div className="df-idle-hint">⟡ {requestMode==="new_software"?"Describe what you want to build":"Enter a feature request"}<br/>and hit ▶ LAUNCH<br/><br/><span className="df-cursor">_</span></div>;
+    if(!detail) return (
+      <div className="df-idle-hero">
+        <div className="df-idle-hero-title"><em>DevForge AI</em></div>
+        <div className="df-idle-hero-sub">6 autonomous agents · full SDLC · human review gates</div>
+        <div className="df-idle-pipeline">
+          {STAGES.map((s,i)=>(
+            <React.Fragment key={s.id}>
+              <div className="df-idle-scard" style={{"--c":s.color,animationDelay:`${i*80}ms`}}>
+                <span className="df-idle-scard-icon" style={{color:s.color}}>{s.icon}</span>
+                <span className="df-idle-scard-num">{s.num}</span>
+                <span className="df-idle-scard-name">{s.label}</span>
+                <span className="df-idle-scard-sub">{s.desc}</span>
+              </div>
+              {i<STAGES.length-1&&<div className="df-idle-arrow"/>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="df-idle-hint">⟡ {requestMode==="new_software"?"Describe what to build in the box above":"Paste a feature request above"}, then hit ▶ LAUNCH <span className="df-cursor">_</span></div>
+        <div className="df-idle-features">
+          {[
+            {icon:"⏸",color:"#ffaa00",title:"Human Review Gates",desc:"Approve or reject at every checkpoint — targeted feedback loops back into the pipeline and agents self-correct"},
+            {icon:"◉",color:"#e066ff",title:"Multi-Agent PR Review",desc:"4 specialized agents run in parallel: security posture, code quality, test coverage, and architecture coherence"},
+            {icon:"◈",color:"#00d4ff",title:"LLM Observability",desc:"Real-time token counts, per-call latency, model routing, and cost breakdown across every agent in the run"},
+          ].map((f,i)=>(
+            <div key={i} className="df-idle-feat" style={{"--fi-color":f.color}}>
+              <span className="df-idle-feat-icon" style={{color:f.color}}>{f.icon}</span>
+              <div>
+                <div className="df-idle-feat-title">{f.title}</div>
+                <div className="df-idle-feat-desc">{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="df-idle-stack">
+          {["LangGraph","FastAPI","React 18","Anthropic API","Linear","Slack","GitHub"].map(t=>(
+            <span key={t} className="df-idle-chip">{t}</span>
+          ))}
+        </div>
+      </div>
+    );
     if(detail==="requirements") return (
       <div>
         <div className="df-dtitle" style={{color:"#00d4ff"}}>Requirements Agent</div>
@@ -2481,7 +2949,7 @@ export default function DevForgeDashboard() {
               <path d="M23 9 L14 24.5 L19.4 24.5 L17 35 L27 19 L21.2 19 Z" fill="url(#dfBolt)"/>
             </svg>
           </div>
-          <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autopilot Engineer · Autonomous SDLC</div></div>
+          <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autonomous SDLC Pipeline · 6 AI Agents</div></div>
         </div>
         <div className="df-timer" style={{color:timerColor}}>{display}</div>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -2588,8 +3056,8 @@ export default function DevForgeDashboard() {
             if(pipeCollapsed) return (
               <div key={stage.id} className={`df-rail ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,cursor:clickable?"pointer":"default"}} title={`${stage.num} · ${stage.label} — ${stage.desc}`} onClick={goDetail}>
                 <span className="df-rail-num">{stage.num}</span>
-                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(200,214,232,.25)","rgba(20,30,80,.25)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
-                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(200,214,232,.25)","var(--c,#5566dd)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
+                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","var(--c)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
               </div>
             );
             return (
@@ -2599,7 +3067,7 @@ export default function DevForgeDashboard() {
                     style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.4)":stage.glow}}>
                     {isActive&&<span className="df-sn-ping"/>}
                     <span className={isActive?"spin":""} style={{display:"inline-block",fontSize:11,transition:"color .3s",
-                      color:isActive?(isGate?"#ffaa00":stage.color):isDone?"#00ff88":isGate?"#ffaa00":tc("rgba(200,214,232,.3)","rgba(20,30,80,.3)")}}>
+                      color:isActive?(isGate?"#ffaa00":stage.color):isDone?"#00ff88":isGate?"#ffaa00":tc("rgba(200,214,232,.3)","var(--c,#5566dd)")}}>
                       {isDone&&!isGate?"✓":isGate?"⏸":stage.icon}
                     </span>
                   </div>
@@ -2615,7 +3083,7 @@ export default function DevForgeDashboard() {
                     <div className="df-crow">
                       <span className="df-cnum">{stage.num}</span>
                       <div className="df-clbl">
-                        <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#0d0f1f"):isGate?"#ffcc55":tc("rgba(255,255,255,.42)","rgba(20,30,80,.42)")}}>{stage.label}</div>
+                        <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#0d1526"):isGate?"#ffcc55":tc("rgba(255,255,255,.42)","rgba(13,21,38,.62)")}}>{stage.label}</div>
                         <div className="df-csub">{stage.sub}</div>
                       </div>
                       <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
@@ -2623,7 +3091,9 @@ export default function DevForgeDashboard() {
                     {(isActive||isDone||isGate)&&<div className="df-cdesc">{isGate?"Awaiting your approval":stage.desc}</div>}
                     {(isActive||isDone)&&<div className="df-cprog"><div className="df-cfill" style={{width:`${isDone?100:p}%`,background:isGate?"#ffaa00":stage.color}}/></div>}
                     {llmCalls.filter(c=>c.stage===stage.id).length>0&&(
-                      <div style={{fontSize:9,marginTop:3,opacity:.5,color:stage.color}}>
+                      <div style={{fontSize:10,marginTop:4,fontWeight:600,
+                        color:theme==="light"?"#1e3a5c":stage.color,
+                        opacity:theme==="light"?0.82:0.7}}>
                         {llmCalls.filter(c=>c.stage===stage.id).length} LLM call{llmCalls.filter(c=>c.stage===stage.id).length>1?"s":""} · {llmCalls.filter(c=>c.stage===stage.id).reduce((a,c)=>a+c.inputTok+c.outputTok,0).toLocaleString()} tok
                       </div>
                     )}
@@ -2676,12 +3146,22 @@ export default function DevForgeDashboard() {
           </div>
           {logView!=="collapsed"&&(
             <div className="df-log-bd" ref={logRef}>
-              {logs.length===0&&<div style={{opacity:.4,fontSize:10,textAlign:"center",marginTop:40,color:"rgba(0,200,255,.6)",letterSpacing:".06em"}}>⟡ Awaiting pipeline...</div>}
+              {logs.length===0&&<div className="df-log-empty">⟡ Awaiting pipeline...</div>}
               {logs.map(e=><div key={e.id} className="df-log-row"><span className="df-log-ts">{e.ts}</span><span className={`df-log-msg ${e.type}`}>{e.msg}</span></div>)}
             </div>
           )}
         </div>
 
+      </div>
+
+      {/* Footer */}
+      <div className="df-foot">
+        <span className="df-foot-brand">DevForge <em>AI</em></span>
+        <div className="df-foot-dots">
+          {STAGES.map(s=><span key={s.id} className="df-foot-dot" style={{background:s.color}}/>)}
+        </div>
+        <span className="df-foot-sep">·</span>
+        <span className="df-foot-tag">Autonomous SDLC Intelligence Engine</span>
       </div>
 
       {/* Debug Help Panel */}
@@ -2959,23 +3439,6 @@ export default function DevForgeDashboard() {
         </div>
       )}
 
-      {/* Attribution footer */}
-      <div style={{
-        flexShrink:0,padding:"5px 20px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:12,
-        borderTop:`1px solid ${tc("rgba(255,255,255,.05)","rgba(0,0,0,.07)")}`,
-        background:tc("rgba(8,9,18,.6)","rgba(238,241,252,.7)"),
-      }}>
-        <span style={{fontSize:10,color:tc("rgba(200,214,232,.58)","rgba(20,30,80,.5)"),letterSpacing:".04em"}}>
-          Built by <strong style={{color:tc("rgba(200,214,232,.82)","rgba(20,30,80,.75)"),fontWeight:600}}>Sushil Kumar</strong>
-        </span>
-        <a href="https://www.linkedin.com/in/sushilk001" target="_blank" rel="noreferrer"
-          style={{fontSize:10,color:"#0a66c2",textDecoration:"none",display:"flex",alignItems:"center",gap:4,fontWeight:500,opacity:.8,transition:"opacity .15s"}}
-          onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=".8"}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          linkedin.com/in/sushilk001
-        </a>
-      </div>
     </div>
   );
 }

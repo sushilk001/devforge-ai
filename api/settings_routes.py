@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
 import logging
 import httpx
 from fastapi import APIRouter
@@ -143,6 +144,27 @@ async def test_linear():
         if viewer:
             return {"ok": True, "info": viewer.get("name") or viewer.get("email", "authenticated")}
         return {"ok": False, "error": data.get("errors", [{}])[0].get("message", "Unknown")}
+    except Exception as e:
+        return {"ok": False, "error": str(e)[:120]}
+
+
+@router_settings.post("/test-slack")
+async def test_slack():
+    """Verify Slack bot token by calling auth.test."""
+    token = rc.get_slack_bot_token()
+    if not token:
+        return {"ok": False, "error": "No Slack bot token configured"}
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                "https://slack.com/api/auth.test",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                timeout=8,
+            )
+        data = r.json()
+        if data.get("ok"):
+            return {"ok": True, "info": data.get("team", "authenticated"), "user": data.get("user")}
+        return {"ok": False, "error": data.get("error", "Unknown Slack error")}
     except Exception as e:
         return {"ok": False, "error": str(e)[:120]}
 
