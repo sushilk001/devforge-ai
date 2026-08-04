@@ -2154,13 +2154,14 @@ export default function DevForgeDashboard() {
     setTimeout(poll, 5000);
   };
 
-  const pollCompliance = (cTid, onComplete) => {
+  const pollCompliance = (cTid) => {
     const deadline = Date.now() + 240_000;
+    const FALLBACK = (verdict) => ({ findings:[], score:0, criticals:0, warnings_count:0, verdict, debt_history:[] });
     const poll = () => {
       if (Date.now() > deadline) {
         addLog("⚠ Compliance check timed out — proceeding with advisory","warn");
+        setRealCompliance(FALLBACK("TIMED OUT — no results within time limit"));
         setApiReady(p=>({...p, compliance:true}));
-        onComplete && onComplete();
         return;
       }
       fetch(`/compliance/status/${cTid}`).then(r=>r.json()).then(d=>{
@@ -2172,12 +2173,14 @@ export default function DevForgeDashboard() {
             if (c===0 && w===0) addLog("✓ Compliance audit passed — no issues found","success");
             else if (c===0)     addLog(`⚠ Compliance advisory: ${w} warning(s), no blockers`,"warn");
             else                addLog(`⚠ Compliance: ${c} critical issue(s), ${w} warning(s) — review required`,"warn");
-            onComplete && onComplete();
-          }).catch(()=>{ setApiReady(p=>({...p,compliance:true})); onComplete&&onComplete(); });
+          }).catch(()=>{
+            setRealCompliance(FALLBACK("ADVISORY — report fetch failed"));
+            setApiReady(p=>({...p,compliance:true}));
+          });
         } else if (d.status==="error") {
           addLog(`⚠ Compliance check error: ${d.error||"unknown"}`,"warn");
+          setRealCompliance(FALLBACK(`ERROR — ${d.error||"compliance check failed"}`));
           setApiReady(p=>({...p, compliance:true}));
-          onComplete && onComplete();
         } else {
           setTimeout(poll, 4000);
         }
@@ -2188,23 +2191,24 @@ export default function DevForgeDashboard() {
 
   const runCompliance = (onComplete) => {
     const s4Tid = s4TidRef.current;
-    runStage("compliance", ()=>{});
+    runStage("compliance", onComplete);
+    const FALLBACK = (verdict) => ({ findings:[], score:0, criticals:0, warnings_count:0, verdict, debt_history:[] });
     fetch(`/compliance/start/${s4Tid}`, {method:"POST"})
       .then(r=>r.json())
       .then(d=>{
         if (d.thread_id) {
           setComplianceTid(d.thread_id);
-          pollCompliance(d.thread_id, onComplete);
+          pollCompliance(d.thread_id);
         } else {
           addLog("⚠ Compliance start failed — skipping","warn");
+          setRealCompliance(FALLBACK("SKIPPED — compliance start failed"));
           setApiReady(p=>({...p,compliance:true}));
-          onComplete && onComplete();
         }
       })
       .catch(()=>{
         addLog("⚠ Compliance API unreachable — skipping","warn");
+        setRealCompliance(FALLBACK("UNREACHABLE — compliance API unavailable"));
         setApiReady(p=>({...p,compliance:true}));
-        onComplete && onComplete();
       });
   };
 
@@ -2835,7 +2839,7 @@ export default function DevForgeDashboard() {
         </div>
       </div>);
     }
-    if(detail==="compliance") {
+    if(detail==="compliance" || detail==="gate_compliance") {
       const rpt = realCompliance;
       const running = !rpt;
       const criticals = rpt?.criticals || 0;
