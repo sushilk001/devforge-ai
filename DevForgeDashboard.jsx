@@ -2328,7 +2328,7 @@ export default function DevForgeDashboard() {
       compliance:   () => setRealCompliance(D.compliance),
     };
 
-    const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); setRealDeploy(D.deploy); pushCalls("deploy"); runDeploy(); };
+    const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); pushCalls("deploy"); runDeploy(); T(() => setRealDeploy(D.deploy), STAGE_DUR.deploy - 600); };
     function goProdGate(){ setAppState("prod_gate"); setDetail("prod_gate"); addLog("⚠ PRODUCTION GATE — mandatory approval required","gate"); resumeFn.current = s7; }
     const demoStage = (id, onComplete) => {
       pushCalls(id);
