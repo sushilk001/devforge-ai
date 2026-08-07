@@ -2779,6 +2779,8 @@ export default function DevForgeDashboard() {
       }).then(r=>r.json()).then(data=>{
         const count = (data.linear_issue_ids||[]).length;
         addLog(`✓ ${count} Linear issues created in new project`,"success");
+        // Re-sync tasks so linear_issue_url is populated for the deploy panel
+        if(Array.isArray(data.tasks) && data.tasks.length) setRealTasks(data.tasks);
         // Auto-start Stage 4 Code Gen
         fetch(`/stage4/start/${tid}`, {method:"POST"})
           .then(r=>{
