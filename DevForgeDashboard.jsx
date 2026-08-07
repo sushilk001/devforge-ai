@@ -988,271 +988,261 @@ const css = `
   }
 
   /* ════════════════════════════════════════════════════════════════════════
-     LIGHT THEME — animated aurora, glassmorphism, full colour coding
-     Stage colours (from STAGES array, used via var(--c)):
-       Requirements #00d4ff  Tasks #00ff88  Code Gen #bf5fff
-       PR Review    #e066ff  QA    #2dd4bf  Deploy   #ff2d6b
+     LIGHT THEME — Claude design: warm sand canvas, vivid orange accent
+     Palette: sand #EFE8DF · orange #D4662E · dark #1A1916
+              warm-mid #3D3730 · muted #6B6258 · ghost #9C928A
   ══════════════════════════════════════════════════════════════════════════ */
 
-  /* ── Light-mode blob animations (defined here, usable globally) ── */
+  /* ── Light-mode ambient animations ── */
   @keyframes lBgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
   @keyframes lBlob1{
-    0%,100%{transform:translate(0,0) scale(1);opacity:.82}
-    20%{transform:translate(90px,-60px) scale(1.22);opacity:1}
-    50%{transform:translate(20px,80px) scale(.86);opacity:.72}
-    75%{transform:translate(-70px,25px) scale(1.1);opacity:.9}
+    0%,100%{transform:translate(0,0) scale(1);opacity:1}
+    30%{transform:translate(90px,-55px) scale(1.2);opacity:1}
+    65%{transform:translate(-45px,65px) scale(.88);opacity:.88}
   }
   @keyframes lBlob2{
-    0%,100%{transform:translate(0,0) scale(1);opacity:.78}
-    30%{transform:translate(-80px,60px) scale(1.18);opacity:.98}
-    62%{transform:translate(60px,-70px) scale(.88);opacity:.68}
-    82%{transform:translate(15px,35px) scale(1.08);opacity:.88}
-  }
-  @keyframes lBlob3{
-    0%,100%{transform:translate(0,0) scale(1);opacity:.6}
-    35%{transform:translate(60px,50px) scale(1.15);opacity:.82}
-    70%{transform:translate(-50px,-40px) scale(.9);opacity:.55}
+    0%,100%{transform:translate(0,0) scale(1);opacity:1}
+    38%{transform:translate(-75px,55px) scale(1.15);opacity:1}
+    72%{transform:translate(55px,-60px) scale(.86);opacity:.88}
   }
 
-  /* ── Base — animated aurora background ── */
+  /* ── Base — warm sand canvas with vivid blobs ── */
   .df[data-theme='light']{
-    background:linear-gradient(-45deg,#a8d4ff,#d0b0ff,#a2f0d0,#ffb0cc,#b8d8ff,#a8d4ff);
-    background-size:500% 500%;
-    animation:lBgShift 14s ease infinite;
-    color:#0d1526;
+    background:linear-gradient(-45deg,#EDE5DB,#F2EAE0,#E8DFCF,#EFE7DC,#EDE5DB);
+    background-size:400% 400%;
+    animation:lBgShift 22s ease infinite;
+    color:#1A1916;
   }
   .df[data-theme='light']::before{
-    width:1100px;height:1100px;top:-320px;left:-260px;
-    background:radial-gradient(circle,rgba(56,189,248,.9) 0%,rgba(103,232,249,.55) 38%,transparent 65%);
-    filter:blur(72px);
-    animation:lBlob1 16s ease-in-out infinite;
+    width:960px;height:960px;top:-280px;left:-200px;
+    background:radial-gradient(circle,rgba(240,120,50,.38) 0%,rgba(220,90,30,.22) 38%,transparent 66%);
+    filter:blur(48px);
+    animation:lBlob1 18s ease-in-out infinite;
   }
   .df[data-theme='light']::after{
-    width:950px;height:950px;bottom:-260px;right:-200px;
-    background:radial-gradient(circle,rgba(196,181,253,.95) 0%,rgba(167,139,250,.6) 38%,transparent 65%);
-    filter:blur(62px);
-    animation:lBlob2 12s ease-in-out infinite;
+    width:840px;height:840px;bottom:-220px;right:-160px;
+    background:radial-gradient(circle,rgba(255,170,80,.32) 0%,rgba(230,120,45,.18) 42%,transparent 66%);
+    filter:blur(44px);
+    animation:lBlob2 14s ease-in-out infinite;
   }
 
-  /* ── Header — frosted glass ── */
+  /* ── Header ── */
   .df[data-theme='light'] .df-hdr{
-    background:rgba(255,255,255,.82);
-    backdrop-filter:blur(24px) saturate(180%);
-    border-bottom:1px solid rgba(255,255,255,.7);
-    box-shadow:0 1px 0 rgba(0,0,0,.07),0 4px 24px rgba(0,0,0,.08);
+    background:rgba(252,246,238,.95);
+    backdrop-filter:blur(24px) saturate(160%);
+    border-bottom:1px solid rgba(212,102,46,.22);
+    box-shadow:0 1px 0 rgba(212,102,46,.12),0 4px 28px rgba(0,0,0,.08);
   }
-  .df[data-theme='light'] .df-lname{color:#0d1526;font-weight:800}
+  .df[data-theme='light'] .df-lname{color:#1A1916;font-weight:800}
   .df[data-theme='light'] .df-lname span{
-    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    background:linear-gradient(90deg,#D4662E,#E87C4A,#D4662E);
+    background-size:200% auto;
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:shimmer 6s linear infinite;
   }
-  .df[data-theme='light'] .df-ltag{color:#4e607f;font-weight:500}
-  .df[data-theme='light'] .df-timer{color:#0d1526;font-weight:800;letter-spacing:.03em}
-  .df[data-theme='light'] .df-badge.idle   {color:#4e607f;border-color:rgba(78,96,127,.3);background:rgba(255,255,255,.6)}
+  .df[data-theme='light'] .df-ltag{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .df-timer{color:#1A1916;font-weight:800;letter-spacing:.03em}
+  .df[data-theme='light'] .df-badge.idle   {color:#5C5650;border-color:rgba(92,86,80,.28);background:rgba(255,255,255,.65)}
   .df[data-theme='light'] .df-badge.running{color:#15803d;border-color:rgba(22,163,74,.4);background:rgba(240,253,244,.8)}
   .df[data-theme='light'] .df-badge.gate   {color:#92400e;border-color:rgba(217,119,6,.4);background:rgba(255,251,235,.8)}
-  .df[data-theme='light'] .df-badge.done   {color:#0055c8;border-color:rgba(0,85,200,.4);background:rgba(239,246,255,.8)}
-  .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.15);color:#2c3a56;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);font-weight:600}
-  .df[data-theme='light'] .df-settings-btn:hover{background:rgba(255,255,255,.9);border-color:#0055c8;color:#0055c8}
-  .df[data-theme='light'] .df-int-dot.off{background:#aab6d0}
-  .df[data-theme='light'] .df-int-dot-lbl{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-badge.done   {color:#D4662E;border-color:rgba(212,102,46,.38);background:rgba(255,244,236,.8)}
+  .df[data-theme='light'] .df-settings-btn{border-color:rgba(0,0,0,.12);color:#3D3730;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);font-weight:600}
+  .df[data-theme='light'] .df-settings-btn:hover{background:rgba(255,255,255,.92);border-color:#D4662E;color:#D4662E}
+  .df[data-theme='light'] .df-int-dot.off{background:#C4BCB4}
+  .df[data-theme='light'] .df-int-dot-lbl{color:#5C5650;font-weight:500}
 
-  /* ── Input area — frosted glass ── */
+  /* ── Input area ── */
   .df[data-theme='light'] .df-inp-area{
-    background:rgba(255,255,255,.78);
-    backdrop-filter:blur(20px) saturate(160%);
-    border-bottom:1px solid rgba(255,255,255,.65);
-    box-shadow:0 2px 12px rgba(0,0,0,.07);
+    background:rgba(248,240,230,.92);
+    backdrop-filter:blur(20px) saturate(140%);
+    border-bottom:1px solid rgba(212,102,46,.20);
+    box-shadow:0 2px 16px rgba(0,0,0,.08);
   }
-  .df[data-theme='light'] .df-inp-lbl{color:#0d1526;font-weight:700;font-size:13px;letter-spacing:.01em}
-  .df[data-theme='light'] .df-mode-btn{border:1.5px solid rgba(0,0,0,.14);color:#2c3a56;background:rgba(255,255,255,.65);font-weight:600;backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-mode-btn:hover{border-color:#0055c8;color:#0055c8;background:rgba(239,246,255,.9)}
-  .df[data-theme='light'] .df-mode-btn.active{background:linear-gradient(135deg,#0055c8,#7c3aed);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 2px 14px rgba(0,85,200,.35)}
+  .df[data-theme='light'] .df-inp-lbl{color:#1A1916;font-weight:700;font-size:13px;letter-spacing:.01em}
+  .df[data-theme='light'] .df-mode-btn{border:1.5px solid rgba(0,0,0,.11);color:#3D3730;background:rgba(255,255,255,.68);font-weight:600;backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-mode-btn:hover{border-color:#D4662E;color:#D4662E;background:rgba(255,244,236,.92)}
+  .df[data-theme='light'] .df-mode-btn.active{background:linear-gradient(135deg,#D4662E,#9A4520);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 2px 14px rgba(212,102,46,.40)}
   .df[data-theme='light'] .df-inp{
-    background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526;
+    background:rgba(255,252,245,.96);border:1.5px solid rgba(212,102,46,.18);color:#1A1916;
     box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:14px;
   }
-  .df[data-theme='light'] .df-inp:focus{border-color:#0055c8;box-shadow:0 0 0 3px rgba(0,85,200,.14)}
-  .df[data-theme='light'] .df-inp::placeholder{color:#8899b4}
-  .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
-  .df[data-theme='light'] .df-ctx-gh::placeholder{color:#8899b4}
-  .df[data-theme='light'] .df-ctx-gh:focus{border-color:#0055c8}
-  .df[data-theme='light'] .df-ctx-attach{border:1.5px solid #0055c8;color:#0055c8;background:rgba(239,246,255,.85);font-weight:600}
-  .df[data-theme='light'] .df-ctx-attach:hover{background:rgba(219,238,255,.95)}
-  .df[data-theme='light'] .df-ctx-chip{background:rgba(219,238,255,.85);border-color:#93c5fd;color:#0055c8;font-weight:600}
-  .df[data-theme='light'] .df-ctx-chip button{color:#8899b4}
-  .df[data-theme='light'] .df-rerun-btn{border:1.5px solid rgba(0,0,0,.14);color:#2c3a56;background:rgba(255,255,255,.65);font-weight:600}
-  .df[data-theme='light'] .df-rerun-btn:hover{border-color:#0055c8;color:#0055c8;background:rgba(219,238,255,.9)}
+  .df[data-theme='light'] .df-inp:focus{border-color:#D4662E;box-shadow:0 0 0 3px rgba(212,102,46,.14)}
+  .df[data-theme='light'] .df-inp::placeholder{color:#A09890}
+  .df[data-theme='light'] .df-ctx-gh{background:rgba(255,255,255,.92);border:1.5px solid rgba(0,0,0,.10);color:#1A1916}
+  .df[data-theme='light'] .df-ctx-gh::placeholder{color:#A09890}
+  .df[data-theme='light'] .df-ctx-gh:focus{border-color:#D4662E}
+  .df[data-theme='light'] .df-ctx-attach{border:1.5px solid #D4662E;color:#D4662E;background:rgba(255,244,236,.88);font-weight:600}
+  .df[data-theme='light'] .df-ctx-attach:hover{background:rgba(255,232,216,.96)}
+  .df[data-theme='light'] .df-ctx-chip{background:rgba(255,232,216,.88);border-color:rgba(212,102,46,.45);color:#9A4520;font-weight:600}
+  .df[data-theme='light'] .df-ctx-chip button{color:#A09890}
+  .df[data-theme='light'] .df-rerun-btn{border:1.5px solid rgba(0,0,0,.11);color:#3D3730;background:rgba(255,255,255,.68);font-weight:600}
+  .df[data-theme='light'] .df-rerun-btn:hover{border-color:#D4662E;color:#D4662E;background:rgba(255,232,216,.92)}
   .df[data-theme='light'] .df-launch{
-    background:linear-gradient(135deg,#0055c8,#5b21b6);
-    box-shadow:0 4px 22px rgba(0,85,200,.45),0 0 0 1px rgba(255,255,255,.2);
+    background:linear-gradient(135deg,#D4662E,#9A4520);
+    box-shadow:0 4px 22px rgba(212,102,46,.45),0 0 0 1px rgba(255,255,255,.25);
   }
   .df[data-theme='light'] .df-launch:hover:not(:disabled){
-    background:linear-gradient(135deg,#0043aa,#4c1d95);
-    box-shadow:0 8px 30px rgba(0,85,200,.6);
+    background:linear-gradient(135deg,#B84E22,#7D3618);
+    box-shadow:0 8px 30px rgba(212,102,46,.58);
   }
   .df[data-theme='light'] .df-stop{border:1.5px solid rgba(159,18,57,.4);color:#9f1239;background:rgba(255,241,243,.85);font-weight:600}
   .df[data-theme='light'] .df-stop:hover{background:rgba(255,228,235,.95);border-color:#9f1239}
 
   /* ── Debug button & panel ── */
   .df[data-theme='light'] .df-dbg-btn{
-    background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.3);color:#0055c8;
-    font-weight:700;box-shadow:0 2px 10px rgba(0,85,200,.15);backdrop-filter:blur(8px);
+    background:rgba(255,244,236,.88);border:1.5px solid rgba(212,102,46,.28);color:#D4662E;
+    font-weight:700;box-shadow:0 2px 10px rgba(212,102,46,.14);backdrop-filter:blur(8px);
   }
-  .df[data-theme='light'] .df-dbg-btn:hover{background:rgba(219,238,255,.95);box-shadow:0 4px 16px rgba(0,85,200,.25)}
-  .df[data-theme='light'] .df-dbg-panel{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);box-shadow:-12px -12px 48px rgba(0,0,0,.14)}
-  .df[data-theme='light'] .df-dbg-title{color:#0055c8;font-weight:800}
-  .df[data-theme='light'] .df-dbg-close{color:#8899b4}
-  .df[data-theme='light'] .df-dbg-ctx{color:#4e607f;background:rgba(239,246,255,.7);border-radius:6px}
-  .df[data-theme='light'] .df-dbg-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
-  .df[data-theme='light'] .df-dbg-inp::placeholder{color:#8899b4}
-  .df[data-theme='light'] .df-dbg-inp:focus{border-color:#0055c8}
-  .df[data-theme='light'] .df-dbg-answer{color:#2c3a56;background:rgba(239,246,255,.7);border:1px solid rgba(0,85,200,.15)}
+  .df[data-theme='light'] .df-dbg-btn:hover{background:rgba(255,232,216,.96);box-shadow:0 4px 16px rgba(212,102,46,.24)}
+  .df[data-theme='light'] .df-dbg-panel{background:rgba(255,254,252,.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.85);box-shadow:-12px -12px 48px rgba(0,0,0,.10)}
+  .df[data-theme='light'] .df-dbg-title{color:#D4662E;font-weight:800}
+  .df[data-theme='light'] .df-dbg-close{color:#A09890}
+  .df[data-theme='light'] .df-dbg-ctx{color:#5C5650;background:rgba(255,244,236,.72);border-radius:6px}
+  .df[data-theme='light'] .df-dbg-inp{background:rgba(255,255,255,.92);border:1.5px solid rgba(0,0,0,.10);color:#1A1916}
+  .df[data-theme='light'] .df-dbg-inp::placeholder{color:#A09890}
+  .df[data-theme='light'] .df-dbg-inp:focus{border-color:#D4662E}
+  .df[data-theme='light'] .df-dbg-answer{color:#3D3730;background:rgba(255,244,236,.72);border:1px solid rgba(212,102,46,.14)}
 
-  /* ── Tabs — frosted ── */
-  .df[data-theme='light'] .df-tabs{background:rgba(255,255,255,.75);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-tab{color:#4e607f;font-weight:600}
-  .df[data-theme='light'] .df-tab.active{color:#0055c8;border-bottom-color:#0055c8;font-weight:800}
-  .df[data-theme='light'] .df-tab:hover:not(.active){color:#0d1526;background:rgba(0,85,200,.05)}
+  /* ── Tabs ── */
+  .df[data-theme='light'] .df-tabs{background:rgba(248,240,230,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,102,46,.16)}
+  .df[data-theme='light'] .df-tab{color:#5C5650;font-weight:600}
+  .df[data-theme='light'] .df-tab.active{color:#D4662E;border-bottom-color:#D4662E;font-weight:800;text-shadow:0 0 14px rgba(212,102,46,.3)}
+  .df[data-theme='light'] .df-tab:hover:not(.active){color:#1A1916;background:rgba(212,102,46,.04)}
 
-  /* ── Pipeline sidebar — deep frosted glass with colour coding ── */
+  /* ── Pipeline sidebar ── */
   .df[data-theme='light'] .df-pipe{
-    background:rgba(210,224,252,.6);
-    backdrop-filter:blur(22px) saturate(160%);
-    border-right:1px solid rgba(255,255,255,.6);
+    background:rgba(235,220,202,.75);
+    backdrop-filter:blur(22px) saturate(130%);
+    border-right:1px solid rgba(212,102,46,.18);
   }
-  .df[data-theme='light'] .df-pipe::-webkit-scrollbar-thumb{background:rgba(170,182,208,.6)}
-  .df[data-theme='light'] .df-pipe-hdr-lbl{color:#0d1526;font-weight:800;font-size:11px;letter-spacing:.08em}
-  .df[data-theme='light'] .df-pipe-btn{background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);color:#2c3a56;font-weight:600;backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-pipe-btn:hover{background:rgba(255,255,255,.9);color:#0055c8}
-  .df[data-theme='light'] .df-rail{border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.5);backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-rail:hover{background:rgba(255,255,255,.75)}
-  .df[data-theme='light'] .df-rail.active{border-color:var(--c);background:rgba(255,255,255,.9);box-shadow:0 0 0 1px var(--c),0 4px 14px rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-rail.done{border-color:rgba(22,163,74,.5);background:rgba(240,253,244,.8)}
-  .df[data-theme='light'] .df-rail.gate{border-color:rgba(217,119,6,.5);background:rgba(255,251,235,.8)}
+  .df[data-theme='light'] .df-pipe::-webkit-scrollbar-thumb{background:rgba(180,155,130,.5)}
+  .df[data-theme='light'] .df-pipe-hdr-lbl{color:#1A1916;font-weight:800;font-size:11px;letter-spacing:.08em}
+  .df[data-theme='light'] .df-pipe-btn{background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.85);color:#3D3730;font-weight:600;backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-pipe-btn:hover{background:rgba(255,255,255,.92);color:#D4662E}
+  .df[data-theme='light'] .df-rail{border:1px solid rgba(255,248,240,.75);background:rgba(255,248,238,.68);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-rail:hover{background:rgba(255,252,244,.88)}
+  .df[data-theme='light'] .df-rail.active{border-color:var(--c);background:rgba(255,255,255,.92);box-shadow:0 0 0 1px var(--c),0 4px 14px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .df-rail.done{border-color:rgba(22,163,74,.5);background:rgba(240,253,244,.82)}
+  .df[data-theme='light'] .df-rail.gate{border-color:rgba(217,119,6,.5);background:rgba(255,251,235,.82)}
 
-  /* ── Stage cards — glass with stage colour accent ── */
+  /* ── Stage cards ── */
   .df[data-theme='light'] .df-sn-row{animation:none;opacity:1}
   .df[data-theme='light'] .df-card{
-    background:rgba(255,255,255,.76);
+    background:rgba(255,248,238,.90);
     backdrop-filter:blur(14px);
-    border:1px solid rgba(255,255,255,.72);
-    border-left:3px solid var(--c,#6366f1);
-    background-image:linear-gradient(135deg,rgba(255,255,255,.9) 0%,color-mix(in srgb,var(--c,#6366f1) 6%,rgba(255,255,255,.65)) 100%);
-    box-shadow:0 2px 14px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.04);
+    border:1px solid rgba(212,160,110,.22);
+    border-left:3px solid var(--c,#D4662E);
+    background-image:linear-gradient(135deg,rgba(255,252,244,.95) 0%,color-mix(in srgb,var(--c,#D4662E) 7%,rgba(255,246,234,.78)) 100%);
+    box-shadow:0 2px 14px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04);
     animation:none;opacity:1;
   }
   .df[data-theme='light'] .df-card:hover{
-    background-image:linear-gradient(135deg,rgba(255,255,255,.96) 0%,color-mix(in srgb,var(--c,#6366f1) 10%,rgba(255,255,255,.85)) 100%);
+    background-image:linear-gradient(135deg,rgba(255,252,244,.98) 0%,color-mix(in srgb,var(--c,#D4662E) 11%,rgba(255,246,234,.92)) 100%);
     border-left-color:var(--c);
-    box-shadow:0 6px 22px rgba(0,0,0,.1),0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent);
+    box-shadow:0 6px 22px rgba(0,0,0,.10),0 0 0 1px color-mix(in srgb,var(--c) 28%,transparent);
   }
   .df[data-theme='light'] .df-card.active{
-    background-image:linear-gradient(135deg,rgba(255,255,255,.98) 0%,color-mix(in srgb,var(--c,#6366f1) 14%,rgba(255,255,255,.88)) 100%);
+    background-image:linear-gradient(135deg,rgba(255,255,250,1) 0%,color-mix(in srgb,var(--c,#D4662E) 14%,rgba(255,246,234,.94)) 100%);
     border-left:4px solid var(--c);
-    box-shadow:0 0 0 1.5px var(--c),0 8px 28px color-mix(in srgb,var(--c) 15%,rgba(0,0,0,.08));
+    box-shadow:0 0 0 1.5px var(--c),0 8px 28px color-mix(in srgb,var(--c) 16%,rgba(0,0,0,.07));
     animation:none;
   }
   .df[data-theme='light'] .df-card.active::after{
-    background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c) 10%,transparent),transparent 60%);
+    background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c) 9%,transparent),transparent 60%);
   }
   .df[data-theme='light'] .df-card.done{
-    background:rgba(240,253,244,.88);
-    border-left:4px solid #16a34a;
-    box-shadow:0 2px 12px rgba(22,163,74,.1);
+    background:rgba(240,253,244,.90);border-left:4px solid #16a34a;
+    box-shadow:0 2px 12px rgba(22,163,74,.09);
   }
   .df[data-theme='light'] .df-card.gate{
-    background:rgba(255,251,235,.88);
-    border-left:4px solid #d97706;
-    box-shadow:0 4px 18px rgba(217,119,6,.1);animation:none;
+    background:rgba(255,251,235,.90);border-left:4px solid #d97706;
+    box-shadow:0 4px 18px rgba(217,119,6,.09);animation:none;
   }
-  .df[data-theme='light'] .df-cnum{color:#8899b4!important;font-weight:700;opacity:1!important}
-  .df[data-theme='light'] .df-cname{color:#0d1526!important;font-weight:800}
-  .df[data-theme='light'] .df-csub{color:#4e607f!important;font-weight:600;opacity:1!important}
-  .df[data-theme='light'] .df-cdesc{color:#4e607f!important;opacity:1!important}
-  .df[data-theme='light'] .df-cprog{background:rgba(0,0,0,.08)!important}
+  .df[data-theme='light'] .df-cnum{color:#A09890!important;font-weight:700;opacity:1!important}
+  .df[data-theme='light'] .df-cname{color:#1A1916!important;font-weight:800}
+  .df[data-theme='light'] .df-csub{color:#5C5650!important;font-weight:600;opacity:1!important}
+  .df[data-theme='light'] .df-cdesc{color:#5C5650!important;opacity:1!important}
+  .df[data-theme='light'] .df-cprog{background:rgba(0,0,0,.07)!important}
   .df[data-theme='light'] .df-crev.approved{background:rgba(220,252,231,.8);color:#15803d;border-color:rgba(21,128,61,.3)}
   .df[data-theme='light'] .df-crev.changes {background:rgba(254,226,226,.8);color:#b91c1c;border-color:rgba(185,28,28,.25)}
 
-  /* ── Stage node circles — colour coded per stage ── */
+  /* ── Stage node circles ── */
   .df[data-theme='light'] .df-sn{
-    background:rgba(255,255,255,.85);
+    background:rgba(255,255,255,.88);
     backdrop-filter:blur(8px);
-    border:2px solid var(--c,#6366f1);
-    color:var(--c,#6366f1);
-    box-shadow:0 2px 8px rgba(0,0,0,.1),0 0 0 3px rgba(255,255,255,.5);
+    border:2px solid var(--c,#D4662E);
+    color:var(--c,#D4662E);
+    box-shadow:0 2px 8px rgba(0,0,0,.08),0 0 0 3px rgba(255,255,255,.55);
   }
   .df[data-theme='light'] .df-sn.active{
-    background:rgba(255,255,255,.95);
+    background:rgba(255,255,255,.96);
     border-color:var(--c);
-    box-shadow:0 0 18px var(--glow,rgba(0,85,200,.4)),0 2px 8px rgba(0,0,0,.1);
+    box-shadow:0 0 18px var(--glow,rgba(212,102,46,.38)),0 2px 8px rgba(0,0,0,.08);
     color:var(--c);
   }
   .df[data-theme='light'] .df-sn.done{
-    background:rgba(220,252,231,.9);border-color:#16a34a;
-    box-shadow:0 2px 10px rgba(22,163,74,.25);color:#15803d;
+    background:rgba(220,252,231,.92);border-color:#16a34a;
+    box-shadow:0 2px 10px rgba(22,163,74,.22);color:#15803d;
   }
-  .df[data-theme='light'] .df-sn.gate{background:rgba(255,251,235,.9);border-color:#d97706;color:#92400e}
-  .df[data-theme='light'] .df-sn-line{background:linear-gradient(to bottom,rgba(0,0,0,.12),rgba(0,0,0,.06))}
-  .df[data-theme='light'] .df-sn-line.flow::after{background:linear-gradient(to bottom,transparent,#0055c8,transparent)}
-  .df[data-theme='light'] .df-sn-dot{background:#0055c8;box-shadow:0 0 8px rgba(0,85,200,.7)}
-  .df[data-theme='light'] .df-cline{background:rgba(0,0,0,.1)}
-  .df[data-theme='light'] .df-cline.flow::after{background:#0055c8}
+  .df[data-theme='light'] .df-sn.gate{background:rgba(255,251,235,.92);border-color:#d97706;color:#92400e}
+  .df[data-theme='light'] .df-sn-line{background:linear-gradient(to bottom,rgba(0,0,0,.10),rgba(0,0,0,.05))}
+  .df[data-theme='light'] .df-sn-line.flow::after{background:linear-gradient(to bottom,transparent,#D4662E,transparent)}
+  .df[data-theme='light'] .df-sn-dot{background:#D4662E;box-shadow:0 0 8px rgba(212,102,46,.65)}
+  .df[data-theme='light'] .df-cline{background:rgba(0,0,0,.08)}
+  .df[data-theme='light'] .df-cline.flow::after{background:#D4662E}
   .df[data-theme='light'] .df-conn{opacity:1}
 
-  /* ── Center panel — frosted ── */
-  .df[data-theme='light'] .df-center{border-right:1px solid rgba(255,255,255,.5)}
-  .df[data-theme='light'] .df-detail{background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .df-detail::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
-  .df[data-theme='light'] .df-dtitle{color:#0d1526;font-weight:800}
+  /* ── Center panel ── */
+  .df[data-theme='light'] .df-center{border-right:1px solid rgba(212,102,46,.14)}
+  .df[data-theme='light'] .df-detail{background:rgba(248,241,232,.82);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .df-detail::-webkit-scrollbar-thumb{background:rgba(180,155,130,.55)}
+  .df[data-theme='light'] .df-dtitle{color:#1A1916;font-weight:800}
   .df[data-theme='light'] .df-dsub{
-    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    background:linear-gradient(90deg,#D4662E,#E87C4A);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
     font-weight:800;
   }
 
   /* ── PRD ── */
-  .df[data-theme='light'] .df-prd{background:rgba(239,246,255,.85);border:1px solid rgba(147,197,253,.5);backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-prd-h{color:#0055c8;font-weight:700}
-  .df[data-theme='light'] .df-pl{color:#0055c8}
-  .df[data-theme='light'] .df-pt{color:#2c3a56;opacity:1}
-  .df[data-theme='light'] .df-pi{color:#2c3a56;opacity:1}
-  .df[data-theme='light'] .df-pi::before{color:#0055c8}
+  .df[data-theme='light'] .df-prd{background:rgba(255,244,236,.88);border:1px solid rgba(212,102,46,.28);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-prd-h{color:#D4662E;font-weight:700}
+  .df[data-theme='light'] .df-pl{color:#D4662E}
+  .df[data-theme='light'] .df-pt{color:#3D3730;opacity:1}
+  .df[data-theme='light'] .df-pi{color:#3D3730;opacity:1}
+  .df[data-theme='light'] .df-pi::before{color:#D4662E}
 
   /* ── Tasks ── */
-  .df[data-theme='light'] .df-task{background:rgba(240,253,244,.85);border:1px solid rgba(22,163,74,.25);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-task{background:rgba(240,253,244,.88);border:1px solid rgba(22,163,74,.25);backdrop-filter:blur(8px)}
   .df[data-theme='light'] .df-tid {color:#15803d;font-weight:700}
-  .df[data-theme='light'] .df-tname{color:#0d1526;font-weight:700}
+  .df[data-theme='light'] .df-tname{color:#1A1916;font-weight:700}
   .df[data-theme='light'] .df-tpts {color:#15803d;font-weight:700}
 
   /* ── Agents ── */
-  .df[data-theme='light'] .df-agent{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);box-shadow:0 1px 6px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .df-agent.running{border-color:var(--ac);background:rgba(239,246,255,.85)}
-  .df[data-theme='light'] .df-agent.passed {border-color:rgba(22,163,74,.35);background:rgba(240,253,244,.85)}
-  .df[data-theme='light'] .df-agname{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .df-agst{color:#4e607f;font-weight:500;opacity:1}
-  .df[data-theme='light'] .df-agf{color:#2c3a56;opacity:1;line-height:1.7}
+  .df[data-theme='light'] .df-agent{background:rgba(255,255,255,.80);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.72);box-shadow:0 1px 6px rgba(0,0,0,.05)}
+  .df[data-theme='light'] .df-agent.running{border-color:var(--ac);background:rgba(255,244,236,.88)}
+  .df[data-theme='light'] .df-agent.passed {border-color:rgba(22,163,74,.35);background:rgba(240,253,244,.88)}
+  .df[data-theme='light'] .df-agname{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .df-agst{color:#5C5650;font-weight:500;opacity:1}
+  .df[data-theme='light'] .df-agf{color:#3D3730;opacity:1;line-height:1.7}
 
   /* ── QA ── */
-  .df[data-theme='light'] .df-qa-row{background:rgba(250,245,255,.85);border:1px solid rgba(109,40,217,.18);backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-qa-type {color:#7c3aed;font-weight:700}
-  .df[data-theme='light'] .df-qa-count{color:#2c3a56;font-weight:600}
-  .df[data-theme='light'] .df-qa-badge{background:rgba(220,252,231,.85);color:#15803d;border-color:rgba(22,163,74,.3)}
+  .df[data-theme='light'] .df-qa-row{background:rgba(255,248,242,.88);border:1px solid rgba(212,102,46,.16);backdrop-filter:blur(8px)}
+  .df[data-theme='light'] .df-qa-type {color:#9A4520;font-weight:700}
+  .df[data-theme='light'] .df-qa-count{color:#3D3730;font-weight:600}
+  .df[data-theme='light'] .df-qa-badge{background:rgba(220,252,231,.88);color:#15803d;border-color:rgba(22,163,74,.3)}
 
   /* ── Deploy environments ── */
   .df[data-theme='light'] .df-env{background:rgba(255,241,243,.85);border:1px solid rgba(159,18,57,.18);backdrop-filter:blur(8px)}
-  .df[data-theme='light'] .df-env.live{background:rgba(240,253,244,.85);border-color:rgba(22,163,74,.3)}
-  .df[data-theme='light'] .df-env-name{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .df-env-bar{background:rgba(252,213,224,.7)}
+  .df[data-theme='light'] .df-env.live{background:rgba(240,253,244,.88);border-color:rgba(22,163,74,.3)}
+  .df[data-theme='light'] .df-env-name{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .df-env-bar{background:rgba(212,102,46,.12)}
   .df[data-theme='light'] .df-env.live .df-env-fill{background:#16a34a}
-  .df[data-theme='light'] .df-env-st{color:#4e607f;font-weight:600}
+  .df[data-theme='light'] .df-env-st{color:#5C5650;font-weight:600}
 
   /* ── Gate panel ── */
   .df[data-theme='light'] .df-gate{
-    background:rgba(255,251,235,.88);
-    backdrop-filter:blur(16px);
-    border:2px solid #d97706;
-    box-shadow:0 8px 32px rgba(217,119,6,.14);animation:none;
+    background:rgba(255,251,235,.90);backdrop-filter:blur(16px);
+    border:2px solid #d97706;box-shadow:0 8px 32px rgba(217,119,6,.12);animation:none;
   }
   .df[data-theme='light'] .df-gate::before{background:linear-gradient(90deg,transparent,#b45309,#d97706,#b45309,transparent)}
   .df[data-theme='light'] .df-gate-icon{filter:none}
@@ -1265,202 +1255,200 @@ const css = `
   .df[data-theme='light'] .df-gate-rej{color:#9f1239;border-color:rgba(159,18,57,.35);background:rgba(255,241,243,.85);font-weight:700}
   .df[data-theme='light'] .df-gate-rej:hover{background:rgba(255,228,235,.95)}
   .df[data-theme='light'] .df-fb-lbl{color:#9f1239;font-weight:700}
-  .df[data-theme='light'] .df-fb-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(159,18,57,.3);color:#0d1526}
+  .df[data-theme='light'] .df-fb-inp{background:rgba(255,255,255,.92);border:1.5px solid rgba(159,18,57,.28);color:#1A1916}
   .df[data-theme='light'] .df-fb-inp:focus{border-color:#9f1239}
   .df[data-theme='light'] .df-fb-sub{background:rgba(255,241,243,.85);color:#9f1239;border-color:rgba(159,18,57,.35);font-weight:700}
   .df[data-theme='light'] .df-fb-sub:hover{background:rgba(255,228,235,.95)}
 
   /* ── Prod gate ── */
   .df[data-theme='light'] .df-prod-gate{
-    background:rgba(255,241,243,.9);backdrop-filter:blur(20px);
-    border:2px solid rgba(159,18,57,.45);
-    box-shadow:0 8px 40px rgba(159,18,57,.12);animation:none;
+    background:rgba(255,241,243,.92);backdrop-filter:blur(20px);
+    border:2px solid rgba(159,18,57,.45);box-shadow:0 8px 40px rgba(159,18,57,.11);animation:none;
   }
   .df[data-theme='light'] .df-prod-gate::before{background:linear-gradient(90deg,transparent,#9f1239,#e11d48,#9f1239,transparent)}
   .df[data-theme='light'] .df-pg-title{color:#881337;font-weight:800}
   .df[data-theme='light'] .df-pg-sub{color:rgba(136,19,55,.7);font-weight:500}
-  .df[data-theme='light'] .df-pg-check{color:#2c3a56;border-bottom-color:rgba(159,18,57,.1)}
-  .df[data-theme='light'] .df-pg-cinp{background:rgba(255,255,255,.9);border:1.5px solid rgba(159,18,57,.35);color:#881337}
+  .df[data-theme='light'] .df-pg-check{color:#3D3730;border-bottom-color:rgba(159,18,57,.09)}
+  .df[data-theme='light'] .df-pg-cinp{background:rgba(255,255,255,.92);border:1.5px solid rgba(159,18,57,.35);color:#881337}
   .df[data-theme='light'] .df-pg-btn.unlocked{background:linear-gradient(135deg,#881337,#9f1239)}
   .df[data-theme='light'] .df-pg-btn.unlocked:hover{box-shadow:0 8px 24px rgba(136,19,55,.35)}
 
   /* ── Done state ── */
-  .df[data-theme='light'] .df-done-ic{filter:drop-shadow(0 0 18px rgba(22,163,74,.45))}
+  .df[data-theme='light'] .df-done-ic{filter:drop-shadow(0 0 18px rgba(212,102,46,.38))}
   .df[data-theme='light'] .df-done-t{
-    background:linear-gradient(135deg,#0055c8,#7c3aed,#15803d);
+    background:linear-gradient(135deg,#D4662E,#E87C4A,#15803d);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:none;
   }
-  .df[data-theme='light'] .df-done-s{color:#4e607f;font-weight:500}
-  .df[data-theme='light'] .df-metric{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 12px rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-metric:hover{box-shadow:0 6px 22px rgba(0,85,200,.14)}
-  .df[data-theme='light'] .df-mv{color:#0055c8;font-weight:800}
-  .df[data-theme='light'] .df-ml{color:#4e607f;font-weight:500}
+  .df[data-theme='light'] .df-done-s{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .df-metric{background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border:1px solid rgba(212,102,46,.10);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-metric:hover{box-shadow:0 6px 22px rgba(212,102,46,.14)}
+  .df[data-theme='light'] .df-mv{color:#D4662E;font-weight:800}
+  .df[data-theme='light'] .df-ml{color:#5C5650;font-weight:500}
 
-  .df[data-theme='light'] .df-cursor{color:#0055c8}
+  .df[data-theme='light'] .df-cursor{color:#D4662E}
 
-  /* ── Observability — frosted stats ── */
-  .df[data-theme='light'] .obs-wrap{background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .obs-stat{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 10px rgba(0,0,0,.07)}
-  .df[data-theme='light'] .obs-stat:hover{box-shadow:0 6px 20px rgba(0,85,200,.12)}
-  .df[data-theme='light'] .obs-stat-val{color:#0055c8;font-weight:800}
-  .df[data-theme='light'] .obs-stat-lbl{color:#4e607f;font-weight:600;opacity:1}
+  /* ── Observability ── */
+  .df[data-theme='light'] .obs-wrap{background:rgba(248,241,232,.82);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .obs-stat{background:rgba(255,248,238,.92);backdrop-filter:blur(10px);border:1px solid rgba(212,102,46,.15);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .obs-stat:hover{box-shadow:0 6px 20px rgba(212,102,46,.14)}
+  .df[data-theme='light'] .obs-stat-val{color:#D4662E;font-weight:800}
+  .df[data-theme='light'] .obs-stat-lbl{color:#5C5650;font-weight:600;opacity:1}
   .df[data-theme='light'] .obs-sh{
-    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    background:linear-gradient(90deg,#D4662E,#E87C4A);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;
   }
-  .df[data-theme='light'] .obs-sh::after{background:rgba(0,0,0,.1)}
-  .df[data-theme='light'] .obs-table th{color:#2c3a56;border-bottom:2px solid rgba(0,0,0,.08);font-weight:800}
-  .df[data-theme='light'] .obs-table td{border-bottom-color:rgba(0,0,0,.05);color:#2c3a56}
-  .df[data-theme='light'] .obs-table tr:hover td{background:rgba(239,246,255,.6)}
-  .df[data-theme='light'] .obs-chart-box{background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 10px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .obs-chart-title{color:#2c3a56;font-weight:800}
-  .df[data-theme='light'] .obs-legend-item{color:#4e607f;font-weight:500;opacity:1}
-  .df[data-theme='light'] .obs-empty{color:#8899b4;opacity:1}
-  .df[data-theme='light'] .obs-drift-banner{background:rgba(255,251,235,.85);border-color:#d97706}
-  .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:rgba(255,255,255,.95)!important;border-color:rgba(0,0,0,.1)!important;color:#0d1526!important;box-shadow:0 8px 24px rgba(0,0,0,.14)!important;backdrop-filter:blur(12px)!important}
+  .df[data-theme='light'] .obs-sh::after{background:rgba(0,0,0,.09)}
+  .df[data-theme='light'] .obs-table th{color:#3D3730;border-bottom:2px solid rgba(0,0,0,.07);font-weight:800}
+  .df[data-theme='light'] .obs-table td{border-bottom-color:rgba(0,0,0,.04);color:#3D3730}
+  .df[data-theme='light'] .obs-table tr:hover td{background:rgba(255,244,236,.55)}
+  .df[data-theme='light'] .obs-chart-box{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .df[data-theme='light'] .obs-chart-title{color:#3D3730;font-weight:800}
+  .df[data-theme='light'] .obs-legend-item{color:#5C5650;font-weight:500;opacity:1}
+  .df[data-theme='light'] .obs-empty{color:#A09890;opacity:1}
+  .df[data-theme='light'] .obs-drift-banner{background:rgba(255,251,235,.88);border-color:#d97706}
+  .df[data-theme='light'] .recharts-tooltip-wrapper .recharts-default-tooltip{background:rgba(255,254,252,.96)!important;border-color:rgba(212,102,46,.15)!important;color:#1A1916!important;box-shadow:0 8px 24px rgba(0,0,0,.12)!important;backdrop-filter:blur(12px)!important}
 
-  /* ── Log panel — tinted frosted glass ── */
-  .df[data-theme='light'] .df-log{background:rgba(220,232,255,.6);backdrop-filter:blur(18px) saturate(140%);border-left:1px solid rgba(255,255,255,.6)}
+  /* ── Log panel ── */
+  .df[data-theme='light'] .df-log{background:rgba(230,215,195,.65);backdrop-filter:blur(18px) saturate(130%);border-left:1px solid rgba(212,102,46,.16)}
   .df[data-theme='light'] .df-log-hdr{
-    background:rgba(255,255,255,.72);
-    backdrop-filter:blur(16px);
-    border-bottom:1px solid rgba(255,255,255,.65);
-    color:#0055c8;font-weight:800;
+    background:rgba(245,234,220,.88);backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(212,102,46,.18);
+    color:#D4662E;font-weight:800;
   }
-  .df[data-theme='light'] .df-log-dot{background:#0055c8;box-shadow:0 0 8px rgba(0,85,200,.5)}
-  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
-  .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.06)}
-  .df[data-theme='light'] .df-log-row:hover{background:rgba(255,255,255,.4)}
-  .df[data-theme='light'] .df-log-ts{color:#6677a0;font-weight:600;font-size:10px}
-  .df[data-theme='light'] .df-log-msg.info   {color:#1a2742;font-weight:500;font-size:12px}
-  .df[data-theme='light'] .df-log-msg.agent  {color:#1e40af;font-weight:600}
+  .df[data-theme='light'] .df-log-dot{background:#D4662E;box-shadow:0 0 8px rgba(212,102,46,.65)}
+  .df[data-theme='light'] .df-log-bd::-webkit-scrollbar-thumb{background:rgba(180,155,130,.55)}
+  .df[data-theme='light'] .df-log-row{border-bottom-color:rgba(0,0,0,.05)}
+  .df[data-theme='light'] .df-log-row:hover{background:rgba(255,255,255,.38)}
+  .df[data-theme='light'] .df-log-ts{color:#8C8580;font-weight:600;font-size:10px}
+  .df[data-theme='light'] .df-log-msg.info   {color:#2A201A;font-weight:500;font-size:12px}
+  .df[data-theme='light'] .df-log-msg.agent  {color:#9A4520;font-weight:600}
   .df[data-theme='light'] .df-log-msg.success{color:#15803d;font-weight:600;text-shadow:none}
-  .df[data-theme='light'] .df-log-msg.handoff{color:#0055c8;font-weight:600;text-shadow:none}
+  .df[data-theme='light'] .df-log-msg.handoff{color:#D4662E;font-weight:600;text-shadow:none}
   .df[data-theme='light'] .df-log-msg.warn   {color:#92400e;font-weight:600;text-shadow:none}
   .df[data-theme='light'] .df-log-msg.gate   {color:#78350f;font-weight:700;text-shadow:none}
   .df[data-theme='light'] .df-log-msg.done   {color:#9f1239;font-weight:700;text-shadow:none}
 
-  /* ── Settings drawer — frosted glass ── */
-  .df[data-theme='light'] .df-settings-overlay{background:rgba(13,21,38,.3)}
-  .df[data-theme='light'] .df-settings-drawer{background:rgba(248,251,255,.92);backdrop-filter:blur(24px);border-left:1px solid rgba(255,255,255,.7);box-shadow:-20px 0 60px rgba(0,0,0,.14)}
-  .df[data-theme='light'] .df-set-hdr{background:rgba(255,255,255,.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-set-title{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .df-set-close{color:#8899b4;font-size:22px;font-weight:700}
+  /* ── Settings drawer ── */
+  .df[data-theme='light'] .df-settings-overlay{background:rgba(26,25,22,.28)}
+  .df[data-theme='light'] .df-settings-drawer{background:rgba(245,236,224,.97);backdrop-filter:blur(24px);border-left:1px solid rgba(212,102,46,.18);box-shadow:-20px 0 60px rgba(0,0,0,.14)}
+  .df[data-theme='light'] .df-set-hdr{background:rgba(250,242,230,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,102,46,.14)}
+  .df[data-theme='light'] .df-set-title{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .df-set-close{color:#9C928A;font-size:22px;font-weight:700}
   .df[data-theme='light'] .df-set-close:hover{color:#9f1239;background:rgba(255,241,243,.8)}
-  .df[data-theme='light'] .df-set-tabs{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-set-tab{color:#4e607f;font-weight:600}
-  .df[data-theme='light'] .df-set-tab.active{color:#0055c8;border-bottom-color:#0055c8;font-weight:800}
-  .df[data-theme='light'] .df-set-tab:hover{color:#0d1526}
-  .df[data-theme='light'] .df-set-body{background:rgba(255,255,255,.7);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .df-set-body::-webkit-scrollbar-thumb{background:rgba(170,182,208,.5)}
+  .df[data-theme='light'] .df-set-tabs{background:rgba(248,238,225,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,102,46,.12)}
+  .df[data-theme='light'] .df-set-tab{color:#6B6258;font-weight:600}
+  .df[data-theme='light'] .df-set-tab.active{color:#D4662E;border-bottom-color:#D4662E;font-weight:800}
+  .df[data-theme='light'] .df-set-tab:hover{color:#1A1916}
+  .df[data-theme='light'] .df-set-body{background:rgba(252,244,234,.82);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .df-set-body::-webkit-scrollbar-thumb{background:rgba(180,155,130,.55)}
   .df[data-theme='light'] .df-set-sec-title{
-    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    background:linear-gradient(90deg,#D4662E,#E87C4A);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;
   }
-  .df[data-theme='light'] .df-set-lbl{color:#2c3a56;font-weight:700}
-  .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
-  .df[data-theme='light'] .df-set-inp:focus{border-color:#0055c8;box-shadow:0 0 0 3px rgba(0,85,200,.12)}
-  .df[data-theme='light'] .df-set-inp::placeholder{color:#8899b4}
-  .df[data-theme='light'] .df-set-preview{color:#8899b4}
-  .df[data-theme='light'] .df-set-test-btn{background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.25);color:#0055c8;font-weight:700}
-  .df[data-theme='light'] .df-set-test-btn:hover{background:rgba(219,238,255,.95)}
-  .df[data-theme='light'] .df-set-result.ok {background:rgba(220,252,231,.85);border-color:rgba(22,163,74,.35);color:#15803d;font-weight:700}
-  .df[data-theme='light'] .df-set-result.err{background:rgba(254,226,226,.85);border-color:rgba(185,28,28,.35);color:#b91c1c;font-weight:700}
-  .df[data-theme='light'] .df-model-card{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 1px 6px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .df-model-card:hover{background:rgba(255,255,255,.94);box-shadow:0 4px 16px rgba(0,85,200,.1)}
-  .df[data-theme='light'] .df-model-card.selected{background:rgba(239,246,255,.92);border-color:#0055c8;box-shadow:0 0 0 2px rgba(0,85,200,.2)}
-  .df[data-theme='light'] .df-model-card.selected::before{background:linear-gradient(to right,transparent,#0055c8,transparent)}
-  .df[data-theme='light'] .df-mc-name{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .df-mc-desc{color:#4e607f;font-weight:500}
-  .df[data-theme='light'] .df-mc-price{color:#8899b4}
-  .df[data-theme='light'] .df-mc-remove{color:rgba(159,18,57,.55)}
+  .df[data-theme='light'] .df-set-lbl{color:#3D3730;font-weight:700}
+  .df[data-theme='light'] .df-set-inp{background:rgba(255,255,255,.92);border:1.5px solid rgba(0,0,0,.10);color:#1A1916}
+  .df[data-theme='light'] .df-set-inp:focus{border-color:#D4662E;box-shadow:0 0 0 3px rgba(212,102,46,.12)}
+  .df[data-theme='light'] .df-set-inp::placeholder{color:#A09890}
+  .df[data-theme='light'] .df-set-preview{color:#A09890}
+  .df[data-theme='light'] .df-set-test-btn{background:rgba(255,244,236,.88);border:1.5px solid rgba(212,102,46,.28);color:#D4662E;font-weight:700}
+  .df[data-theme='light'] .df-set-test-btn:hover{background:rgba(255,232,216,.96)}
+  .df[data-theme='light'] .df-set-result.ok {background:rgba(220,252,231,.88);border-color:rgba(22,163,74,.35);color:#15803d;font-weight:700}
+  .df[data-theme='light'] .df-set-result.err{background:rgba(254,226,226,.88);border-color:rgba(185,28,28,.35);color:#b91c1c;font-weight:700}
+  .df[data-theme='light'] .df-model-card{background:rgba(255,255,255,.80);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.82);box-shadow:0 1px 6px rgba(0,0,0,.05)}
+  .df[data-theme='light'] .df-model-card:hover{background:rgba(255,255,255,.96);box-shadow:0 4px 16px rgba(212,102,46,.10)}
+  .df[data-theme='light'] .df-model-card.selected{background:rgba(255,244,236,.94);border-color:#D4662E;box-shadow:0 0 0 2px rgba(212,102,46,.18)}
+  .df[data-theme='light'] .df-model-card.selected::before{background:linear-gradient(to right,transparent,#D4662E,transparent)}
+  .df[data-theme='light'] .df-mc-name{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .df-mc-desc{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .df-mc-price{color:#A09890}
+  .df[data-theme='light'] .df-mc-remove{color:rgba(159,18,57,.52)}
   .df[data-theme='light'] .df-mc-remove:hover{color:#9f1239}
-  .df[data-theme='light'] .df-add-model-inp{background:rgba(255,255,255,.9);border:1.5px solid rgba(0,0,0,.12);color:#0d1526}
-  .df[data-theme='light'] .df-add-model-inp::placeholder{color:#8899b4}
-  .df[data-theme='light'] .df-add-model-btn{background:rgba(239,246,255,.85);border:1.5px solid rgba(0,85,200,.25);color:#0055c8;font-weight:700}
-  .df[data-theme='light'] .df-add-model-btn:hover{background:rgba(219,238,255,.95)}
-  .df[data-theme='light'] .df-int-status-row{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.75)}
+  .df[data-theme='light'] .df-add-model-inp{background:rgba(255,255,255,.92);border:1.5px solid rgba(0,0,0,.10);color:#1A1916}
+  .df[data-theme='light'] .df-add-model-inp::placeholder{color:#A09890}
+  .df[data-theme='light'] .df-add-model-btn{background:rgba(255,244,236,.88);border:1.5px solid rgba(212,102,46,.28);color:#D4662E;font-weight:700}
+  .df[data-theme='light'] .df-add-model-btn:hover{background:rgba(255,232,216,.96)}
+  .df[data-theme='light'] .df-int-status-row{background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}
   .df[data-theme='light'] .df-int-status-dot.on{box-shadow:0 0 6px rgba(22,163,74,.55)}
-  .df[data-theme='light'] .df-int-status-dot.off{background:#aab6d0}
-  .df[data-theme='light'] .df-int-status-name{color:#2c3a56;font-weight:700}
-  .df[data-theme='light'] .df-int-status-val{color:#4e607f;font-weight:500}
-  .df[data-theme='light'] .df-set-footer{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.07)}
-  .df[data-theme='light'] .df-set-save{background:linear-gradient(135deg,#0055c8,#5b21b6);box-shadow:0 4px 16px rgba(0,85,200,.35)}
-  .df[data-theme='light'] .df-set-cancel{background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.12);color:#2c3a56;font-weight:600}
-  .df[data-theme='light'] .df-set-cancel:hover{border-color:#0055c8;color:#0055c8;background:rgba(239,246,255,.9)}
+  .df[data-theme='light'] .df-int-status-dot.off{background:#C4BCB4}
+  .df[data-theme='light'] .df-int-status-name{color:#3D3730;font-weight:700}
+  .df[data-theme='light'] .df-int-status-val{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .df-set-footer{background:rgba(255,254,252,.78);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-set-save{background:linear-gradient(135deg,#D4662E,#9A4520);box-shadow:0 4px 16px rgba(212,102,46,.38)}
+  .df[data-theme='light'] .df-set-cancel{background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.10);color:#3D3730;font-weight:600}
+  .df[data-theme='light'] .df-set-cancel:hover{border-color:#D4662E;color:#D4662E;background:rgba(255,244,236,.92)}
 
-  /* ── About panel — frosted ── */
-  .df[data-theme='light'] .abt-wrap{color:#0d1526;background:rgba(248,251,255,.7);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .abt-hero{background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.8);box-shadow:0 4px 20px rgba(0,0,0,.08)}
-  .df[data-theme='light'] .abt-title{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .abt-tagline{background:linear-gradient(90deg,#0055c8,#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
-  .df[data-theme='light'] .abt-desc{color:#2c3a56;opacity:1;line-height:1.8}
-  .df[data-theme='light'] .abt-link{color:#0055c8;border-color:rgba(0,85,200,.3);background:rgba(239,246,255,.8);font-weight:600}
-  .df[data-theme='light'] .abt-link:hover{background:rgba(219,238,255,.95)}
-  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.07)}
-  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 18px rgba(0,85,200,.1)}
-  .df[data-theme='light'] .abt-stage-num{color:#0369a1;font-weight:700}
-  .df[data-theme='light'] .abt-stage-lbl{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .abt-stage-sub{color:#4e607f;font-weight:500;opacity:1}
-  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.2)}
-  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.85);border-color:#d97706;color:#78350f;font-weight:700}
-  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8)}
+  /* ── About panel ── */
+  .df[data-theme='light'] .abt-wrap{color:#1A1916;background:rgba(248,241,232,.82);backdrop-filter:blur(12px)}
+  .df[data-theme='light'] .abt-hero{background:rgba(252,244,234,.90);backdrop-filter:blur(12px);border:1px solid rgba(212,102,46,.16);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+  .df[data-theme='light'] .abt-title{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .abt-tagline{background:linear-gradient(90deg,#D4662E,#E87C4A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+  .df[data-theme='light'] .abt-desc{color:#3D3730;opacity:1;line-height:1.8}
+  .df[data-theme='light'] .abt-link{color:#D4662E;border-color:rgba(212,102,46,.28);background:rgba(255,244,236,.82);font-weight:600}
+  .df[data-theme='light'] .abt-link:hover{background:rgba(255,232,216,.96)}
+  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 18px rgba(212,102,46,.12)}
+  .df[data-theme='light'] .abt-stage-num{color:#9A4520;font-weight:700}
+  .df[data-theme='light'] .abt-stage-lbl{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .abt-stage-sub{color:#5C5650;font-weight:500;opacity:1}
+  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.18)}
+  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.88);border-color:#d97706;color:#78350f;font-weight:700}
+  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.80);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08)}
   .df[data-theme='light'] .abt-chip{opacity:1;font-weight:600;font-size:11px}
 
-  /* ── Idle hero — light mode ── */
-  .df[data-theme='light'] .df-idle-hero-title{color:#0d1526}
+  /* ── Idle hero ── */
+  .df[data-theme='light'] .df-idle-hero-title{color:#1A1916}
   .df[data-theme='light'] .df-idle-hero-title em{
-    background:linear-gradient(90deg,#0055c8,#7c3aed,#e066ff);
+    background:linear-gradient(90deg,#D4662E,#E87C4A,#D97706);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   }
-  .df[data-theme='light'] .df-idle-hero-sub{color:rgba(78,96,127,.72);font-size:13px}
+  .df[data-theme='light'] .df-idle-hero-sub{color:rgba(92,86,80,.72);font-size:13px}
   .df[data-theme='light'] .df-idle-scard{
-    background:rgba(255,255,255,.82);backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.9);box-shadow:0 2px 12px rgba(0,0,0,.07);
+    background:rgba(255,248,238,.90);backdrop-filter:blur(10px);
+    border:1px solid rgba(212,102,46,.16);box-shadow:0 2px 12px rgba(0,0,0,.07);
     animation:none;opacity:1;
   }
   .df[data-theme='light'] .df-idle-scard:hover{
-    background:rgba(255,255,255,.97);
-    box-shadow:0 10px 28px rgba(0,0,0,.1),0 0 0 2px var(--c);
+    background:rgba(255,255,255,.98);
+    box-shadow:0 10px 28px rgba(0,0,0,.09),0 0 0 2px var(--c);
     border-color:var(--c);
   }
-  .df[data-theme='light'] .df-idle-scard-num{color:rgba(78,96,127,.5);font-size:11px}
-  .df[data-theme='light'] .df-idle-scard-name{color:#0d1526;font-weight:800;font-size:15px}
-  .df[data-theme='light'] .df-idle-scard-sub{color:rgba(78,96,127,.65);font-size:12px}
-  .df[data-theme='light'] .df-idle-arrow{background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.12),rgba(0,0,0,0));animation:none}
-  .df[data-theme='light'] .df-idle-arrow::after{color:rgba(0,0,0,.2)}
-  .df[data-theme='light'] .df-idle-hint{color:#2c3a56;font-size:15px;font-weight:500}
-  .df[data-theme='light'] .df-cursor{color:#0055c8}
-  .df[data-theme='light'] .df-idle-feat{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .df-idle-feat-title{color:#0d1526;font-weight:800;font-size:14px}
-  .df[data-theme='light'] .df-idle-feat-desc{color:rgba(78,96,127,.72);font-size:12px}
-  .df[data-theme='light'] .df-idle-chip{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.1);color:#4e607f;font-size:12px}
-  .df[data-theme='light'] .df-log-empty{color:#4e607f;opacity:.7}
+  .df[data-theme='light'] .df-idle-scard-num{color:rgba(92,86,80,.48);font-size:11px}
+  .df[data-theme='light'] .df-idle-scard-name{color:#1A1916;font-weight:800;font-size:15px}
+  .df[data-theme='light'] .df-idle-scard-sub{color:rgba(92,86,80,.65);font-size:12px}
+  .df[data-theme='light'] .df-idle-arrow{background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.10),rgba(0,0,0,0));animation:none}
+  .df[data-theme='light'] .df-idle-arrow::after{color:rgba(0,0,0,.18)}
+  .df[data-theme='light'] .df-idle-hint{color:#3D3730;font-size:15px;font-weight:500}
+  .df[data-theme='light'] .df-cursor{color:#D4662E}
+  .df[data-theme='light'] .df-idle-feat{background:rgba(255,248,238,.88);backdrop-filter:blur(10px);border:1px solid rgba(212,102,46,.14);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .df[data-theme='light'] .df-idle-feat-title{color:#1A1916;font-weight:800;font-size:14px}
+  .df[data-theme='light'] .df-idle-feat-desc{color:rgba(92,86,80,.72);font-size:12px}
+  .df[data-theme='light'] .df-idle-chip{background:rgba(255,244,236,.75);border-color:rgba(212,102,46,.18);color:#9A4520;font-size:12px}
+  .df[data-theme='light'] .df-log-empty{color:#5C5650;opacity:.7}
 
-  /* ── Footer — light mode ── */
+  /* ── Footer ── */
   .df[data-theme='light'] .df-foot{
-    background:rgba(255,255,255,.75);backdrop-filter:blur(16px) saturate(150%);
-    border-top:1px solid rgba(255,255,255,.65);box-shadow:0 -1px 0 rgba(0,0,0,.04);
+    background:rgba(245,234,220,.90);backdrop-filter:blur(16px) saturate(130%);
+    border-top:1px solid rgba(212,102,46,.18);box-shadow:0 -1px 0 rgba(0,0,0,.05);
   }
   .df[data-theme='light'] .df-foot::before{
     background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,rgba(0,0,0,.025) 23px,rgba(0,0,0,.025) 24px);
   }
-  .df[data-theme='light'] .df-foot-brand{color:rgba(13,21,38,.5)}
+  .df[data-theme='light'] .df-foot-brand{color:rgba(26,25,22,.5)}
   .df[data-theme='light'] .df-foot-brand em{
-    background:linear-gradient(90deg,#0055c8,#7c3aed);
+    background:linear-gradient(90deg,#D4662E,#E87C4A);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   }
-  .df[data-theme='light'] .df-foot-sep{color:rgba(13,21,38,.2)}
-  .df[data-theme='light'] .df-foot-tag{color:rgba(13,21,38,.38)}
+  .df[data-theme='light'] .df-foot-sep{color:rgba(26,25,22,.18)}
+  .df[data-theme='light'] .df-foot-tag{color:rgba(26,25,22,.36)}
   .df[data-theme='light'] .df-foot-dot{opacity:.75}
 
   /* ── Fullscreen viewer ── */
-  .df[data-theme='light'] .df-fsv{background:rgba(248,251,255,.96);backdrop-filter:blur(20px)}
-  .df[data-theme='light'] .df-fsv-hdr{background:rgba(255,255,255,.82);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.08)}
-  .df[data-theme='light'] .df-fsv-fname{color:#0d1526;font-weight:800}
-  .df[data-theme='light'] .df-fsv-task{color:#7c3aed;font-weight:700}
-  .df[data-theme='light'] .df-fsv-copy{background:rgba(245,240,255,.85);border:1px solid rgba(124,58,237,.3);color:#7c3aed;font-weight:700}
-  .df[data-theme='light'] .df-fsv-close{border:1px solid rgba(0,0,0,.12);color:#4e607f;background:rgba(255,255,255,.8)}
+  .df[data-theme='light'] .df-fsv{background:rgba(255,251,248,.97);backdrop-filter:blur(20px)}
+  .df[data-theme='light'] .df-fsv-hdr{background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,102,46,.10)}
+  .df[data-theme='light'] .df-fsv-fname{color:#1A1916;font-weight:800}
+  .df[data-theme='light'] .df-fsv-task{color:#D4662E;font-weight:700}
+  .df[data-theme='light'] .df-fsv-copy{background:rgba(255,244,236,.88);border:1px solid rgba(212,102,46,.28);color:#D4662E;font-weight:700}
+  .df[data-theme='light'] .df-fsv-close{border:1px solid rgba(0,0,0,.10);color:#5C5650;background:rgba(255,255,255,.82)}
 
 `;
 
@@ -1615,7 +1603,7 @@ function ObsPanel({ llmCalls, theme }) {
                 <tr key={c.id}>
                   <td style={{color:"rgba(0,212,255,.45)"}}>{c.id}</td>
                   <td>
-                    <div style={{color:tc("#e8f4ff","#1a1d2e"),marginBottom:2}}>{c.label}</div>
+                    <div style={{color:tc("#e8f4ff","#1A1916"),marginBottom:2}}>{c.label}</div>
                     <div style={{fontSize:10,color:STAGE_COLORS[c.stage],opacity:.85}}>{c.stage}</div>
                   </td>
                   <td>
@@ -1698,7 +1686,6 @@ function AboutPanel({ theme }) {
           Human review gates at each stage keep you in control.
         </div>
         <div className="abt-links">
-          <a className="abt-link" href="https://github.com/sushilk001/devforge-ai" target="_blank" rel="noreferrer">⬡ GitHub</a>
           <a className="abt-link abt-link-demo" href="https://tinyurl.com/DevForgeAI-demoVideo" target="_blank" rel="noreferrer">▶ Demo Video</a>
         </div>
       </div>
@@ -2890,7 +2877,7 @@ export default function DevForgeDashboard() {
                   {findings.map((f,i) => (
                     <div key={i} style={{padding:"7px 10px",borderRadius:6,marginBottom:4,background:`rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.06)`,border:`1px solid rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.18)`,borderLeft:`3px solid ${severityColor(f.severity)}`}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:6}}>
-                        <div style={{fontSize:11,fontWeight:700,color:tc("#c8d4f0","#1e3a5c"),flex:1}}>{f.title}</div>
+                        <div style={{fontSize:11,fontWeight:700,color:tc("#c8d4f0","#3D3730"),flex:1}}>{f.title}</div>
                         <span style={{fontSize:9,fontWeight:700,color:severityColor(f.severity),letterSpacing:1,textTransform:"uppercase",flexShrink:0}}>{f.severity}</span>
                       </div>
                       <div style={{fontSize:9,color:tc("rgba(175,215,255,.45)","rgba(20,30,80,.55)"),marginTop:2}}>{f.standard}{f.file ? ` · ${f.file}` : ""}</div>
@@ -2900,23 +2887,61 @@ export default function DevForgeDashboard() {
                   ))}
                 </div>
               ))}
-              {(rpt?.debt_history||[]).length > 1 && (
-                <div style={{marginTop:12,padding:"8px 12px",borderRadius:6,background:tc("rgba(175,215,255,.04)","rgba(20,30,80,.06)"),border:"1px solid rgba(245,158,11,.12)"}}>
-                  <div style={{fontSize:9,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Compliance Debt History</div>
-                  <div style={{display:"flex",gap:4,alignItems:"flex-end",height:32}}>
-                    {rpt.debt_history.map((h,i)=>{
-                      const maxScore = Math.max(...rpt.debt_history.map(x=>x.score),1);
-                      const h_ = Math.max(4, Math.round((h.score/maxScore)*28));
-                      const c = h.criticals>0?"#ff2d6b":h.score>0?"#f59e0b":"#00ff88";
-                      return <div key={i} title={`${h.date}: score ${h.score}`} style={{flex:1,height:h_,background:c,borderRadius:2,opacity:.75}}/>;
-                    })}
+              {(rpt?.debt_history||[]).length > 1 && (()=>{
+                const maxScore = Math.max(...rpt.debt_history.map(x=>x.score),1);
+                const last = rpt.debt_history[rpt.debt_history.length-1];
+                const prev = rpt.debt_history[rpt.debt_history.length-2];
+                const trend = last.score - prev.score;
+                const trendColor = trend>0?"#ff2d6b":trend<0?"#00ff88":"#f59e0b";
+                const trendLabel = trend>0?`↑ +${trend} worsening`:trend<0?`↓ ${trend} improving`:"→ stable";
+                return (
+                  <div style={{marginTop:12,padding:"12px 14px",borderRadius:8,background:tc("rgba(175,215,255,.04)","rgba(20,30,80,.06)"),border:"1px solid rgba(245,158,11,.20)"}}>
+                    {/* Header */}
+                    <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:8}}>
+                      <div>
+                        <div style={{fontSize:9,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>Compliance Debt History</div>
+                        <div style={{fontSize:9,color:tc("rgba(175,215,255,.45)","rgba(20,30,80,.5)"),marginTop:2}}>critical = 10 pts · warning = 5 pts · info = 1 pt</div>
+                      </div>
+                      <div style={{fontSize:10,fontWeight:700,color:trendColor,letterSpacing:.5}}>{trendLabel}</div>
+                    </div>
+                    {/* Legend */}
+                    <div style={{display:"flex",gap:12,marginBottom:10}}>
+                      {[["#00ff88","Clean"],["#f59e0b","Warnings"],["#ff2d6b","Criticals"]].map(([col,lbl])=>(
+                        <div key={lbl} style={{display:"flex",alignItems:"center",gap:4}}>
+                          <div style={{width:8,height:8,borderRadius:2,background:col}}/>
+                          <span style={{fontSize:9,color:tc("rgba(175,215,255,.55)","rgba(20,30,80,.6)")}}>{lbl}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Chart */}
+                    <div style={{display:"flex",gap:3,alignItems:"flex-end",height:60}}>
+                      {rpt.debt_history.map((h,i)=>{
+                        const barH = Math.max(6, Math.round((h.score/maxScore)*50));
+                        const c = h.criticals>0?"#ff2d6b":h.score>0?"#f59e0b":"#00ff88";
+                        const isLatest = i===rpt.debt_history.length-1;
+                        return (
+                          <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,height:60,justifyContent:"flex-end"}}
+                            title={`${h.date}: score ${h.score} · ${h.criticals||0} critical · ${h.warnings_count||0} warnings`}>
+                            <span style={{fontSize:8,color:c,fontWeight:700,opacity:isLatest?1:.7,lineHeight:1}}>{h.score}</span>
+                            <div style={{
+                              width:"100%",height:barH,background:c,borderRadius:"3px 3px 0 0",
+                              opacity:isLatest?1:.55,
+                              boxShadow:isLatest?`0 0 10px ${c}88,0 0 3px ${c}`:"none",
+                              border:isLatest?`1px solid ${c}`:"none",
+                              transition:"height .3s"
+                            }}/>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Date axis */}
+                    <div style={{display:"flex",justifyContent:"space-between",marginTop:5,paddingTop:5,borderTop:`1px solid ${tc("rgba(175,215,255,.10)","rgba(20,30,80,.12)")}`}}>
+                      <span style={{fontSize:8,color:tc("rgba(175,215,255,.35)","rgba(20,30,80,.4)")}}>{rpt.debt_history[0]?.date}</span>
+                      <span style={{fontSize:8,color:trendColor,fontWeight:600}}>{last?.date} <span style={{opacity:.6}}>(current)</span></span>
+                    </div>
                   </div>
-                  <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
-                    <span style={{fontSize:8,color:tc("rgba(175,215,255,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[0]?.date}</span>
-                    <span style={{fontSize:8,color:tc("rgba(175,215,255,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[rpt.debt_history.length-1]?.date}</span>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
               <div style={{marginTop:12,padding:"9px 12px",borderRadius:6,background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.2)"}}>
                 <div style={{fontSize:10,color:"rgba(175,215,255,.55)",marginBottom:6}}>This is an optional gate — you may proceed to deploy regardless of findings.</div>
                 <div style={{display:"flex",gap:8}}>
@@ -3091,7 +3116,7 @@ export default function DevForgeDashboard() {
 
   const badgeCls  = appState==="running"?"running":appState==="gate"||appState==="prod_gate"?"gate":appState==="done"?"done":"idle";
   const badgeTxt  = appState==="running"?"● PIPELINE ACTIVE":appState==="gate"?"⏸ AWAITING REVIEW":appState==="prod_gate"?"⚠ PROD GATE":appState==="done"?"✓ COMPLETE":"STANDBY";
-  const timerColor= appState==="running"?"#00ff88":appState==="done"?"#00d4ff":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("#fff","#1a1d2e");
+  const timerColor= appState==="running"?"#00ff88":appState==="done"?"#00d4ff":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("#fff","#1A1916");
 
   return (
     <div className="df" data-theme={theme}>
@@ -3249,7 +3274,7 @@ export default function DevForgeDashboard() {
                     <div className="df-crow">
                       <span className="df-cnum">{stage.num}</span>
                       <div className="df-clbl">
-                        <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#0d1526"):isGate?"#ffcc55":tc("rgba(255,255,255,.42)","rgba(13,21,38,.62)")}}>{stage.label}</div>
+                        <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#1A1916"):isGate?"#ffcc55":tc("rgba(255,255,255,.42)","rgba(26,25,22,.55)")}}>{stage.label}</div>
                         <div className="df-csub">{stage.sub}</div>
                       </div>
                       <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(175,215,255,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
