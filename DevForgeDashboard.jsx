@@ -3573,19 +3573,19 @@ export default function DevForgeDashboard() {
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
           </div>
-          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>{setInput(e.target.value); setInputTouched(true);}} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
+          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>{setInput(e.target.value); setInputTouched(true);}} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."} title={demoMode?"Demo mode — input is locked to the scripted scenario":undefined}/>
           {/* Context attachments row */}
           <div className="df-ctx-row">
             <input
               className="df-ctx-gh"
               value={githubUrl}
               onChange={e=>setGithubUrl(e.target.value)}
-              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}
               placeholder="github.com/owner/repo  (optional)"
             />
             <button
               className="df-ctx-attach"
-              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}
               onClick={()=>fileInputRef.current?.click()}
               title="Attach files (.md, .txt, .py, .ts, .json, …)"
             >+ Files</button>
@@ -3604,13 +3604,13 @@ export default function DevForgeDashboard() {
               {githubUrl && (
                 <div className="df-ctx-chip gh">
                   <span>⎇ {githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//,"")}</span>
-                  <button onClick={()=>setGithubUrl("")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                  <button onClick={()=>setGithubUrl("")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}>×</button>
                 </div>
               )}
               {attachments.map(a=>(
                 <div key={a.name} className="df-ctx-chip">
                   <span>📄 {a.name}</span>
-                  <button onClick={()=>removeAttachment(a.name)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                  <button onClick={()=>removeAttachment(a.name)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}>×</button>
                 </div>
               ))}
             </div>
