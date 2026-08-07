@@ -1668,13 +1668,14 @@ function AboutPanel({ theme }) {
   const STAGES = [
     { num:1, icon:"📋", label:"Requirements",      sub:"PRD generation" },
     { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm" },
-    { num:3, icon:"🔍", label:"PR Review",          sub:"4× parallel agents" },
-    { num:4, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk" },
-    { num:5, icon:"🧪", label:"QA",                 sub:"Test runner" },
-    { num:6, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
+    { num:3, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk" },
+    { num:4, icon:"🔍", label:"PR Review",          sub:"4× parallel agents" },
+    { num:5, icon:"🧪", label:"QA",                 sub:"pytest runner" },
+    { num:6, icon:"⚖",  label:"Compliance",         sub:"WCAG · GDPR · OWASP" },
+    { num:7, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
   ];
   const STACK = [
-    { cat:"AI / LLM",      color:"#bf7fff", lc:"#6d28d9", items:["Claude Sonnet 5", "Anthropic API"] },
+    { cat:"AI / LLM",      color:"#bf7fff", lc:"#6d28d9", items:["claude-sonnet-4-6", "Anthropic API"] },
     { cat:"Orchestration", color:"#00d4ff", lc:"#0369a1", items:["LangGraph 1.x", "MemorySaver checkpointing"] },
     { cat:"Backend",       color:"#00ff88", lc:"#065f46", items:["FastAPI", "Uvicorn", "Pydantic v2"] },
     { cat:"Frontend",      color:"#ffaa00", lc:"#92400e", items:["React 18", "Recharts", "Vite"] },
@@ -1688,8 +1689,8 @@ function AboutPanel({ theme }) {
         <div className="abt-tagline">Autonomous end-to-end SDLC intelligence engine</div>
         <div className="abt-desc">
           Drop a feature request — AI agents autonomously handle requirements analysis, task planning,
-          code review, code generation, QA testing, and GitHub deployment.
-          Human review gates at each critical milestone keep you in control.
+          code generation, code review, QA testing, compliance & governance auditing, and GitHub deployment.
+          Human review gates at each stage keep you in control.
         </div>
         <div className="abt-links">
           <a className="abt-link" href="https://github.com/sushilk001/devforge-ai" target="_blank" rel="noreferrer">⬡ GitHub</a>
@@ -1698,7 +1699,7 @@ function AboutPanel({ theme }) {
       </div>
 
       <div>
-        <div className="obs-sh">6-Stage Pipeline</div>
+        <div className="obs-sh">7-Stage Pipeline</div>
         <div className="abt-stages">
           {STAGES.map((s, i) => (
             <React.Fragment key={s.num}>
@@ -1713,8 +1714,9 @@ function AboutPanel({ theme }) {
           ))}
         </div>
         <div className="abt-gates">
-          <span className="abt-gate-chip">⏸ Human gate after Stage 1 — approve or request changes</span>
-          <span className="abt-gate-chip">⏸ Human gate after Stage 2 — approve or request changes</span>
+          <span className="abt-gate-chip">⏸ Human gate after every stage — approve or request changes</span>
+          <span className="abt-gate-chip">⚖ Compliance is an optional gate — deploy anyway or fix first</span>
+          <span className="abt-gate-chip">🔒 Mandatory production approval before final deploy</span>
         </div>
       </div>
 
