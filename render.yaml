@@ -34,3 +34,5 @@ services:
         sync: false
       - key: GITHUB_CLIENT_SECRET
         sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false

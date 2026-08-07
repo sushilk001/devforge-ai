@@ -51,8 +51,8 @@ async def _fetch_github_context(github_url: str) -> str:
                         text = r.text[:4000]  # cap at 4k chars
                         parts.append(f"### README\n{text}")
                         break
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug("[GitHub ctx] README fetch failed for %s: %s", repo_slug, e)
             else:
                 continue
             break
@@ -67,8 +67,8 @@ async def _fetch_github_context(github_url: str) -> str:
                 tree = r.json().get("tree", [])
                 files = [t["path"] for t in tree if t.get("type") == "blob"][:30]
                 parts.append("### Top-level files\n" + "\n".join(files))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("[GitHub ctx] File tree fetch failed for %s: %s", repo_slug, e)
 
     return "\n\n".join(parts) if len(parts) > 1 else ""
 
@@ -133,7 +133,7 @@ async def submit_feature_request(
         _sessions[thread_id] = final_state
 
         if final_state.error:
-            return PRDResponse(status=PRDStatus.DRAFT, message=final_state.error)
+            raise HTTPException(status_code=422, detail=final_state.error)
 
         if final_state.prd:
             slack_ts = post_prd_for_review(final_state)
@@ -291,11 +291,15 @@ async def slack_events(payload: dict):
                 )
             )
             config = {"configurable": {"thread_id": thread_id}}
-            final_state: AgentState = stage1_graph.invoke(initial_state, config=config)
-            _sessions[thread_id] = final_state
-
-            if final_state.error and final_state.parsed_intent:
-                post_incomplete_request(channel, final_state.parsed_intent.missing_info, ts)
+            try:
+                final_state = _coerce_state(
+                    stage1_graph.invoke(initial_state, config=config), AgentState
+                )
+                _sessions[thread_id] = final_state
+                if final_state.error and final_state.parsed_intent:
+                    post_incomplete_request(channel, final_state.parsed_intent.missing_info, ts)
+            except Exception as exc:
+                logger.exception("[Slack] Stage1 graph error for ts=%s: %s", ts, exc)
 
     return {"ok": True}
 

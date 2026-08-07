@@ -97,10 +97,10 @@ class AttachedFile(BaseModel):
 
 
 class SubmitFeatureRequest(BaseModel):
-    raw_text:     str
+    raw_text:     str = Field(..., min_length=10, max_length=32_000)
     requester:    Optional[str]        = None
     request_type: RequestType          = RequestType.ADD_FEATURE
-    github_url:   Optional[str]        = None
+    github_url:   Optional[str]        = Field(None, max_length=500)
     attachments:  list[AttachedFile]   = []
 
 
