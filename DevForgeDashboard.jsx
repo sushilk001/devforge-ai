@@ -157,9 +157,9 @@ const css = `
   .df-hdr{
     display:flex;align-items:center;justify-content:space-between;
     padding:12px 24px;flex-shrink:0;position:relative;
-    border-bottom:1px solid rgba(60,120,255,.22);
-    background:rgba(16,30,60,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    box-shadow:0 1px 0 rgba(0,212,255,.06),0 2px 24px rgba(0,0,0,.3);
+    border-bottom:1px solid rgba(60,140,255,.40);
+    background:rgba(16,30,60,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    box-shadow:0 1px 0 rgba(0,212,255,.22),0 2px 32px rgba(0,0,0,.45);
   }
   .df-logo{display:flex;align-items:center;gap:12px}
   .df-hex{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -190,9 +190,9 @@ const css = `
   /* ── Input area ──────────────────────────────────────────────────────── */
   .df-inp-area{
     display:flex;gap:10px;align-items:flex-end;padding:14px 24px;flex-shrink:0;
-    border-bottom:1px solid rgba(60,120,255,.20);
-    background:rgba(16,30,60,.78);backdrop-filter:blur(12px);
-    box-shadow:0 1px 0 rgba(0,212,255,.04);
+    border-bottom:1px solid rgba(60,140,255,.38);
+    background:rgba(16,30,60,.88);backdrop-filter:blur(12px);
+    box-shadow:0 1px 0 rgba(0,212,255,.18),0 4px 20px rgba(0,0,0,.3);
   }
   .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
   .df-inp-lbl{font-size:13px;letter-spacing:.06em;color:rgba(120,190,255,.7);font-weight:500}
@@ -450,26 +450,28 @@ const css = `
   .df-pipe-btn:hover{background:rgba(60,120,255,.28);border-color:rgba(255,255,255,.2);color:#e0eaff}
   .df-rail{
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0;border-radius:8px;
-    margin-bottom:3px;border:1px solid rgba(60,120,255,.18);background:rgba(60,120,255,.07);transition:all .2s;
+    margin-bottom:3px;border:1px solid rgba(60,130,255,.32);background:rgba(60,120,255,.12);transition:all .2s;
   }
-  .df-rail:hover{background:rgba(60,120,255,.13)}
-  .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35)}
-  .df-rail.done{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
+  .df-rail:hover{background:rgba(60,120,255,.20)}
+  .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35);box-shadow:0 0 10px color-mix(in srgb,var(--c) 30%,transparent)}
+  .df-rail.done{border-color:rgba(0,255,136,.45);background:rgba(0,255,136,.08)}
   .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.04)}
-  .df-rail-num{font-size:12px;letter-spacing:.06em;opacity:.6;font-weight:600}
+  .df-rail-num{font-size:12px;letter-spacing:.06em;opacity:.9;font-weight:700}
   .df-rail-dot{width:6px;height:6px;border-radius:50%}
   .df-card{
-    border:1px solid rgba(60,120,255,.22);
-    border-left:3px solid color-mix(in srgb,var(--c,#00d4ff) 50%,transparent);
+    border:1px solid rgba(60,130,255,.35);
+    border-left:3px solid color-mix(in srgb,var(--c,#00d4ff) 80%,transparent);
     border-radius:12px;padding:10px 12px;margin-bottom:4px;
-    background:color-mix(in srgb,var(--c,#00d4ff) 4%,rgba(16,30,60,.45));
+    background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(16,30,60,.55));
     transition:all .3s;position:relative;overflow:hidden;
     animation:stageIn .35s ease-out both;
+    box-shadow:0 2px 12px rgba(0,0,0,.3),inset 0 1px 0 rgba(60,140,255,.15);
   }
   .df-card:hover{
-    background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(16,30,60,.5));
-    border-left-color:color-mix(in srgb,var(--c,#00d4ff) 75%,transparent);
-    border-color:rgba(60,120,255,.30);
+    background:color-mix(in srgb,var(--c,#00d4ff) 14%,rgba(16,30,60,.6));
+    border-left-color:color-mix(in srgb,var(--c,#00d4ff) 95%,transparent);
+    border-color:rgba(60,140,255,.55);
+    box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 12px color-mix(in srgb,var(--c,rgba(60,120,255,.2)) 15%,transparent);
   }
   .df-card.active{
     border-color:var(--c);
@@ -494,12 +496,12 @@ const css = `
     pointer-events:none;
   }
   .df-crow{display:flex;align-items:center;gap:7px}
-  .df-cnum{font-size:11px;letter-spacing:.06em;color:var(--c,rgba(175,215,255,.6));opacity:.7;font-weight:700}
+  .df-cnum{font-size:11px;letter-spacing:.06em;color:var(--c,rgba(175,215,255,.9));opacity:1;font-weight:700}
   .df-cicon{font-size:15px;transition:color .3s}
   .df-cicon.spin{animation:spin 1s linear infinite}
   .df-clbl{flex:1}
   .df-cname{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:14px;font-weight:700;color:#fff;transition:color .3s}
-  .df-csub{font-size:12px;letter-spacing:.06em;opacity:.65;font-weight:500}
+  .df-csub{font-size:12px;letter-spacing:.06em;opacity:.88;font-weight:500}
   .df-cdot{width:7px;height:7px;border-radius:50%;transition:background .3s}
   .df-cdesc{font-size:10px;opacity:.65;margin-top:3px;line-height:1.4}
   .df-cprog{height:2px;background:rgba(60,120,255,.20);margin-top:5px;border-radius:1px;overflow:hidden}
@@ -556,16 +558,17 @@ const css = `
 
   /* Tabs */
   .df-tabs{
-    display:flex;border-bottom:1px solid rgba(60,120,255,.20);
-    background:rgba(16,30,60,.72);flex-shrink:0;padding:0 8px;
+    display:flex;border-bottom:1px solid rgba(60,140,255,.35);
+    background:rgba(16,30,60,.82);flex-shrink:0;padding:0 8px;
+    box-shadow:0 2px 12px rgba(0,0,0,.3);
   }
   .df-tab{
     padding:12px 20px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
     border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;
-    color:rgba(175,215,255,.62);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
+    color:rgba(175,215,255,.70);font-weight:600;font-family:-apple-system,system-ui,sans-serif;
   }
-  .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
-  .df-tab:hover:not(.active){color:rgba(175,215,255,.85)}
+  .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff;background:rgba(0,212,255,.07);text-shadow:0 0 12px rgba(0,212,255,.5)}
+  .df-tab:hover:not(.active){color:rgba(175,215,255,.92);background:rgba(60,120,255,.08)}
 
   /* Detail pane */
   .df-detail{flex:1;overflow-y:auto;padding:18px 22px}
@@ -877,49 +880,51 @@ const css = `
   .df-idle-scard{
     display:flex;flex-direction:column;align-items:center;gap:5px;
     padding:14px 11px;border-radius:10px;
-    border:1px solid color-mix(in srgb,var(--c,rgba(255,255,255,.15)) 28%,rgba(60,120,255,.18));
-    background:color-mix(in srgb,var(--c,rgba(60,120,255,.13)) 6%,rgba(16,30,60,.3));
+    border:1px solid color-mix(in srgb,var(--c,rgba(100,160,255,.6)) 55%,rgba(60,120,255,.30));
+    background:color-mix(in srgb,var(--c,rgba(60,120,255,.2)) 12%,rgba(16,30,60,.55));
     min-width:94px;animation:stagePop .4s ease-out both;
+    box-shadow:0 4px 18px rgba(0,0,0,.35),0 0 0 1px color-mix(in srgb,var(--c,rgba(60,120,255,.1)) 10%,transparent);
     transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;cursor:default;
   }
   .df-idle-scard:hover{
-    transform:translateY(-5px);background:rgba(60,120,255,.24);
-    border-color:var(--c,rgba(255,255,255,.15));
-    box-shadow:0 8px 28px rgba(0,0,0,.4),0 0 0 1px var(--c,rgba(60,120,255,.28));
+    transform:translateY(-5px);background:color-mix(in srgb,var(--c,rgba(60,120,255,.28)) 20%,rgba(16,30,60,.65));
+    border-color:var(--c,rgba(100,160,255,.8));
+    box-shadow:0 12px 36px rgba(0,0,0,.5),0 0 20px color-mix(in srgb,var(--c,rgba(60,120,255,.3)) 28%,transparent);
   }
   .df-idle-scard-icon{font-size:28px;line-height:1}
-  .df-idle-scard-num{font-size:11px;color:rgba(150,180,240,.4);letter-spacing:.06em;font-weight:700}
-  .df-idle-scard-name{font-size:15px;font-weight:700;color:#c8d4f0;text-align:center;line-height:1.2}
-  .df-idle-scard-sub{font-size:12px;color:rgba(150,180,240,.5);text-align:center;line-height:1.35;max-width:96px}
+  .df-idle-scard-num{font-size:11px;color:var(--c,rgba(150,200,255,.8));letter-spacing:.06em;font-weight:700;opacity:.85}
+  .df-idle-scard-name{font-size:15px;font-weight:700;color:#e8f0ff;text-align:center;line-height:1.2}
+  .df-idle-scard-sub{font-size:12px;color:rgba(175,210,255,.72);text-align:center;line-height:1.35;max-width:96px}
   .df-idle-arrow{
     width:22px;height:2px;flex-shrink:0;position:relative;align-self:center;
-    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.15),rgba(255,255,255,0));
+    background:linear-gradient(90deg,rgba(60,140,255,0),rgba(60,200,255,.55),rgba(60,140,255,0));
     background-size:44px 2px;animation:pipeFlow 2s linear infinite;
   }
   .df-idle-arrow::after{
     content:'›';position:absolute;top:50%;right:-6px;transform:translateY(-50%);
-    font-size:13px;color:rgba(255,255,255,.22);line-height:1;
+    font-size:13px;color:rgba(100,190,255,.7);line-height:1;
   }
-  .df-idle-hint{font-size:15px;color:rgba(120,180,255,.55);text-align:center;letter-spacing:.02em;margin-bottom:28px}
+  .df-idle-hint{font-size:15px;color:rgba(140,200,255,.80);text-align:center;letter-spacing:.02em;margin-bottom:28px}
   .df-cursor{animation:blink 1s step-end infinite;color:#00d4ff}
   .df-idle-features{
     display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;justify-content:center;max-width:720px;
   }
   .df-idle-feat{
     display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:10px;
-    background:color-mix(in srgb,var(--fi-color,rgba(60,120,255,.13)) 6%,rgba(16,30,60,.3));
-    border:1px solid color-mix(in srgb,var(--fi-color,rgba(60,120,255,.22)) 22%,rgba(60,120,255,.18));
-    border-left:3px solid color-mix(in srgb,var(--fi-color,#00d4ff) 55%,transparent);
+    background:color-mix(in srgb,var(--fi-color,rgba(60,120,255,.22)) 14%,rgba(16,30,60,.55));
+    border:1px solid color-mix(in srgb,var(--fi-color,rgba(60,120,255,.5)) 45%,rgba(60,120,255,.30));
+    border-left:3px solid color-mix(in srgb,var(--fi-color,#00d4ff) 90%,transparent);
     flex:1;min-width:190px;max-width:225px;
+    box-shadow:0 4px 20px rgba(0,0,0,.3),0 0 14px color-mix(in srgb,var(--fi-color,rgba(60,120,255,.12)) 12%,transparent);
   }
   .df-idle-feat-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-  .df-idle-feat-title{font-size:14px;font-weight:700;color:#c8d4f0;margin-bottom:4px}
-  .df-idle-feat-desc{font-size:12px;color:rgba(150,180,240,.5);line-height:1.55}
+  .df-idle-feat-title{font-size:14px;font-weight:700;color:#e8f0ff;margin-bottom:4px}
+  .df-idle-feat-desc{font-size:12px;color:rgba(175,210,255,.75);line-height:1.55}
   .df-idle-stack{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:640px}
   .df-idle-chip{
     font-size:12px;font-weight:600;letter-spacing:.04em;padding:5px 13px;border-radius:20px;
-    background:rgba(60,120,255,.13);border:1px solid rgba(60,120,255,.26);
-    color:rgba(150,180,240,.55);
+    background:rgba(60,120,255,.22);border:1px solid rgba(80,150,255,.50);
+    color:rgba(175,215,255,.90);
   }
   .df-log-empty{opacity:.5;font-size:11px;text-align:center;margin-top:44px;color:rgba(0,200,255,.7);letter-spacing:.06em}
 
