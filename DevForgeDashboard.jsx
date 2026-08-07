@@ -1673,6 +1673,20 @@ const PLANS = [
     cta:"Get started free", ctaHref:"#",
   },
   {
+    key:"indie", name:"Indie", badge:null, price:"$20", period:"/month",
+    highlight:false,
+    desc:"For solo developers and indie hackers shipping side projects fast.",
+    features:[
+      "25 pipeline runs / month",
+      "All 7 stages — full pipeline",
+      "GitHub & Slack integrations",
+      "LLM Observability dashboard",
+      "Bring your own Claude API key",
+      "Email support",
+    ],
+    cta:"Start Indie trial", ctaHref:"#",
+  },
+  {
     key:"pro", name:"Pro", badge:"Most popular", price:"$99", period:"/month",
     highlight:true,
     desc:"The full autonomous SDLC engine for engineering teams shipping fast.",
