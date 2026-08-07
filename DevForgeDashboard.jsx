@@ -91,7 +91,6 @@ const REVIEW_SUMMARY = {
 
 
 
-const ENV_DATA =[{name:"DEV",delay:1000},{name:"STAGING",delay:1800},{name:"UAT",delay:2800}];
 
 const MODEL_COLORS = { "claude-sonnet-4-6":"#00d4ff", "claude-haiku-4-5":"#00ff88" };
 const STAGE_COLORS = { requirements:"#00d4ff", tasks:"#00ff88", code_gen:"#bf5fff", pr_review:"#e066ff", qa:"#2dd4bf", compliance:"#f59e0b", deploy:"#ff2d6b" };
@@ -2130,7 +2129,6 @@ export default function DevForgeDashboard() {
   const [showFB, setShowFB]         = useState(false);
   const [fb, setFb]                 = useState("");
   const [prodCfm, setProdCfm]       = useState("");
-  const [envProg, setEnvProg]       = useState({});
   const [llmCalls, setLlmCalls]     = useState([]);
   const [stage1ThreadId, setS1Tid]   = useState(null);
   const [stage2ThreadId, setS2Tid]   = useState(null);
@@ -2231,10 +2229,6 @@ export default function DevForgeDashboard() {
     fetch(`/settings/custom-models/${encodeURIComponent(modelId)}`,{method:"DELETE"})
       .then(r=>r.json()).then(d=>{ setSettingsData(d); });
   };
-  // Effective settings = server data merged with unsaved edits (for display)
-  const effSettings = {...(settingsData||{}), ...Object.fromEntries(
-    Object.entries(settingsEdits).map(([k,v])=>[k,v])
-  )};
   const activeModel = settingsEdits.model || settingsData?.model || "claude-sonnet-4-6";
 
   const handleFileAttach = (e) => {
@@ -3645,6 +3639,13 @@ export default function DevForgeDashboard() {
             {!pipeCollapsed&&<span className="df-pipe-timer" style={{color:timerColor}}>{display}</span>}
             <button className="df-pipe-btn" onClick={()=>setPipeCollapsed(c=>!c)} title={pipeCollapsed?"Expand pipeline":"Collapse pipeline"}>{pipeCollapsed?"»":"«"}</button>
           </div>
+          {pipeCollapsed&&appState==="running"&&(
+            <div style={{textAlign:"center",fontFamily:"'SF Mono','Cascadia Code',monospace",
+              fontSize:9,fontWeight:700,color:timerColor,letterSpacing:".04em",
+              fontVariantNumeric:"tabular-nums",marginBottom:4,opacity:.85}}>
+              {display}
+            </div>
+          )}
           {STAGES.map((stage,i)=>{
             const isActive=activeStage===stage.id, isDone=doneStages.has(stage.id), isGate=gateStage===stage.id;
             const rev=stageReviews[stage.id], p=progress[stage.id]||0;

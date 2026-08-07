@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     github_client_id: str = ""
     github_client_secret: str = ""
 
+    # CORS — comma-separated allowed origins, or "*" for local dev
+    # Example: ALLOWED_ORIGINS=https://devforgeai.onrender.com
+    allowed_origins: str = "*"
+
     # App
     app_env: str = "development"
     app_port: int = 8000
