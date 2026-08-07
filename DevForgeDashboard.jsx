@@ -2702,7 +2702,18 @@ export default function DevForgeDashboard() {
       compliance:   () => setRealCompliance(D.compliance),
     };
 
-    const s7 = () => { addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); pushCalls("deploy"); runDeploy(); T(() => setRealDeploy(D.deploy), STAGE_DUR.deploy - 600); };
+    const s7 = () => {
+      addLog("⟡ PRODUCTION DEPLOY INITIATED","handoff"); pushCalls("deploy"); runDeploy();
+      // Batch all completion state in one timeout so React applies everything in a single render
+      // (avoids the async useEffect gap where deploy shows active while center shows done)
+      T(() => {
+        setRealDeploy(D.deploy);
+        setProgress(p=>({...p,deploy:100}));
+        setDone(p=>new Set([...p,"deploy"]));
+        setActive(null); setAppState("done"); setDetail("done");
+        addLog("🎉 Feature shipped — PR created on GitHub","done");
+      }, STAGE_DUR.deploy - 600);
+    };
     function goProdGate(){ setAppState("prod_gate"); setDetail("prod_gate"); addLog("⚠ PRODUCTION GATE — mandatory approval required","gate"); resumeFn.current = s7; }
     const demoStage = (id, onComplete) => {
       pushCalls(id);
@@ -2902,6 +2913,13 @@ export default function DevForgeDashboard() {
   const handleProdDeploy = () => {
     if(!prodOK) return;
     addLog("✓ Production approved","success");
+    setProdCfm("");
+
+    // In demo mode just advance the animation; no real API calls
+    if(demoModeRef.current) {
+      setGateStage(null); const fn=resumeFn.current; resumeFn.current=null; T(fn,400);
+      return;
+    }
 
     // Deploy from a named output directory on disk (survives server restart)
     const doFireFromDir = (dirName, attempt=0) => {
