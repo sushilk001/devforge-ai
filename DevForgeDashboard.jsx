@@ -3381,7 +3381,7 @@ export default function DevForgeDashboard() {
         {key:"pr",        label:"Create Pull Request",  done: !!(realDeploy?.pr_url)},
         {key:"slack",     label:"Slack Notification",   done: realDeploy?.status==="complete"||realDeploy?.step==="linear"||realDeploy?.step==="launching"||realDeploy?.step==="done"},
         {key:"linear",    label:"Close Linear Issues",  done: realDeploy?.status==="complete"||realDeploy?.step==="launching"||realDeploy?.step==="done"},
-        {key:"launching", label:"Launch App",           done: !!(realDeploy?.app_url)},
+        {key:"launching", label:"Launch App",           done: realDeploy?.status==="complete" || !!(realDeploy?.app_url)},
       ];
       const curStep = realDeploy?.step;
       const stepLabel = {pushing:"Pushing files to GitHub…",pr:"Generating PR description…",slack:"Notifying Slack…",linear:"Closing Linear issues…",launching:"Installing packages & launching app…"}[curStep] || "Deploying…";
@@ -3405,6 +3405,20 @@ export default function DevForgeDashboard() {
               <div style={{fontSize:9,opacity:.5,marginTop:4}}>{realDeploy.branch} · {realDeploy.files_pushed} files pushed{realDeploy.linear_issues_closed>0?` · ${realDeploy.linear_issues_closed} issues closed`:""}</div>
             </div>
           )}
+          {(realDeploy?.linear_issues_closed > 0 || (realTasks||[]).some(t=>t.linear_issue_url)) && (() => {
+            const linearUrl = (realTasks||[]).find(t=>t.linear_issue_url)?.linear_issue_url;
+            const workspaceUrl = linearUrl ? linearUrl.replace(/\/issue\/.*$/, "") : null;
+            const closedCount = realDeploy?.linear_issues_closed || 0;
+            return (
+              <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(130,80,255,.25)",background:"rgba(130,80,255,.05)",marginTop:8}}>
+                <div style={{fontSize:10,color:"#9b6dff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Linear Issues</div>
+                {workspaceUrl
+                  ? <a href={workspaceUrl} target="_blank" rel="noopener noreferrer" style={{color:"#9b6dff",fontSize:11,wordBreak:"break-all",display:"block"}}>🔗 {workspaceUrl}</a>
+                  : <span style={{color:"#9b6dff",fontSize:11}}>🔗 Linear workspace</span>}
+                <div style={{fontSize:9,opacity:.5,marginTop:4}}>{closedCount > 0 ? `${closedCount} issue${closedCount!==1?"s":""} closed` : "Issues linked"}</div>
+              </div>
+            );
+          })()}
           {realDeploy?.app_url && (
             <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,255,136,.25)",background:"rgba(0,255,136,.06)",marginTop:8}}>
               <div style={{fontSize:10,color:"#00ff88",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>🟢 App Running</div>
