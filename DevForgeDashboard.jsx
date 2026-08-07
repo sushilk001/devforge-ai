@@ -3498,7 +3498,6 @@ export default function DevForgeDashboard() {
               Sign in
             </button>
           )}
-          {showLoginModal && <LoginModal theme={theme} onClose={()=>setShowLoginModal(false)} onLogin={u=>{setUser(u);setShowLoginModal(false);}}/>}
         </div>
       </div>
 
@@ -3970,6 +3969,8 @@ export default function DevForgeDashboard() {
           </div>
         </div>
       )}
+
+      {showLoginModal && <LoginModal theme={theme} onClose={()=>setShowLoginModal(false)} onLogin={u=>{setUser(u);setShowLoginModal(false);}}/>}
 
     </div>
   );
