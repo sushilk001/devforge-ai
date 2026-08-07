@@ -700,7 +700,7 @@ const css = `
   .df-pg-sub{font-size:10px;letter-spacing:.12em;color:rgba(255,45,107,.55);text-transform:uppercase;margin-bottom:14px;font-weight:600}
   .df-pg-checks{margin-bottom:14px}
   .df-pg-check{display:flex;align-items:center;gap:9px;padding:6px 0;
-    border-bottom:1px solid rgba(255,45,107,.1);font-size:12px;opacity:.82}
+    border-bottom:1px solid rgba(255,45,107,.1);font-size:12px;color:rgba(255,200,210,1)}
   .df-pg-check-ic{color:#00ff88;font-size:11px;min-width:14px}
   .df-pg-clbl{font-size:10px;letter-spacing:.12em;color:rgba(255,45,107,.7);text-transform:uppercase;margin-bottom:7px;margin-top:14px;font-weight:600}
   .df-pg-cinp{
@@ -709,13 +709,13 @@ const css = `
     padding:11px 14px;outline:none;letter-spacing:.2em;text-align:center;transition:border-color .2s;
   }
   .df-pg-cinp:focus{border-color:rgba(255,45,107,.6);box-shadow:0 0 0 3px rgba(255,45,107,.1)}
-  .df-pg-cinp::placeholder{color:rgba(255,45,107,.22);letter-spacing:.04em;font-size:11px}
+  .df-pg-cinp::placeholder{color:rgba(255,45,107,.52);letter-spacing:.04em;font-size:11px}
   .df-pg-btn{
     width:100%;margin-top:14px;padding:15px;border:none;border-radius:10px;cursor:pointer;
     font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:800;
     letter-spacing:.08em;text-transform:uppercase;transition:all .2s;
   }
-  .df-pg-btn.locked  {background:rgba(255,45,107,.1);color:rgba(255,45,107,.32);cursor:not-allowed}
+  .df-pg-btn.locked  {background:rgba(255,45,107,.15);color:rgba(255,45,107,.7);cursor:not-allowed;border:1px solid rgba(255,45,107,.25)}
   .df-pg-btn.unlocked{background:linear-gradient(135deg,#cc1a4a,#ff2d6b);color:#fff}
   .df-pg-btn.unlocked:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,45,107,.45);background:linear-gradient(135deg,#e01f55,#ff4d80)}
 
