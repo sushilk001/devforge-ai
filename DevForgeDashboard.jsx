@@ -700,7 +700,7 @@ const css = `
   .df-pg-sub{font-size:10px;letter-spacing:.12em;color:rgba(255,45,107,.55);text-transform:uppercase;margin-bottom:14px;font-weight:600}
   .df-pg-checks{margin-bottom:14px}
   .df-pg-check{display:flex;align-items:center;gap:9px;padding:6px 0;
-    border-bottom:1px solid rgba(255,45,107,.1);font-size:12px;opacity:.82}
+    border-bottom:1px solid rgba(255,45,107,.1);font-size:12px;color:rgba(255,200,210,1)}
   .df-pg-check-ic{color:#00ff88;font-size:11px;min-width:14px}
   .df-pg-clbl{font-size:10px;letter-spacing:.12em;color:rgba(255,45,107,.7);text-transform:uppercase;margin-bottom:7px;margin-top:14px;font-weight:600}
   .df-pg-cinp{
@@ -709,13 +709,13 @@ const css = `
     padding:11px 14px;outline:none;letter-spacing:.2em;text-align:center;transition:border-color .2s;
   }
   .df-pg-cinp:focus{border-color:rgba(255,45,107,.6);box-shadow:0 0 0 3px rgba(255,45,107,.1)}
-  .df-pg-cinp::placeholder{color:rgba(255,45,107,.22);letter-spacing:.04em;font-size:11px}
+  .df-pg-cinp::placeholder{color:rgba(255,45,107,.52);letter-spacing:.04em;font-size:11px}
   .df-pg-btn{
     width:100%;margin-top:14px;padding:15px;border:none;border-radius:10px;cursor:pointer;
     font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:800;
     letter-spacing:.08em;text-transform:uppercase;transition:all .2s;
   }
-  .df-pg-btn.locked  {background:rgba(255,45,107,.1);color:rgba(255,45,107,.32);cursor:not-allowed}
+  .df-pg-btn.locked  {background:rgba(255,45,107,.15);color:rgba(255,45,107,.7);cursor:not-allowed;border:1px solid rgba(255,45,107,.25)}
   .df-pg-btn.unlocked{background:linear-gradient(135deg,#cc1a4a,#ff2d6b);color:#fff}
   .df-pg-btn.unlocked:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,45,107,.45);background:linear-gradient(135deg,#e01f55,#ff4d80)}
 
@@ -2614,7 +2614,7 @@ export default function DevForgeDashboard() {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
-    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setShowFB(false); setFb(""); setProdCfm("");
     setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setComplianceTid(null); setRealCompliance(null); setRealDeploy(null); setExpandedFile(null);
     setGithubUrl(""); setAttachments([]);
     addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
@@ -2674,7 +2674,7 @@ export default function DevForgeDashboard() {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
-    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setShowFB(false); setFb(""); setProdCfm("");
     setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setQaTid(null); setExpandedFile(null);
     setApiReady({ requirements:true, tasks:true, code_gen:true, pr_review:true, qa:true });
     setLlmCalls([]);
@@ -3573,19 +3573,19 @@ export default function DevForgeDashboard() {
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
           </div>
-          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>{setInput(e.target.value); setInputTouched(true);}} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."}/>
+          <textarea ref={inputRef} className="df-inp" rows={2} value={input} onChange={e=>{setInput(e.target.value); setInputTouched(true);}} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode} placeholder={requestMode==="new_software"?"Describe the software you want to build — problem it solves, target users, core functionality...":"Describe the feature to add — problem, users, success criteria..."} title={demoMode?"Demo mode — input is locked to the scripted scenario":undefined}/>
           {/* Context attachments row */}
           <div className="df-ctx-row">
             <input
               className="df-ctx-gh"
               value={githubUrl}
               onChange={e=>setGithubUrl(e.target.value)}
-              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}
               placeholder="github.com/owner/repo  (optional)"
             />
             <button
               className="df-ctx-attach"
-              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}
+              disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}
               onClick={()=>fileInputRef.current?.click()}
               title="Attach files (.md, .txt, .py, .ts, .json, …)"
             >+ Files</button>
@@ -3604,13 +3604,13 @@ export default function DevForgeDashboard() {
               {githubUrl && (
                 <div className="df-ctx-chip gh">
                   <span>⎇ {githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//,"")}</span>
-                  <button onClick={()=>setGithubUrl("")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                  <button onClick={()=>setGithubUrl("")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}>×</button>
                 </div>
               )}
               {attachments.map(a=>(
                 <div key={a.name} className="df-ctx-chip">
                   <span>📄 {a.name}</span>
-                  <button onClick={()=>removeAttachment(a.name)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>×</button>
+                  <button onClick={()=>removeAttachment(a.name)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"||demoMode}>×</button>
                 </div>
               ))}
             </div>
