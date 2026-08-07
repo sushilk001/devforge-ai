@@ -3737,7 +3737,7 @@ export default function DevForgeDashboard() {
                       </div>
                     )}
                     {rev&&<div className={`df-crev ${rev}`}>{rev==="approved"?"✓ Approved":"↺ Changes Req."}</div>}
-                    {isDone&&!isGate&&!isActive&&["code_gen","pr_review","qa","deploy"].includes(stage.id)&&(
+                    {isDone&&!isGate&&!isActive&&appState!=="done"&&["code_gen","pr_review","qa","deploy"].includes(stage.id)&&(
                       <button className="df-rerun-btn" onClick={e=>{e.stopPropagation();rerunFromStage(stage.id);}} title={`Re-run from Stage ${stage.num} onwards`}>
                         ↺ re-run from here
                       </button>
