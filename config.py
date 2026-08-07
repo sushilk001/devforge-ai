@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     github_org: str = ""
     github_repo: str = ""          # "owner/repo" to push generated code to
 
+    # Google OAuth (optional — enables Gmail SSO button)
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    app_base_url: str = "http://localhost:8000"
+
     # App
     app_env: str = "development"
     app_port: int = 8000

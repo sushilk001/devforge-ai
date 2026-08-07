@@ -1656,6 +1656,147 @@ function ObsPanel({ llmCalls, theme }) {
   );
 }
 
+// ── Pricing Panel ──────────────────────────────────────────────────────────
+const PLANS = [
+  {
+    key:"starter", name:"Starter", badge:null, price:"Free", period:"forever",
+    highlight:false,
+    desc:"Try the full pipeline on your own project — no credit card needed.",
+    features:[
+      "5 pipeline runs / month",
+      "Requirements + Task planning stages",
+      "Code generation (single file)",
+      "Demo mode (pre-recorded runs)",
+      "Community support",
+    ],
+    cta:"Get started free", ctaHref:"#",
+  },
+  {
+    key:"pro", name:"Pro", badge:"Most popular", price:"$99", period:"/month",
+    highlight:true,
+    desc:"The full autonomous SDLC engine for engineering teams shipping fast.",
+    features:[
+      "100 pipeline runs / month",
+      "All 7 stages — full pipeline",
+      "Linear, Slack & GitHub integrations",
+      "LLM Observability dashboard",
+      "Compliance & security scanning",
+      "Bring your own Claude API key",
+      "Email support",
+    ],
+    cta:"Start Pro trial", ctaHref:"#",
+  },
+  {
+    key:"enterprise", name:"Enterprise", badge:null, price:"Custom", period:"pricing",
+    highlight:false,
+    desc:"Unlimited scale, custom models, and enterprise security for large teams.",
+    features:[
+      "Unlimited pipeline runs",
+      "All stages + custom agent plugins",
+      "Gmail / SAML SSO",
+      "Custom AI models & fine-tuning",
+      "Dedicated Slack support channel",
+      "99.9% SLA + dedicated CSM",
+      "On-premise / VPC deployment",
+      "Audit logs & RBAC",
+    ],
+    cta:"Contact sales", ctaHref:"mailto:sushil@hackerrank.com",
+  },
+];
+
+function PricingPanel({ theme }) {
+  const dk = theme === "dark";
+  const bg   = dk ? "rgba(16,30,60,.7)"       : "rgba(255,248,238,.92)";
+  const card = dk ? "rgba(16,26,54,.80)"       : "rgba(255,252,244,.95)";
+  const bdr  = dk ? "rgba(60,130,255,.18)"     : "rgba(212,102,46,.18)";
+  const bdrH = dk ? "rgba(0,212,255,.45)"      : "rgba(212,102,46,.45)";
+  const acc  = dk ? "#00d4ff"                  : "#D4662E";
+  const txt  = dk ? "#e0eaff"                  : "#1A1916";
+  const sub  = dk ? "rgba(175,215,255,.55)"    : "#6B6258";
+  const chk  = dk ? "rgba(0,255,136,.8)"       : "#16a34a";
+  const launchBg = dk
+    ? "linear-gradient(135deg,#0055c8,#7c3aed)"
+    : "linear-gradient(135deg,#D4662E,#9A4520)";
+
+  return (
+    <div style={{padding:"28px 24px",background:bg,minHeight:"100%",overflowY:"auto"}}>
+      {/* Header */}
+      <div style={{textAlign:"center",marginBottom:28}}>
+        <div style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:acc,fontWeight:700,marginBottom:8}}>Pricing</div>
+        <div style={{fontSize:22,fontWeight:800,color:txt,letterSpacing:"-.4px",lineHeight:1.2}}>
+          Automate your entire SDLC
+        </div>
+        <div style={{fontSize:13,color:sub,marginTop:6,maxWidth:380,margin:"8px auto 0"}}>
+          From feature request to deployed PR — powered by 7 autonomous AI agents.
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div style={{display:"flex",gap:14,alignItems:"stretch",flexWrap:"wrap"}}>
+        {PLANS.map(plan => (
+          <div key={plan.key} style={{
+            flex:"1 1 180px",minWidth:180,
+            background: plan.highlight ? "transparent" : card,
+            backgroundImage: plan.highlight ? launchBg : "none",
+            border:`1.5px solid ${plan.highlight ? "transparent" : bdr}`,
+            borderRadius:12,padding:"20px 18px",
+            boxShadow: plan.highlight
+              ? dk ? "0 0 32px rgba(0,212,255,.18),0 8px 32px rgba(0,0,0,.4)" : "0 0 32px rgba(212,102,46,.22),0 8px 24px rgba(0,0,0,.12)"
+              : "0 2px 16px rgba(0,0,0,.1)",
+            position:"relative",transition:"box-shadow .2s",
+          }}>
+            {/* Badge */}
+            {plan.badge && (
+              <div style={{
+                position:"absolute",top:-11,left:"50%",transform:"translateX(-50%)",
+                background: dk ? "#00d4ff" : "#D4662E",
+                color:"#fff",fontSize:9,fontWeight:800,letterSpacing:1.5,
+                padding:"3px 10px",borderRadius:20,textTransform:"uppercase",whiteSpace:"nowrap",
+              }}>{plan.badge}</div>
+            )}
+
+            <div style={{fontSize:11,fontWeight:700,color: plan.highlight ? "rgba(255,255,255,.7)" : sub,letterSpacing:1,textTransform:"uppercase",marginBottom:6}}>{plan.name}</div>
+            <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:4}}>
+              <span style={{fontSize:28,fontWeight:800,color: plan.highlight ? "#fff" : txt,letterSpacing:"-.5px"}}>{plan.price}</span>
+              <span style={{fontSize:11,color: plan.highlight ? "rgba(255,255,255,.6)" : sub}}>{plan.period}</span>
+            </div>
+            <div style={{fontSize:12,color: plan.highlight ? "rgba(255,255,255,.72)" : sub,marginBottom:16,lineHeight:1.5}}>{plan.desc}</div>
+
+            {/* CTA */}
+            <a href={plan.ctaHref} style={{
+              display:"block",textAlign:"center",padding:"8px 0",borderRadius:8,
+              background: plan.highlight
+                ? "rgba(255,255,255,.18)"
+                : dk ? "rgba(0,212,255,.10)" : "rgba(212,102,46,.12)",
+              border: plan.highlight
+                ? "1px solid rgba(255,255,255,.28)"
+                : `1px solid ${bdrH}`,
+              color: plan.highlight ? "#fff" : acc,
+              fontSize:12,fontWeight:700,textDecoration:"none",
+              marginBottom:16,transition:"all .2s",
+            }}>{plan.cta}</a>
+
+            {/* Features */}
+            <div style={{display:"flex",flexDirection:"column",gap:7}}>
+              {plan.features.map((f,i) => (
+                <div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}>
+                  <span style={{color:chk,fontSize:12,flexShrink:0,marginTop:1}}>✓</span>
+                  <span style={{fontSize:12,color: plan.highlight ? "rgba(255,255,255,.82)" : txt,lineHeight:1.4}}>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer note */}
+      <div style={{textAlign:"center",marginTop:22,fontSize:11,color:sub}}>
+        All plans include demo mode · No setup fees · Cancel anytime
+      </div>
+    </div>
+  );
+}
+
 // ── About Panel ────────────────────────────────────────────────────────────
 function AboutPanel({ theme }) {
   const STAGES = [
@@ -1791,7 +1932,11 @@ export default function DevForgeDashboard() {
   const [customModelName, setCustomModelName]     = useState("");
   const [customModelAdding, setCustomModelAdding] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("df-theme") || "dark");
+  const [user,  setUser]  = useState(null);
   useEffect(() => { localStorage.setItem("df-theme", theme); }, [theme]);
+  useEffect(() => {
+    fetch("/auth/me").then(r=>r.ok?r.json():null).then(d=>{ if(d?.user) setUser(d.user); }).catch(()=>{});
+  }, []);
   useEffect(() => {
     const onKey = e => { if(e.key==="Escape" && fullscreenFile) setFullscreenFile(null); };
     document.addEventListener("keydown", onKey);
@@ -3159,6 +3304,32 @@ export default function DevForgeDashboard() {
             ))}
           </div>
           <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
+          {/* Gmail SSO */}
+          {user ? (
+            <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4}}>
+              <img src={user.picture} alt={user.name} referrerPolicy="no-referrer"
+                style={{width:28,height:28,borderRadius:"50%",border:`1.5px solid ${tc("rgba(175,215,255,.3)","rgba(212,102,46,.35)")}`}}/>
+              <span style={{fontSize:11,fontWeight:600,color:tc("rgba(175,215,255,.8)","#3D3730"),maxWidth:72,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name.split(" ")[0]}</span>
+              <button onClick={()=>fetch("/auth/logout",{method:"POST"}).then(()=>setUser(null))}
+                className="df-settings-btn" style={{fontSize:10,padding:"3px 8px",borderRadius:5}}>Sign out</button>
+            </div>
+          ) : (
+            <a href="/auth/google/login"
+              style={{display:"flex",alignItems:"center",gap:7,padding:"5px 12px",borderRadius:7,
+                border:`1px solid ${tc("rgba(175,215,255,.22)","rgba(0,0,0,.12)")}`,
+                background:tc("rgba(255,255,255,.06)","rgba(255,255,255,.72)"),
+                color:tc("rgba(175,215,255,.8)","#3D3730"),fontSize:11,fontWeight:600,
+                textDecoration:"none",cursor:"pointer",flexShrink:0,
+                backdropFilter:"blur(8px)",transition:"all .2s",marginLeft:4}}>
+              <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M17.64 9.2a10.34 10.34 0 0 0-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+              </svg>
+              Sign in
+            </a>
+          )}
         </div>
       </div>
 
@@ -3309,6 +3480,7 @@ export default function DevForgeDashboard() {
               LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:10,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
             <div className={`df-tab ${tab==="about"?"active":""}`} onClick={()=>setTab("about")}>About</div>
+            <div className={`df-tab ${tab==="pricing"?"active":""}`} onClick={()=>setTab("pricing")}>Pricing</div>
             <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
               style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(60,120,255,.28)":"rgba(0,0,0,.12)",
                 color:theme==="dark"?"rgba(175,215,255,.5)":"rgba(20,30,80,.5)",
@@ -3317,7 +3489,7 @@ export default function DevForgeDashboard() {
             <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(175,215,255,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
-            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
+            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : tab==="pricing" ? <PricingPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
           </div>
         </div>
 
