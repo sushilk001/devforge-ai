@@ -38,12 +38,12 @@ const ADD_FEATURE = {
   },
 
   tasks: [
-    { id: "T-001", title: "Password-reset schema & token store", type: "chore",   priority: "high",   estimate_hours: 3, dependencies: [],                 linear_issue_id: "DEV-101" },
-    { id: "T-002", title: "Generate & email reset token (SES)",   type: "feature", priority: "high",   estimate_hours: 5, dependencies: ["T-001"],          linear_issue_id: "DEV-102" },
-    { id: "T-003", title: "Token validation + password update",   type: "feature", priority: "urgent", estimate_hours: 5, dependencies: ["T-001"],          linear_issue_id: "DEV-103" },
-    { id: "T-004", title: "Rate limiting + admin audit log",       type: "feature", priority: "medium", estimate_hours: 4, dependencies: ["T-001"],          linear_issue_id: "DEV-104" },
-    { id: "T-005", title: "Forgot-password UI + branded email",    type: "feature", priority: "high",   estimate_hours: 6, dependencies: ["T-002"],          linear_issue_id: "DEV-105" },
-    { id: "T-006", title: "E2E + unit tests for reset flow",       type: "testing", priority: "medium", estimate_hours: 4, dependencies: ["T-003", "T-005"], linear_issue_id: "DEV-106" },
+    { id: "T-001", title: "Password-reset schema & token store", type: "chore",   priority: "high",   estimate_hours: 3, dependencies: [],                 linear_issue_id: "DEV-101", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-101" },
+    { id: "T-002", title: "Generate & email reset token (SES)",   type: "feature", priority: "high",   estimate_hours: 5, dependencies: ["T-001"],          linear_issue_id: "DEV-102", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-102" },
+    { id: "T-003", title: "Token validation + password update",   type: "feature", priority: "urgent", estimate_hours: 5, dependencies: ["T-001"],          linear_issue_id: "DEV-103", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-103" },
+    { id: "T-004", title: "Rate limiting + admin audit log",       type: "feature", priority: "medium", estimate_hours: 4, dependencies: ["T-001"],          linear_issue_id: "DEV-104", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-104" },
+    { id: "T-005", title: "Forgot-password UI + branded email",    type: "feature", priority: "high",   estimate_hours: 6, dependencies: ["T-002"],          linear_issue_id: "DEV-105", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-105" },
+    { id: "T-006", title: "E2E + unit tests for reset flow",       type: "testing", priority: "medium", estimate_hours: 4, dependencies: ["T-003", "T-005"], linear_issue_id: "DEV-106", linear_issue_url: "https://linear.app/devforge-ai/issue/DEV-106" },
   ],
 
   depGraph: {
@@ -201,13 +201,13 @@ const NEW_SOFTWARE = {
   },
 
   tasks: [
-    { id: "T-001", title: "Project scaffold + Dockerfile + CI",     type: "chore",   priority: "high",   estimate_hours: 3, dependencies: [],                 linear_issue_id: "SNIP-1" },
-    { id: "T-002", title: "Postgres schema + migrations",           type: "chore",   priority: "high",   estimate_hours: 3, dependencies: ["T-001"],          linear_issue_id: "SNIP-2" },
-    { id: "T-003", title: "Create-link API (slug gen + custom)",    type: "feature", priority: "urgent", estimate_hours: 5, dependencies: ["T-002"],          linear_issue_id: "SNIP-3" },
-    { id: "T-004", title: "Redirect endpoint + Redis cache",        type: "feature", priority: "urgent", estimate_hours: 4, dependencies: ["T-002"],          linear_issue_id: "SNIP-4" },
-    { id: "T-005", title: "Click analytics tracking",               type: "feature", priority: "medium", estimate_hours: 4, dependencies: ["T-004"],          linear_issue_id: "SNIP-5" },
-    { id: "T-006", title: "Minimal web UI (create + list)",         type: "feature", priority: "high",   estimate_hours: 5, dependencies: ["T-003"],          linear_issue_id: "SNIP-6" },
-    { id: "T-007", title: "Unit + integration + E2E tests",         type: "testing", priority: "medium", estimate_hours: 5, dependencies: ["T-005", "T-006"], linear_issue_id: "SNIP-7" },
+    { id: "T-001", title: "Project scaffold + Dockerfile + CI",     type: "chore",   priority: "high",   estimate_hours: 3, dependencies: [],                 linear_issue_id: "SNIP-1", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-1" },
+    { id: "T-002", title: "Postgres schema + migrations",           type: "chore",   priority: "high",   estimate_hours: 3, dependencies: ["T-001"],          linear_issue_id: "SNIP-2", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-2" },
+    { id: "T-003", title: "Create-link API (slug gen + custom)",    type: "feature", priority: "urgent", estimate_hours: 5, dependencies: ["T-002"],          linear_issue_id: "SNIP-3", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-3" },
+    { id: "T-004", title: "Redirect endpoint + Redis cache",        type: "feature", priority: "urgent", estimate_hours: 4, dependencies: ["T-002"],          linear_issue_id: "SNIP-4", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-4" },
+    { id: "T-005", title: "Click analytics tracking",               type: "feature", priority: "medium", estimate_hours: 4, dependencies: ["T-004"],          linear_issue_id: "SNIP-5", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-5" },
+    { id: "T-006", title: "Minimal web UI (create + list)",         type: "feature", priority: "high",   estimate_hours: 5, dependencies: ["T-003"],          linear_issue_id: "SNIP-6", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-6" },
+    { id: "T-007", title: "Unit + integration + E2E tests",         type: "testing", priority: "medium", estimate_hours: 5, dependencies: ["T-005", "T-006"], linear_issue_id: "SNIP-7", linear_issue_url: "https://linear.app/devforge-ai/issue/SNIP-7" },
   ],
 
   depGraph: {
