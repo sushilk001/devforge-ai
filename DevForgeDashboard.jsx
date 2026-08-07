@@ -179,9 +179,10 @@ const css = `
   .df-ltag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:rgba(120,190,255,.6);margin-top:4px}
   .df-ltag::before{content:'';width:5px;height:5px;border-radius:50%;background:#00ff88;flex-shrink:0;
     box-shadow:0 0 6px #00ff88;animation:pulse 1.6s infinite}
-  .df-timer{font-size:22px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
-    font-family:'SF Mono','Cascadia Code',monospace;color:#e0eaff}
+  .df-hdr-modes{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;padding:0 16px}
   .df-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid;border-radius:20px}
+  .df-pipe-timer{font-size:13px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+    font-family:'SF Mono','Cascadia Code',monospace;color:rgba(200,220,255,.6);line-height:1}
   .df-badge.idle   {color:rgba(175,215,255,.65);border-color:rgba(175,215,255,.2)}
   .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.35);animation:pulse 1.5s infinite}
   .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.35);animation:pulse 1s infinite}
@@ -1041,7 +1042,7 @@ const css = `
     animation:shimmer 6s linear infinite;
   }
   .df[data-theme='light'] .df-ltag{color:#5C5650;font-weight:500}
-  .df[data-theme='light'] .df-timer{color:#1A1916;font-weight:800;letter-spacing:.03em}
+  .df[data-theme='light'] .df-pipe-timer{color:#5C5650}
   .df[data-theme='light'] .df-badge.idle   {color:#5C5650;border-color:rgba(92,86,80,.28);background:rgba(255,255,255,.65)}
   .df[data-theme='light'] .df-badge.running{color:#15803d;border-color:rgba(22,163,74,.4);background:rgba(240,253,244,.8)}
   .df[data-theme='light'] .df-badge.gate   {color:#92400e;border-color:rgba(217,119,6,.4);background:rgba(255,251,235,.8)}
@@ -3462,7 +3463,12 @@ export default function DevForgeDashboard() {
           </div>
           <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autonomous SDLC Pipeline · 6 AI Agents</div></div>
         </div>
-        <div className="df-timer" style={{color:timerColor}}>{display}</div>
+        {/* Mode buttons — live in the header center */}
+        <div className="df-hdr-modes">
+          <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>pickMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
+          <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>pickMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
+          <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           {/* Integration status dots */}
           <div className="df-int-dots" title="Integration status: Anthropic · GitHub · Linear · Slack">
@@ -3504,11 +3510,6 @@ export default function DevForgeDashboard() {
       {/* Input */}
       <div className="df-inp-area">
         <div className="df-inp-w">
-          <div className="df-mode-row">
-            <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>pickMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
-            <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>pickMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
-            <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
-          </div>
           <div className="df-inp-lblrow">
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
@@ -3576,6 +3577,7 @@ export default function DevForgeDashboard() {
         <div className={`df-pipe ${pipeCollapsed?"collapsed":""}`}>
           <div className="df-pipe-toggle">
             {!pipeCollapsed&&<span className="df-pipe-hdr-lbl">Pipeline</span>}
+            {!pipeCollapsed&&<span className="df-pipe-timer" style={{color:timerColor}}>{display}</span>}
             <button className="df-pipe-btn" onClick={()=>setPipeCollapsed(c=>!c)} title={pipeCollapsed?"Expand pipeline":"Collapse pipeline"}>{pipeCollapsed?"»":"«"}</button>
           </div>
           {STAGES.map((stage,i)=>{
