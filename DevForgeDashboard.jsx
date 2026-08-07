@@ -791,31 +791,31 @@ const css = `
   .obs-empty{text-align:center;padding:60px 20px;opacity:.52;font-size:12px;line-height:2}
 
   /* ── About Panel ─────────────────────────────────────────────────────── */
-  .abt-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;height:100%}
-  .abt-hero{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px;padding:18px 20px}
-  .abt-title{font-size:17px;font-weight:800;letter-spacing:.02em;color:rgba(175,215,255,.95);margin-bottom:3px}
-  .abt-tagline{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:10px;font-weight:600}
-  .abt-desc{font-size:12px;line-height:1.75;opacity:.62;margin-bottom:14px}
+  .abt-wrap{padding:20px 24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;height:100%}
+  .abt-hero{background:linear-gradient(135deg,rgba(0,212,255,.07) 0%,rgba(60,80,180,.06) 100%);border:1px solid rgba(0,212,255,.22);border-radius:14px;padding:20px 22px;box-shadow:0 2px 24px rgba(0,0,0,.25)}
+  .abt-title{font-size:20px;font-weight:800;letter-spacing:.01em;color:#fff;margin-bottom:4px}
+  .abt-tagline{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#00d4ff;margin-bottom:12px;font-weight:700;opacity:.9}
+  .abt-desc{font-size:13px;line-height:1.8;color:rgba(200,220,255,.88);margin-bottom:16px}
   .abt-links{display:flex;gap:8px;flex-wrap:wrap}
-  .abt-link{font-size:10px;padding:4px 11px;border-radius:6px;border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.7);text-decoration:none;transition:all .2s;letter-spacing:.04em}
-  .abt-link:hover{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.45)}
-  .abt-link-demo{border-color:rgba(191,95,255,.25);color:rgba(191,95,255,.7)}
-  .abt-link-demo:hover{background:rgba(191,95,255,.08);color:#bf7fff;border-color:rgba(191,95,255,.45)}
-  .abt-stages{display:flex;align-items:stretch;gap:3px;flex-wrap:wrap}
-  .abt-stage{background:rgba(60,120,255,.09);border:1px solid rgba(60,120,255,.22);border-radius:8px;padding:9px 10px;text-align:center;flex:1;min-width:72px;transition:border-color .2s}
-  .abt-stage:hover{border-color:rgba(0,212,255,.2)}
-  .abt-stage-icon{font-size:15px;margin-bottom:3px}
-  .abt-stage-num{font-size:8px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;font-weight:600;margin-bottom:2px}
-  .abt-stage-lbl{font-size:10px;font-weight:700;color:rgba(175,215,255,.85);margin-bottom:2px}
-  .abt-stage-sub{font-size:9px;opacity:.42;line-height:1.35}
-  .abt-arrow{color:rgba(0,212,255,.3);font-size:13px;flex-shrink:0;align-self:center}
-  .abt-gates{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
-  .abt-gate-chip{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.22);color:rgba(255,170,0,.65)}
-  .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .abt-stack-group{background:rgba(255,255,255,.018);border:1px solid rgba(60,120,255,.20);border-radius:9px;padding:10px 12px}
-  .abt-stack-cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
-  .abt-stack-items{display:flex;flex-direction:column;gap:4px}
-  .abt-chip{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;opacity:.78;line-height:1.5}
+  .abt-link{font-size:11px;padding:5px 13px;border-radius:7px;border:1px solid rgba(0,212,255,.32);color:rgba(0,212,255,.88);text-decoration:none;transition:all .2s;letter-spacing:.04em;font-weight:600}
+  .abt-link:hover{background:rgba(0,212,255,.12);color:#00d4ff;border-color:rgba(0,212,255,.55)}
+  .abt-link-demo{border-color:rgba(191,95,255,.38);color:rgba(191,95,255,.9)}
+  .abt-link-demo:hover{background:rgba(191,95,255,.12);color:#bf7fff;border-color:rgba(191,95,255,.6)}
+  .abt-stages{display:flex;align-items:stretch;gap:5px;flex-wrap:wrap}
+  .abt-stage{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-top:2.5px solid var(--c,#00d4ff);border-radius:10px;padding:11px 10px;text-align:center;flex:1;min-width:78px;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+  .abt-stage:hover{background:rgba(255,255,255,.07);box-shadow:0 4px 18px rgba(0,0,0,.3),0 0 0 1px var(--c,#00d4ff)44}
+  .abt-stage-icon{font-size:17px;margin-bottom:4px}
+  .abt-stage-num{font-size:8px;letter-spacing:.12em;color:var(--c,#00d4ff);text-transform:uppercase;font-weight:700;margin-bottom:3px}
+  .abt-stage-lbl{font-size:11px;font-weight:700;color:#e8eeff;margin-bottom:3px}
+  .abt-stage-sub{font-size:9px;color:rgba(175,210,255,.65);line-height:1.4}
+  .abt-arrow{color:rgba(0,212,255,.4);font-size:16px;flex-shrink:0;align-self:center}
+  .abt-gates{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .abt-gate-chip{font-size:10px;padding:4px 11px;border-radius:20px;background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.38);color:rgba(255,185,50,.92);font-weight:600;line-height:1.5}
+  .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .abt-stack-group{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-left:2.5px solid var(--sc,#00d4ff);border-radius:10px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .abt-stack-cat{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-bottom:9px;color:var(--sc,#00d4ff)}
+  .abt-stack-items{display:flex;flex-direction:column;gap:5px}
+  .abt-chip{font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid rgba(255,255,255,.12);display:inline-block;color:rgba(210,228,255,.85);line-height:1.6;background:rgba(255,255,255,.04)}
 
   /* ── Log panel ───────────────────────────────────────────────────────── */
   .df-log{
@@ -1380,21 +1380,21 @@ const css = `
 
   /* ── About panel ── */
   .df[data-theme='light'] .abt-wrap{color:#1A1916;background:rgba(248,241,232,.82);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .abt-hero{background:rgba(252,244,234,.90);backdrop-filter:blur(12px);border:1px solid rgba(212,102,46,.16);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+  .df[data-theme='light'] .abt-hero{background:rgba(252,244,234,.95);backdrop-filter:blur(12px);border:1px solid rgba(212,102,46,.22);box-shadow:0 4px 20px rgba(0,0,0,.08)}
   .df[data-theme='light'] .abt-title{color:#1A1916;font-weight:800}
-  .df[data-theme='light'] .abt-tagline{background:linear-gradient(90deg,#D4662E,#E87C4A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
-  .df[data-theme='light'] .abt-desc{color:#3D3730;opacity:1;line-height:1.8}
-  .df[data-theme='light'] .abt-link{color:#D4662E;border-color:rgba(212,102,46,.28);background:rgba(255,244,236,.82);font-weight:600}
+  .df[data-theme='light'] .abt-tagline{color:#D4662E;-webkit-text-fill-color:initial;font-weight:800;opacity:1}
+  .df[data-theme='light'] .abt-desc{color:#3D3730;line-height:1.8}
+  .df[data-theme='light'] .abt-link{color:#D4662E;border-color:rgba(212,102,46,.32);background:rgba(255,244,236,.82);font-weight:600}
   .df[data-theme='light'] .abt-link:hover{background:rgba(255,232,216,.96)}
-  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08);box-shadow:0 2px 8px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 18px rgba(212,102,46,.12)}
-  .df[data-theme='light'] .abt-stage-num{color:#9A4520;font-weight:700}
+  .df[data-theme='light'] .abt-stage{background:#fff;border:1px solid rgba(0,0,0,.08);border-top:2.5px solid var(--c,#D4662E);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 20px rgba(0,0,0,.1),0 0 0 1px var(--c,#D4662E)33}
   .df[data-theme='light'] .abt-stage-lbl{color:#1A1916;font-weight:800}
-  .df[data-theme='light'] .abt-stage-sub{color:#5C5650;font-weight:500;opacity:1}
-  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.18)}
-  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.88);border-color:#d97706;color:#78350f;font-weight:700}
-  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.80);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08)}
-  .df[data-theme='light'] .abt-chip{opacity:1;font-weight:600;font-size:11px}
+  .df[data-theme='light'] .abt-stage-sub{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.2)}
+  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.9);border-color:rgba(217,119,6,.45);color:#78350f;font-weight:700}
+  .df[data-theme='light'] .abt-stack-group{background:#fff;backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.08);border-left:2.5px solid var(--sc)}
+  .df[data-theme='light'] .abt-stack-cat{font-weight:800}
+  .df[data-theme='light'] .abt-chip{color:#3D3730;border-color:rgba(0,0,0,.12);background:rgba(0,0,0,.03);font-weight:600}
 
   /* ── Idle hero ── */
   .df[data-theme='light'] .df-idle-hero-title{color:#1A1916}
@@ -1852,13 +1852,13 @@ function PricingPanel({ theme, user, onSignIn }) {
 // ── About Panel ────────────────────────────────────────────────────────────
 function AboutPanel({ theme }) {
   const STAGES = [
-    { num:1, icon:"📋", label:"Requirements",      sub:"PRD generation" },
-    { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm" },
-    { num:3, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk" },
-    { num:4, icon:"🔍", label:"PR Review",          sub:"4× parallel agents" },
-    { num:5, icon:"🧪", label:"QA",                 sub:"pytest runner" },
-    { num:6, icon:"⚖",  label:"Compliance",         sub:"WCAG · GDPR · OWASP" },
-    { num:7, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
+    { num:1, icon:"📋", label:"Requirements",       sub:"PRD generation",        color:"#00d4ff" },
+    { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm",      color:"#00ff88" },
+    { num:3, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk", color:"#bf5fff" },
+    { num:4, icon:"🔍", label:"PR Review",          sub:"4× parallel agents",    color:"#e066ff" },
+    { num:5, icon:"🧪", label:"QA",                 sub:"pytest runner",         color:"#2dd4bf" },
+    { num:6, icon:"⚖",  label:"Compliance",         sub:"WCAG · GDPR · OWASP",  color:"#f59e0b" },
+    { num:7, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack",        color:"#ff2d6b" },
   ];
   const STACK = [
     { cat:"AI / LLM",      color:"#bf7fff", lc:"#6d28d9", items:["claude-sonnet-4-6", "Anthropic API"] },
@@ -1888,7 +1888,7 @@ function AboutPanel({ theme }) {
         <div className="abt-stages">
           {STAGES.map((s, i) => (
             <React.Fragment key={s.num}>
-              <div className="abt-stage">
+              <div className="abt-stage" style={{"--c":s.color}}>
                 <div className="abt-stage-icon">{s.icon}</div>
                 <div className="abt-stage-num">Stage {s.num}</div>
                 <div className="abt-stage-lbl">{s.label}</div>
@@ -1911,11 +1911,11 @@ function AboutPanel({ theme }) {
           {STACK.map(g => {
             const sc = theme === "light" ? g.lc : g.color;
             return (
-              <div key={g.cat} className="abt-stack-group">
-                <div className="abt-stack-cat" style={{color:sc}}>{g.cat}</div>
+              <div key={g.cat} className="abt-stack-group" style={{"--sc":sc}}>
+                <div className="abt-stack-cat">{g.cat}</div>
                 <div className="abt-stack-items">
                   {g.items.map(item => (
-                    <span key={item} className="abt-chip" style={{borderColor:sc+"44",color:sc}}>{item}</span>
+                    <span key={item} className="abt-chip">{item}</span>
                   ))}
                 </div>
               </div>
