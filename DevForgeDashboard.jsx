@@ -3220,7 +3220,12 @@ export default function DevForgeDashboard() {
       const warnings  = rpt?.warnings_count || 0;
       const score     = rpt?.score || 0;
       const scoreColor = criticals > 0 ? "#ff2d6b" : warnings > 0 ? "#f59e0b" : "#00ff88";
-      const AGENT_LABELS = { accessibility:"WCAG 2.2 / 508", privacy:"GDPR / Privacy", security:"OWASP Top 10", licensing:"License / Regulatory" };
+      const COMPLIANCE_AGENTS = [
+        {name:"accessibility", label:"Accessibility Agent", sub:"WCAG 2.2 / 508", color:"#f59e0b"},
+        {name:"privacy",       label:"Privacy Agent",       sub:"GDPR / Privacy",  color:"#fb923c"},
+        {name:"security",      label:"Security Agent",      sub:"OWASP Top 10",    color:"#ff4466"},
+        {name:"licensing",     label:"Licensing Agent",     sub:"License / Regs",  color:"#a78bfa"},
+      ];
       const byAgent = {};
       (rpt?.findings||[]).forEach(f => { if(!byAgent[f.agent]) byAgent[f.agent]=[];  byAgent[f.agent].push(f); });
       const severityColor = s => s==="critical"?"#ff2d6b":s==="warning"?"#f59e0b":"#6b8ab0";
@@ -3232,6 +3237,20 @@ export default function DevForgeDashboard() {
               ? <span style={{animation:"pulse .8s infinite",display:"inline-block"}}>⟳ Running 4 compliance agents in parallel...</span>
               : rpt?.verdict}
           </div>
+          {running && (
+            <div className="df-agents">{COMPLIANCE_AGENTS.map(ag=>(
+              <div key={ag.name} className="df-agent running" style={{"--ac":ag.color}}>
+                <div className="df-agh">
+                  <div className="df-agd" style={{background:ag.color,animation:"pulse .8s infinite"}}/>
+                  <div>
+                    <div className="df-agname">{ag.label}</div>
+                    <div className="df-agst" style={{color:ag.color}}>{ag.sub} · AUDITING...</div>
+                  </div>
+                </div>
+                <AgentThinking agent={ag.name} color={ag.color}/>
+              </div>
+            ))}</div>
+          )}
           {!running && (
             <>
               <div style={{display:"flex",gap:10,marginTop:10,marginBottom:12}}>
@@ -3248,25 +3267,29 @@ export default function DevForgeDashboard() {
                   <div style={{fontSize:9,color:"rgba(175,215,255,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Debt Score</div>
                 </div>
               </div>
-              {Object.entries(byAgent).length === 0 && (
-                <div style={{color:"#00ff88",fontSize:12,padding:"8px 12px",borderRadius:6,background:"rgba(0,255,136,.06)",border:"1px solid rgba(0,255,136,.15)"}}>✓ No compliance issues detected across all standards</div>
-              )}
-              {Object.entries(byAgent).map(([agent, findings]) => (
-                <div key={agent} style={{marginBottom:10}}>
-                  <div style={{fontSize:10,fontWeight:700,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",marginBottom:5}}>{AGENT_LABELS[agent]||agent}</div>
-                  {findings.map((f,i) => (
-                    <div key={i} style={{padding:"7px 10px",borderRadius:6,marginBottom:4,background:`rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.06)`,border:`1px solid rgba(${f.severity==="critical"?"255,45,107":f.severity==="warning"?"245,158,11":"107,138,176"},.18)`,borderLeft:`3px solid ${severityColor(f.severity)}`}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:6}}>
-                        <div style={{fontSize:11,fontWeight:700,color:tc("#c8d4f0","#3D3730"),flex:1}}>{f.title}</div>
-                        <span style={{fontSize:9,fontWeight:700,color:severityColor(f.severity),letterSpacing:1,textTransform:"uppercase",flexShrink:0}}>{f.severity}</span>
+              <div className="df-agents">{COMPLIANCE_AGENTS.map(ag=>{
+                const findings = byAgent[ag.name]||[];
+                const hasCritical = findings.some(f=>f.severity==="critical");
+                const hasWarn     = findings.some(f=>f.severity==="warning");
+                const sc = hasCritical?"#ff2d6b":hasWarn?"#f59e0b":"#00ff88";
+                const status = hasCritical?"BLOCKED":hasWarn?"WARNED":"PASSED";
+                return (
+                  <div key={ag.name} className="df-agent passed" style={{"--ac":ag.color}}>
+                    <div className="df-agh">
+                      <div className="df-agd" style={{background:sc}}/>
+                      <div>
+                        <div className="df-agname">{ag.label}</div>
+                        <div className="df-agst" style={{color:sc}}>{status} · {findings.length} finding{findings.length!==1?"s":""}</div>
                       </div>
-                      <div style={{fontSize:9,color:tc("rgba(175,215,255,.45)","rgba(20,30,80,.55)"),marginTop:2}}>{f.standard}{f.file ? ` · ${f.file}` : ""}</div>
-                      <div style={{fontSize:10,color:tc("rgba(175,215,255,.65)","rgba(20,30,80,.7)"),marginTop:4,lineHeight:1.45}}>{f.description}</div>
-                      <div style={{fontSize:10,color:"#00d4ff",marginTop:4,lineHeight:1.4}}>↳ {f.recommendation}</div>
                     </div>
-                  ))}
-                </div>
-              ))}
+                    {findings.map((f,i)=>(
+                      <div key={i} className="df-agf" style={{opacity:.9}}>
+                        {f.severity==="critical"?"🔴":f.severity==="warning"?"⚠":"ℹ"} <b>{f.title}</b>: {f.description?.slice(0,110)}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}</div>
               {(rpt?.debt_history||[]).length > 1 && (()=>{
                 const maxScore = Math.max(...rpt.debt_history.map(x=>x.score),1);
                 const last = rpt.debt_history[rpt.debt_history.length-1];
