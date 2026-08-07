@@ -3490,10 +3490,10 @@ export default function DevForgeDashboard() {
             </div>
           ) : (
             <button onClick={()=>setShowLoginModal(true)}
-              style={{display:"flex",alignItems:"center",gap:7,padding:"5px 12px",borderRadius:7,
+              style={{display:"flex",alignItems:"center",gap:7,padding:"7px 16px",borderRadius:8,
                 border:`1px solid ${tc("rgba(175,215,255,.22)","rgba(0,0,0,.12)")}`,
                 background:tc("rgba(255,255,255,.06)","rgba(255,255,255,.72)"),
-                color:tc("rgba(175,215,255,.8)","#3D3730"),fontSize:11,fontWeight:600,
+                color:tc("rgba(175,215,255,.9)","#3D3730"),fontSize:13,fontWeight:600,
                 cursor:"pointer",flexShrink:0,backdropFilter:"blur(8px)",transition:"all .2s",marginLeft:4}}>
               Sign in
             </button>
