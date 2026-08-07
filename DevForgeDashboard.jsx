@@ -129,7 +129,7 @@ const css = `
   .df*{box-sizing:border-box;margin:0;padding:0}
   .df{
     font-family:-apple-system,'SF Pro Text','Helvetica Neue',system-ui,sans-serif;
-    background:linear-gradient(-45deg,#000510,#000d28,#00071a,#000c22,#000510);
+    background:linear-gradient(-45deg,#060e1e,#0b1830,#060c1c,#091526,#060e1e);
     background-size:400% 400%;
     animation:dkBgShift 18s ease infinite;
     height:100vh;color:#d4daf5;overflow:hidden;position:relative;
@@ -140,13 +140,13 @@ const css = `
   }
   .df::before{
     width:1100px;height:1100px;top:-360px;left:-240px;
-    background:radial-gradient(circle,rgba(0,160,255,.28) 0%,rgba(0,80,220,.12) 40%,transparent 70%);
+    background:radial-gradient(circle,rgba(0,160,255,.38) 0%,rgba(0,80,220,.18) 40%,transparent 70%);
     filter:blur(40px);
     animation:aurora 14s ease-in-out infinite;
   }
   .df::after{
     width:900px;height:900px;bottom:-260px;right:-140px;
-    background:radial-gradient(circle,rgba(30,20,240,.22) 0%,rgba(0,120,255,.10) 45%,transparent 70%);
+    background:radial-gradient(circle,rgba(20,80,240,.30) 0%,rgba(0,120,255,.16) 45%,transparent 70%);
     filter:blur(36px);
     animation:aurora2 18s ease-in-out infinite;
   }
@@ -158,7 +158,7 @@ const css = `
     display:flex;align-items:center;justify-content:space-between;
     padding:12px 24px;flex-shrink:0;position:relative;
     border-bottom:1px solid rgba(255,255,255,.07);
-    background:rgba(0,3,12,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    background:rgba(6,14,28,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     box-shadow:0 1px 0 rgba(0,212,255,.06),0 2px 24px rgba(0,0,0,.3);
   }
   .df-logo{display:flex;align-items:center;gap:12px}
@@ -191,7 +191,7 @@ const css = `
   .df-inp-area{
     display:flex;gap:10px;align-items:flex-end;padding:14px 24px;flex-shrink:0;
     border-bottom:1px solid rgba(255,255,255,.06);
-    background:rgba(0,3,12,.78);backdrop-filter:blur(12px);
+    background:rgba(6,14,28,.78);backdrop-filter:blur(12px);
     box-shadow:0 1px 0 rgba(0,212,255,.04);
   }
   .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -325,7 +325,7 @@ const css = `
   .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
   .df-settings-drawer{
     width:480px;max-width:100vw;height:100vh;
-    background:#00040e;border-left:1px solid rgba(255,255,255,.08);
+    background:#04101e;border-left:1px solid rgba(255,255,255,.08);
     display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.7);
   }
   .df-set-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;
@@ -435,7 +435,7 @@ const css = `
     width:298px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;
     padding:10px 10px;border-right:1px solid rgba(255,255,255,.06);
     transition:width .3s cubic-bezier(.25,.8,.25,1);
-    background:rgba(0,3,12,.65);backdrop-filter:blur(8px);
+    background:rgba(6,14,28,.65);backdrop-filter:blur(8px);
   }
   .df-pipe.collapsed{width:60px;padding:10px 8px}
   .df-pipe::-webkit-scrollbar{width:2px}
@@ -462,12 +462,12 @@ const css = `
     border:1px solid rgba(255,255,255,.07);
     border-left:3px solid color-mix(in srgb,var(--c,#00d4ff) 50%,transparent);
     border-radius:12px;padding:10px 12px;margin-bottom:4px;
-    background:color-mix(in srgb,var(--c,#00d4ff) 4%,rgba(0,3,12,.45));
+    background:color-mix(in srgb,var(--c,#00d4ff) 4%,rgba(6,14,28,.45));
     transition:all .3s;position:relative;overflow:hidden;
     animation:stageIn .35s ease-out both;
   }
   .df-card:hover{
-    background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(0,3,12,.5));
+    background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(6,14,28,.5));
     border-left-color:color-mix(in srgb,var(--c,#00d4ff) 75%,transparent);
     border-color:rgba(255,255,255,.12);
   }
@@ -557,7 +557,7 @@ const css = `
   /* Tabs */
   .df-tabs{
     display:flex;border-bottom:1px solid rgba(255,255,255,.06);
-    background:rgba(0,3,12,.72);flex-shrink:0;padding:0 8px;
+    background:rgba(6,14,28,.72);flex-shrink:0;padding:0 8px;
   }
   .df-tab{
     padding:12px 20px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
@@ -817,7 +817,7 @@ const css = `
   .df-log{
     width:260px;flex-shrink:0;display:flex;flex-direction:column;
     transition:width .3s cubic-bezier(.25,.8,.25,1);overflow:hidden;
-    background:rgba(0,3,12,.7);border-left:1px solid rgba(0,180,255,.1);
+    background:rgba(6,14,28,.7);border-left:1px solid rgba(0,180,255,.1);
     backdrop-filter:blur(10px);
   }
   .df-log.wide     {width:460px}
@@ -878,7 +878,7 @@ const css = `
     display:flex;flex-direction:column;align-items:center;gap:5px;
     padding:14px 11px;border-radius:10px;
     border:1px solid color-mix(in srgb,var(--c,rgba(255,255,255,.15)) 28%,rgba(255,255,255,.05));
-    background:color-mix(in srgb,var(--c,rgba(255,255,255,.04)) 6%,rgba(0,3,12,.3));
+    background:color-mix(in srgb,var(--c,rgba(255,255,255,.04)) 6%,rgba(6,14,28,.3));
     min-width:94px;animation:stagePop .4s ease-out both;
     transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;cursor:default;
   }
@@ -907,7 +907,7 @@ const css = `
   }
   .df-idle-feat{
     display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:10px;
-    background:color-mix(in srgb,var(--fi-color,rgba(255,255,255,.04)) 6%,rgba(0,3,12,.3));
+    background:color-mix(in srgb,var(--fi-color,rgba(255,255,255,.04)) 6%,rgba(6,14,28,.3));
     border:1px solid color-mix(in srgb,var(--fi-color,rgba(255,255,255,.07)) 22%,rgba(255,255,255,.05));
     border-left:3px solid color-mix(in srgb,var(--fi-color,#00d4ff) 55%,transparent);
     flex:1;min-width:190px;max-width:225px;
