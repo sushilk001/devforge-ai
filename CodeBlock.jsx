@@ -15,7 +15,7 @@ const RULES = [
 ];
 
 const COLORS = {
-  comment: "#5c6b7a", string: "#7fe0a0", tag: "#00d4ff", decorator: "#e066ff",
+  comment: "#6a8099", string: "#7fe0a0", tag: "#00d4ff", decorator: "#e066ff",
   keyword: "#bf7fff", number: "#ffaa00", func: "#00d4ff", plain: "#c8d6e8",
 };
 
@@ -38,7 +38,7 @@ export default function CodeBlock({ code = "", style }) {
   return (
     <pre style={{
       fontSize: 11, lineHeight: 1.6, fontFamily: "'Space Mono','SF Mono','Cascadia Code',monospace", padding: "12px 14px",
-      margin: "0 0 4px 0", borderRadius: 3, background: "rgba(0,0,0,0.5)",
+      margin: "0 0 4px 0", borderRadius: 3, background: "#131a24",
       border: "1px solid rgba(191,95,255,0.12)", overflow: "auto", maxHeight: 240,
       whiteSpace: "pre", ...style,
     }}>
