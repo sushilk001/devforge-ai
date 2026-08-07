@@ -1686,7 +1686,6 @@ function AboutPanel({ theme }) {
           Human review gates at each stage keep you in control.
         </div>
         <div className="abt-links">
-          <a className="abt-link" href="https://github.com/sushilk001/devforge-ai" target="_blank" rel="noreferrer">⬡ GitHub</a>
           <a className="abt-link abt-link-demo" href="https://tinyurl.com/DevForgeAI-demoVideo" target="_blank" rel="noreferrer">▶ Demo Video</a>
         </div>
       </div>
