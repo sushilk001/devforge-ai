@@ -132,7 +132,7 @@ const css = `
     background:linear-gradient(-45deg,#162d52,#1c3a66,#142844,#1a3258,#162d52);
     background-size:400% 400%;
     animation:dkBgShift 18s ease infinite;
-    height:100vh;color:#d4daf5;overflow:hidden;position:relative;
+    height:100vh;color:#e0eaff;overflow:hidden;position:relative;
     display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;
   }
   .df::before,.df::after{
@@ -157,7 +157,7 @@ const css = `
   .df-hdr{
     display:flex;align-items:center;justify-content:space-between;
     padding:12px 24px;flex-shrink:0;position:relative;
-    border-bottom:1px solid rgba(255,255,255,.07);
+    border-bottom:1px solid rgba(60,120,255,.22);
     background:rgba(16,30,60,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     box-shadow:0 1px 0 rgba(0,212,255,.06),0 2px 24px rgba(0,0,0,.3);
   }
@@ -176,13 +176,13 @@ const css = `
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
     animation:shimmer 6s linear infinite;
   }
-  .df-ltag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:rgba(120,160,220,.6);margin-top:4px}
+  .df-ltag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:rgba(120,190,255,.6);margin-top:4px}
   .df-ltag::before{content:'';width:5px;height:5px;border-radius:50%;background:#00ff88;flex-shrink:0;
     box-shadow:0 0 6px #00ff88;animation:pulse 1.6s infinite}
   .df-timer{font-size:22px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
-    font-family:'SF Mono','Cascadia Code',monospace;color:#d4daf5}
+    font-family:'SF Mono','Cascadia Code',monospace;color:#e0eaff}
   .df-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid;border-radius:20px}
-  .df-badge.idle   {color:rgba(200,214,232,.65);border-color:rgba(200,214,232,.2)}
+  .df-badge.idle   {color:rgba(175,215,255,.65);border-color:rgba(175,215,255,.2)}
   .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.35);animation:pulse 1.5s infinite}
   .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.35);animation:pulse 1s infinite}
   .df-badge.done   {color:#00d4ff;border-color:rgba(0,212,255,.35)}
@@ -190,17 +190,17 @@ const css = `
   /* ── Input area ──────────────────────────────────────────────────────── */
   .df-inp-area{
     display:flex;gap:10px;align-items:flex-end;padding:14px 24px;flex-shrink:0;
-    border-bottom:1px solid rgba(255,255,255,.06);
+    border-bottom:1px solid rgba(60,120,255,.20);
     background:rgba(16,30,60,.78);backdrop-filter:blur(12px);
     box-shadow:0 1px 0 rgba(0,212,255,.04);
   }
   .df-inp-lblrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-  .df-inp-lbl{font-size:13px;letter-spacing:.06em;color:rgba(120,160,220,.7);font-weight:500}
+  .df-inp-lbl{font-size:13px;letter-spacing:.06em;color:rgba(120,190,255,.7);font-weight:500}
   .df-mode-row{display:flex;gap:6px;margin-bottom:8px}
   .df-mode-btn{
     font-family:-apple-system,system-ui,sans-serif;font-size:13px;letter-spacing:.02em;
-    padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.1);
-    background:transparent;color:rgba(200,214,232,.65);transition:all .15s;font-weight:500;
+    padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid rgba(60,120,255,.28);
+    background:transparent;color:rgba(175,215,255,.65);transition:all .15s;font-weight:500;
   }
   .df-mode-btn.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.45);color:#00d4ff}
   .df-mode-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -209,11 +209,11 @@ const css = `
   .df-inp-w{flex:1;min-width:0}
   .df-ctx-row{display:flex;gap:7px;margin-top:7px;align-items:center;flex-wrap:wrap}
   .df-ctx-gh{
-    flex:1;min-width:160px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
-    border-radius:8px;color:#d4daf5;font-family:'SF Mono','Cascadia Code',monospace;
+    flex:1;min-width:160px;background:rgba(60,120,255,.13);border:1px solid rgba(60,120,255,.28);
+    border-radius:8px;color:#e0eaff;font-family:'SF Mono','Cascadia Code',monospace;
     font-size:11px;padding:6px 10px;outline:none;transition:border-color .2s;
   }
-  .df-ctx-gh::placeholder{color:rgba(200,214,232,.42)}
+  .df-ctx-gh::placeholder{color:rgba(175,215,255,.42)}
   .df-ctx-gh:focus{border-color:rgba(0,212,255,.4)}
   .df-ctx-attach{
     font-size:10px;letter-spacing:.04em;padding:6px 12px;border-radius:8px;cursor:pointer;
@@ -224,21 +224,21 @@ const css = `
   .df-ctx-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
   .df-ctx-chip{
     display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;
-    background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:rgba(200,214,232,.7);max-width:180px;
+    background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:rgba(175,215,255,.7);max-width:180px;
   }
   .df-ctx-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .df-ctx-chip button{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;padding:0;font-size:10px;line-height:1;flex-shrink:0}
+  .df-ctx-chip button{background:none;border:none;color:rgba(175,215,255,.4);cursor:pointer;padding:0;font-size:10px;line-height:1;flex-shrink:0}
   .df-ctx-chip button:hover{color:#ff5555}
   .df-ctx-chip.gh{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);color:rgba(0,212,255,.8)}
   .df-inp{
-    width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+    width:100%;background:rgba(60,120,255,.22);border:1px solid rgba(60,120,255,.30);
     border-radius:10px;color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;
     font-size:13px;padding:11px 14px;outline:none;resize:vertical;
     min-height:46px;max-height:55vh;line-height:1.6;transition:border-color .2s;
   }
   .df-inp::-webkit-resizer{border-width:0 5px 5px 0;border-style:solid;border-color:transparent rgba(0,212,255,.35)}
   .df-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-inp::placeholder{color:rgba(200,214,232,.45)}
+  .df-inp::placeholder{color:rgba(175,215,255,.45)}
   .df-launch{
     background:linear-gradient(110deg,#0073b1,#0099ee,#00c4ff,#0099ee,#0073b1);
     background-size:300% auto;
@@ -261,19 +261,19 @@ const css = `
   .df-rerun-btn{
     display:flex;align-items:center;gap:4px;margin-top:5px;padding:4px 10px;
     font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:.02em;font-weight:500;
-    background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;
-    color:rgba(200,214,232,.65);cursor:pointer;transition:all .15s;width:100%;
+    background:transparent;border:1px solid rgba(60,120,255,.28);border-radius:7px;
+    color:rgba(175,215,255,.65);cursor:pointer;transition:all .15s;width:100%;
   }
   .df-rerun-btn:hover{border-color:rgba(0,212,255,.35);color:#00d4ff;background:rgba(0,212,255,.06)}
   .df-dbg-btn{
     background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.3);color:rgba(0,210,255,.85);
     cursor:pointer;font-family:-apple-system,system-ui,sans-serif;font-size:11px;font-weight:600;
     letter-spacing:.04em;text-transform:uppercase;padding:0 16px;border-radius:10px;height:44px;
-    transition:all .2s;box-shadow:0 0 12px rgba(0,180,255,.1),inset 0 1px 0 rgba(255,255,255,.06);
+    transition:all .2s;box-shadow:0 0 12px rgba(0,180,255,.1),inset 0 1px 0 rgba(60,120,255,.20);
   }
   .df-dbg-btn:hover{
     background:rgba(0,180,255,.15);border-color:rgba(0,210,255,.55);color:#00d4ff;
-    box-shadow:0 0 20px rgba(0,180,255,.2),inset 0 1px 0 rgba(255,255,255,.08);
+    box-shadow:0 0 20px rgba(0,180,255,.2),inset 0 1px 0 rgba(60,120,255,.24);
     transform:translateY(-1px);
   }
   .df-dbg-panel{
@@ -285,17 +285,17 @@ const css = `
   .df-dbg-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
     border-bottom:1px solid rgba(0,212,255,.1);flex-shrink:0}
   .df-dbg-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,212,255,.8);font-weight:600}
-  .df-dbg-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:16px;line-height:1}
+  .df-dbg-close{background:none;border:none;color:rgba(175,215,255,.4);cursor:pointer;font-size:16px;line-height:1}
   .df-dbg-close:hover{color:#ff5555}
   .df-dbg-body{padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
-  .df-dbg-ctx{font-size:10px;color:rgba(200,214,232,.3);background:rgba(0,0,0,.3);
+  .df-dbg-ctx{font-size:10px;color:rgba(175,215,255,.3);background:rgba(0,0,0,.3);
     border-radius:6px;padding:7px 9px;max-height:80px;overflow-y:auto;font-family:'SF Mono','Cascadia Code',monospace}
   .df-dbg-inp{
-    background:rgba(255,255,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:8px;
+    background:rgba(60,120,255,.13);border:1px solid rgba(0,212,255,.18);border-radius:8px;
     color:#e8eeff;font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:9px 11px;
     resize:none;outline:none;width:100%;transition:border-color .2s;
   }
-  .df-dbg-inp::placeholder{color:rgba(200,214,232,.2)}
+  .df-dbg-inp::placeholder{color:rgba(175,215,255,.2)}
   .df-dbg-inp:focus{border-color:rgba(0,212,255,.4)}
   .df-dbg-send{
     align-self:flex-end;background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
@@ -305,38 +305,38 @@ const css = `
   .df-dbg-send:hover:not(:disabled){background:linear-gradient(135deg,#00b3f0,#0077ff)}
   .df-dbg-send:disabled{opacity:.4;cursor:not-allowed}
   .df-dbg-answer{
-    font-size:12px;color:rgba(200,214,232,.85);line-height:1.7;
+    font-size:12px;color:rgba(175,215,255,.85);line-height:1.7;
     background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px;
     padding:12px;white-space:pre-wrap;
   }
 
   /* ── Settings ──────────────────────────────────────────────────────────── */
   .df-settings-btn{
-    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.45);
+    background:transparent;border:1px solid rgba(60,120,255,.28);color:rgba(175,215,255,.45);
     cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:8px;
     display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
   }
-  .df-settings-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22);color:#d4daf5}
+  .df-settings-btn:hover{background:rgba(60,120,255,.20);border-color:rgba(255,255,255,.22);color:#e0eaff}
   .df-int-dots{display:flex;gap:6px;align-items:center}
   .df-int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;cursor:default}
   .df-int-dot.on {background:#00ff88;box-shadow:0 0 5px rgba(0,255,136,.7)}
-  .df-int-dot.off{background:rgba(200,214,232,.35)}
-  .df-int-dot-lbl{font-size:9px;letter-spacing:.04em;color:rgba(200,214,232,.58)}
+  .df-int-dot.off{background:rgba(175,215,255,.35)}
+  .df-int-dot-lbl{font-size:9px;letter-spacing:.04em;color:rgba(175,215,255,.58)}
   .df-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;justify-content:flex-end;animation:fadeUp .15s ease-out}
   .df-settings-drawer{
     width:480px;max-width:100vw;height:100vh;
-    background:#101e48;border-left:1px solid rgba(255,255,255,.08);
+    background:#101e48;border-left:1px solid rgba(60,120,255,.24);
     display:flex;flex-direction:column;overflow:hidden;box-shadow:-20px 0 60px rgba(0,0,0,.7);
   }
   .df-set-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;
-    border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+    border-bottom:1px solid rgba(60,120,255,.22);flex-shrink:0}
   .df-set-title{font-family:-apple-system,'SF Pro Display',system-ui,sans-serif;font-size:17px;font-weight:700;color:#fff}
-  .df-set-close{background:none;border:none;color:rgba(200,214,232,.4);cursor:pointer;font-size:20px;line-height:1;padding:3px 7px;border-radius:6px}
+  .df-set-close{background:none;border:none;color:rgba(175,215,255,.4);cursor:pointer;font-size:20px;line-height:1;padding:3px 7px;border-radius:6px}
   .df-set-close:hover{color:#ff5555;background:rgba(255,68,68,.08)}
-  .df-set-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;padding:0 8px}
+  .df-set-tabs{display:flex;border-bottom:1px solid rgba(60,120,255,.22);flex-shrink:0;padding:0 8px}
   .df-set-tab{
     flex:1;padding:12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-    border:none;border-bottom:2px solid transparent;transition:all .2s;color:rgba(200,214,232,.6);
+    border:none;border-bottom:2px solid transparent;transition:all .2s;color:rgba(175,215,255,.6);
     text-align:center;background:none;font-family:-apple-system,system-ui,sans-serif;font-weight:500;
   }
   .df-set-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
@@ -346,15 +346,15 @@ const css = `
   .df-set-section{display:flex;flex-direction:column;gap:12px}
   .df-set-sec-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,212,255,.55);margin-bottom:2px;font-weight:600}
   .df-set-field{display:flex;flex-direction:column;gap:6px}
-  .df-set-lbl{font-size:12px;color:rgba(200,214,232,.55);font-weight:500}
+  .df-set-lbl{font-size:12px;color:rgba(175,215,255,.55);font-weight:500}
   .df-set-inp{
-    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;
+    background:rgba(60,120,255,.13);border:1px solid rgba(60,120,255,.28);border-radius:8px;
     color:#e8eeff;font-family:'SF Mono','Cascadia Code',monospace;font-size:12px;
     padding:9px 12px;outline:none;width:100%;transition:border-color .2s;
   }
   .df-set-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-set-inp::placeholder{color:rgba(200,214,232,.42)}
-  .df-set-preview{font-size:10px;color:rgba(200,214,232,.52);font-family:'SF Mono','Cascadia Code',monospace;margin-top:2px}
+  .df-set-inp::placeholder{color:rgba(175,215,255,.42)}
+  .df-set-preview{font-size:10px;color:rgba(175,215,255,.52);font-family:'SF Mono','Cascadia Code',monospace;margin-top:2px}
   .df-set-inp-row{display:flex;gap:8px;align-items:center}
   .df-set-inp-row .df-set-inp{flex:1}
   .df-set-test-btn{
@@ -369,8 +369,8 @@ const css = `
   .df-set-result.err{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.18);color:#ff6666}
   .df-model-cards{display:flex;flex-direction:column;gap:8px}
   .df-model-card{
-    border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;cursor:pointer;
-    transition:all .2s;background:rgba(255,255,255,.02);position:relative;overflow:hidden;
+    border:1px solid rgba(60,120,255,.24);border-radius:10px;padding:14px 16px;cursor:pointer;
+    transition:all .2s;background:rgba(60,120,255,.08);position:relative;overflow:hidden;
   }
   .df-model-card:hover{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.22)}
   .df-model-card.selected{border-color:rgba(0,212,255,.5);background:rgba(0,212,255,.07)}
@@ -382,29 +382,29 @@ const css = `
   .df-mc-badge.powerful{background:rgba(191,95,255,.12);color:#bf5fff;border:1px solid rgba(191,95,255,.25)}
   .df-mc-badge.balanced{background:rgba(255,180,0,.10);color:#ffb400;border:1px solid rgba(255,180,0,.22)}
   .df-mc-badge.fast    {background:rgba(0,255,136,.09);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
-  .df-mc-badge.custom  {background:rgba(255,255,255,.06);color:rgba(200,214,232,.7);border:1px solid rgba(255,255,255,.14)}
-  .df-mc-desc{font-size:11px;color:rgba(200,214,232,.48);margin-top:5px;line-height:1.5}
-  .df-mc-price{font-size:10px;color:rgba(200,214,232,.55);margin-top:5px;font-family:'SF Mono','Cascadia Code',monospace}
+  .df-mc-badge.custom  {background:rgba(60,120,255,.20);color:rgba(175,215,255,.7);border:1px solid rgba(60,120,255,.32)}
+  .df-mc-desc{font-size:11px;color:rgba(175,215,255,.48);margin-top:5px;line-height:1.5}
+  .df-mc-price{font-size:10px;color:rgba(175,215,255,.55);margin-top:5px;font-family:'SF Mono','Cascadia Code',monospace}
   .df-mc-remove{margin-left:auto;background:none;border:none;color:rgba(255,100,100,.5);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;transition:color .15s}
   .df-mc-remove:hover{color:rgba(255,80,80,.9)}
   .df-add-model{margin-top:12px;display:flex;flex-direction:column;gap:6px}
   .df-add-model-row{display:flex;gap:6px}
-  .df-add-model-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 12px;font-size:12px;color:#d4daf5;outline:none;font-family:inherit;transition:border-color .15s}
+  .df-add-model-inp{flex:1;background:rgba(60,120,255,.13);border:1px solid rgba(60,120,255,.28);border-radius:7px;padding:8px 12px;font-size:12px;color:#e0eaff;outline:none;font-family:inherit;transition:border-color .15s}
   .df-add-model-inp:focus{border-color:rgba(0,212,255,.4)}
-  .df-add-model-inp::placeholder{color:rgba(200,214,232,.42)}
+  .df-add-model-inp::placeholder{color:rgba(175,215,255,.42)}
   .df-add-model-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:7px;color:#00d4ff;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
   .df-add-model-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.45)}
   .df-add-model-btn:disabled{opacity:.4;cursor:not-allowed}
   .df-int-status-row{
     display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
-    background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+    background:rgba(60,120,255,.08);border:1px solid rgba(60,120,255,.20);
   }
   .df-int-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
   .df-int-status-dot.on {background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,.5)}
-  .df-int-status-dot.off{background:rgba(200,214,232,.18)}
-  .df-int-status-name{font-size:12px;color:rgba(200,214,232,.65);flex:1;font-weight:500}
-  .df-int-status-val{font-size:10px;color:rgba(200,214,232,.58);font-family:'SF Mono','Cascadia Code',monospace}
-  .df-set-footer{border-top:1px solid rgba(255,255,255,.07);padding:16px 24px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+  .df-int-status-dot.off{background:rgba(175,215,255,.18)}
+  .df-int-status-name{font-size:12px;color:rgba(175,215,255,.65);flex:1;font-weight:500}
+  .df-int-status-val{font-size:10px;color:rgba(175,215,255,.58);font-family:'SF Mono','Cascadia Code',monospace}
+  .df-set-footer{border-top:1px solid rgba(60,120,255,.22);padding:16px 24px;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
   .df-set-save{
     background:linear-gradient(135deg,#0099cc,#0066ff);color:#fff;border:none;cursor:pointer;
     font-family:-apple-system,system-ui,sans-serif;font-size:12px;font-weight:700;
@@ -413,11 +413,11 @@ const css = `
   .df-set-save:hover:not(:disabled){background:linear-gradient(135deg,#00b3f0,#0077ff)}
   .df-set-save:disabled{opacity:.4;cursor:not-allowed}
   .df-set-cancel{
-    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.45);cursor:pointer;
+    background:transparent;border:1px solid rgba(60,120,255,.28);color:rgba(175,215,255,.45);cursor:pointer;
     font-family:-apple-system,system-ui,sans-serif;font-size:11px;
     padding:10px 18px;border-radius:8px;transition:all .2s;
   }
-  .df-set-cancel:hover{border-color:rgba(255,255,255,.2);color:#d4daf5}
+  .df-set-cancel:hover{border-color:rgba(255,255,255,.2);color:#e0eaff}
 
   /* ── Main layout ─────────────────────────────────────────────────────── */
   .df-main{display:flex;flex:1;min-height:0;overflow:hidden;position:relative}
@@ -433,7 +433,7 @@ const css = `
   /* ── Pipeline sidebar ────────────────────────────────────────────────── */
   .df-pipe{
     width:298px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;
-    padding:10px 10px;border-right:1px solid rgba(255,255,255,.06);
+    padding:10px 10px;border-right:1px solid rgba(60,120,255,.20);
     transition:width .3s cubic-bezier(.25,.8,.25,1);
     background:rgba(16,30,60,.65);backdrop-filter:blur(8px);
   }
@@ -441,25 +441,25 @@ const css = `
   .df-pipe::-webkit-scrollbar{width:2px}
   .df-pipe::-webkit-scrollbar-thumb{background:rgba(0,212,255,.15)}
   .df-pipe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;min-height:20px}
-  .df-pipe-hdr-lbl{font-size:12px;letter-spacing:.14em;color:rgba(120,160,220,.55);text-transform:uppercase;font-weight:600}
+  .df-pipe-hdr-lbl{font-size:12px;letter-spacing:.14em;color:rgba(120,190,255,.55);text-transform:uppercase;font-weight:600}
   .df-pipe-btn{
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);cursor:pointer;
+    background:rgba(60,120,255,.20);border:1px solid rgba(60,120,255,.28);color:rgba(175,215,255,.6);cursor:pointer;
     width:26px;height:26px;border-radius:6px;font-size:13px;line-height:1;
     display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
   }
-  .df-pipe-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#d4daf5}
+  .df-pipe-btn:hover{background:rgba(60,120,255,.28);border-color:rgba(255,255,255,.2);color:#e0eaff}
   .df-rail{
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0;border-radius:8px;
-    margin-bottom:3px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);transition:all .2s;
+    margin-bottom:3px;border:1px solid rgba(60,120,255,.18);background:rgba(60,120,255,.07);transition:all .2s;
   }
-  .df-rail:hover{background:rgba(255,255,255,.04)}
+  .df-rail:hover{background:rgba(60,120,255,.13)}
   .df-rail.active{border-color:var(--c);background:rgba(0,0,0,.35)}
   .df-rail.done{border-color:rgba(0,255,136,.18);background:rgba(0,255,136,.02)}
   .df-rail.gate{border-color:#ffaa00;background:rgba(255,170,0,.04)}
   .df-rail-num{font-size:12px;letter-spacing:.06em;opacity:.6;font-weight:600}
   .df-rail-dot{width:6px;height:6px;border-radius:50%}
   .df-card{
-    border:1px solid rgba(255,255,255,.07);
+    border:1px solid rgba(60,120,255,.22);
     border-left:3px solid color-mix(in srgb,var(--c,#00d4ff) 50%,transparent);
     border-radius:12px;padding:10px 12px;margin-bottom:4px;
     background:color-mix(in srgb,var(--c,#00d4ff) 4%,rgba(16,30,60,.45));
@@ -469,7 +469,7 @@ const css = `
   .df-card:hover{
     background:color-mix(in srgb,var(--c,#00d4ff) 8%,rgba(16,30,60,.5));
     border-left-color:color-mix(in srgb,var(--c,#00d4ff) 75%,transparent);
-    border-color:rgba(255,255,255,.12);
+    border-color:rgba(60,120,255,.30);
   }
   .df-card.active{
     border-color:var(--c);
@@ -494,7 +494,7 @@ const css = `
     pointer-events:none;
   }
   .df-crow{display:flex;align-items:center;gap:7px}
-  .df-cnum{font-size:11px;letter-spacing:.06em;color:var(--c,rgba(200,214,232,.6));opacity:.7;font-weight:700}
+  .df-cnum{font-size:11px;letter-spacing:.06em;color:var(--c,rgba(175,215,255,.6));opacity:.7;font-weight:700}
   .df-cicon{font-size:15px;transition:color .3s}
   .df-cicon.spin{animation:spin 1s linear infinite}
   .df-clbl{flex:1}
@@ -502,13 +502,13 @@ const css = `
   .df-csub{font-size:12px;letter-spacing:.06em;opacity:.65;font-weight:500}
   .df-cdot{width:7px;height:7px;border-radius:50%;transition:background .3s}
   .df-cdesc{font-size:10px;opacity:.65;margin-top:3px;line-height:1.4}
-  .df-cprog{height:2px;background:rgba(255,255,255,.06);margin-top:5px;border-radius:1px;overflow:hidden}
+  .df-cprog{height:2px;background:rgba(60,120,255,.20);margin-top:5px;border-radius:1px;overflow:hidden}
   .df-cfill{height:100%;border-radius:1px;transition:width .3s}
   .df-crev{font-size:9px;letter-spacing:.04em;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;font-weight:600}
   .df-crev.approved{background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.22)}
   .df-crev.changes {background:rgba(255,100,0,.1);color:#ff6400;border:1px solid rgba(255,100,0,.22)}
   .df-conn{display:flex;align-items:center;justify-content:center;height:7px}
-  .df-cline{width:1px;height:100%;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+  .df-cline{width:1px;height:100%;background:rgba(60,120,255,.24);position:relative;overflow:hidden}
   .df-cline.flow::after{content:'';position:absolute;top:0;left:0;width:100%;height:35%;
     background:var(--c,#00d4ff);animation:flowLine 1.2s ease-in-out infinite}
 
@@ -519,7 +519,7 @@ const css = `
     width:28px;height:28px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     border:1.5px solid rgba(255,255,255,.2);
-    background:rgba(255,255,255,.05);font-size:12px;
+    background:rgba(60,120,255,.18);font-size:12px;
     transition:all .35s;flex-shrink:0;position:relative;
   }
   .df-sn.active{
@@ -536,7 +536,7 @@ const css = `
   .df-sn-ping{position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--c,#00d4ff);pointer-events:none}
   .df-sn-line{
     width:2px;flex:1;min-height:8px;
-    background:linear-gradient(to bottom,rgba(255,255,255,.1),rgba(255,255,255,.04));
+    background:linear-gradient(to bottom,rgba(60,120,255,.28),rgba(60,120,255,.13));
     position:relative;overflow:hidden;
   }
   .df-sn-line.flow::after{
@@ -552,20 +552,20 @@ const css = `
   .df-sn-content{flex:1;min-width:0;padding-bottom:4px}
 
   /* ── Center panel ────────────────────────────────────────────────────── */
-  .df-center{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05)}
+  .df-center{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(60,120,255,.18)}
 
   /* Tabs */
   .df-tabs{
-    display:flex;border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex;border-bottom:1px solid rgba(60,120,255,.20);
     background:rgba(16,30,60,.72);flex-shrink:0;padding:0 8px;
   }
   .df-tab{
     padding:12px 20px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
     border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;
-    color:rgba(200,214,232,.62);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
+    color:rgba(175,215,255,.62);font-weight:500;font-family:-apple-system,system-ui,sans-serif;
   }
   .df-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
-  .df-tab:hover:not(.active){color:rgba(200,214,232,.85)}
+  .df-tab:hover:not(.active){color:rgba(175,215,255,.85)}
 
   /* Detail pane */
   .df-detail{flex:1;overflow-y:auto;padding:18px 22px}
@@ -598,7 +598,7 @@ const css = `
 
   /* Agents */
   .df-agents{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .df-agent{border-radius:10px;padding:11px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);transition:all .3s}
+  .df-agent{border-radius:10px;padding:11px;border:1px solid rgba(60,120,255,.22);background:rgba(60,120,255,.08);transition:all .3s}
   .df-agent.running{border-color:var(--ac)}
   .df-agent.passed {border-color:rgba(0,255,136,.22)}
   .df-agent.warned {border-color:rgba(255,149,0,.22)}
@@ -760,7 +760,7 @@ const css = `
     font-size:9px;letter-spacing:.1em;color:rgba(0,212,255,.45);text-transform:uppercase;
     padding:6px 9px;border-bottom:1px solid rgba(0,212,255,.08);text-align:left;font-weight:600;
   }
-  .obs-table td{padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+  .obs-table td{padding:7px 9px;border-bottom:1px solid rgba(60,120,255,.13);vertical-align:middle}
   .obs-table tr{animation:tokenIn .25s ease-out}
   .obs-table tr:hover td{background:rgba(0,212,255,.025)}
   .obs-model-chip{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;letter-spacing:.04em;font-weight:600}
@@ -771,7 +771,7 @@ const css = `
   .obs-tok-out{background:#00ff88;border-radius:0 3px 3px 0}
   .obs-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .obs-chart-box{
-    background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);
+    background:rgba(60,120,255,.09);border:1px solid rgba(60,120,255,.22);
     border-radius:10px;padding:14px;
   }
   .obs-chart-title{font-size:10px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;margin-bottom:12px;font-weight:600}
@@ -789,7 +789,7 @@ const css = `
   /* ── About Panel ─────────────────────────────────────────────────────── */
   .abt-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;height:100%}
   .abt-hero{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px;padding:18px 20px}
-  .abt-title{font-size:17px;font-weight:800;letter-spacing:.02em;color:rgba(200,214,232,.95);margin-bottom:3px}
+  .abt-title{font-size:17px;font-weight:800;letter-spacing:.02em;color:rgba(175,215,255,.95);margin-bottom:3px}
   .abt-tagline{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:10px;font-weight:600}
   .abt-desc{font-size:12px;line-height:1.75;opacity:.62;margin-bottom:14px}
   .abt-links{display:flex;gap:8px;flex-wrap:wrap}
@@ -798,17 +798,17 @@ const css = `
   .abt-link-demo{border-color:rgba(191,95,255,.25);color:rgba(191,95,255,.7)}
   .abt-link-demo:hover{background:rgba(191,95,255,.08);color:#bf7fff;border-color:rgba(191,95,255,.45)}
   .abt-stages{display:flex;align-items:stretch;gap:3px;flex-wrap:wrap}
-  .abt-stage{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:9px 10px;text-align:center;flex:1;min-width:72px;transition:border-color .2s}
+  .abt-stage{background:rgba(60,120,255,.09);border:1px solid rgba(60,120,255,.22);border-radius:8px;padding:9px 10px;text-align:center;flex:1;min-width:72px;transition:border-color .2s}
   .abt-stage:hover{border-color:rgba(0,212,255,.2)}
   .abt-stage-icon{font-size:15px;margin-bottom:3px}
   .abt-stage-num{font-size:8px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;font-weight:600;margin-bottom:2px}
-  .abt-stage-lbl{font-size:10px;font-weight:700;color:rgba(200,214,232,.85);margin-bottom:2px}
+  .abt-stage-lbl{font-size:10px;font-weight:700;color:rgba(175,215,255,.85);margin-bottom:2px}
   .abt-stage-sub{font-size:9px;opacity:.42;line-height:1.35}
   .abt-arrow{color:rgba(0,212,255,.3);font-size:13px;flex-shrink:0;align-self:center}
   .abt-gates{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
   .abt-gate-chip{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.22);color:rgba(255,170,0,.65)}
   .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .abt-stack-group{background:rgba(255,255,255,.018);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:10px 12px}
+  .abt-stack-group{background:rgba(255,255,255,.018);border:1px solid rgba(60,120,255,.20);border-radius:9px;padding:10px 12px}
   .abt-stack-cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
   .abt-stack-items{display:flex;flex-direction:column;gap:4px}
   .abt-chip{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;opacity:.78;line-height:1.5}
@@ -877,15 +877,15 @@ const css = `
   .df-idle-scard{
     display:flex;flex-direction:column;align-items:center;gap:5px;
     padding:14px 11px;border-radius:10px;
-    border:1px solid color-mix(in srgb,var(--c,rgba(255,255,255,.15)) 28%,rgba(255,255,255,.05));
-    background:color-mix(in srgb,var(--c,rgba(255,255,255,.04)) 6%,rgba(16,30,60,.3));
+    border:1px solid color-mix(in srgb,var(--c,rgba(255,255,255,.15)) 28%,rgba(60,120,255,.18));
+    background:color-mix(in srgb,var(--c,rgba(60,120,255,.13)) 6%,rgba(16,30,60,.3));
     min-width:94px;animation:stagePop .4s ease-out both;
     transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;cursor:default;
   }
   .df-idle-scard:hover{
-    transform:translateY(-5px);background:rgba(255,255,255,.08);
+    transform:translateY(-5px);background:rgba(60,120,255,.24);
     border-color:var(--c,rgba(255,255,255,.15));
-    box-shadow:0 8px 28px rgba(0,0,0,.4),0 0 0 1px var(--c,rgba(255,255,255,.1));
+    box-shadow:0 8px 28px rgba(0,0,0,.4),0 0 0 1px var(--c,rgba(60,120,255,.28));
   }
   .df-idle-scard-icon{font-size:28px;line-height:1}
   .df-idle-scard-num{font-size:11px;color:rgba(150,180,240,.4);letter-spacing:.06em;font-weight:700}
@@ -907,8 +907,8 @@ const css = `
   }
   .df-idle-feat{
     display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:10px;
-    background:color-mix(in srgb,var(--fi-color,rgba(255,255,255,.04)) 6%,rgba(16,30,60,.3));
-    border:1px solid color-mix(in srgb,var(--fi-color,rgba(255,255,255,.07)) 22%,rgba(255,255,255,.05));
+    background:color-mix(in srgb,var(--fi-color,rgba(60,120,255,.13)) 6%,rgba(16,30,60,.3));
+    border:1px solid color-mix(in srgb,var(--fi-color,rgba(60,120,255,.22)) 22%,rgba(60,120,255,.18));
     border-left:3px solid color-mix(in srgb,var(--fi-color,#00d4ff) 55%,transparent);
     flex:1;min-width:190px;max-width:225px;
   }
@@ -918,7 +918,7 @@ const css = `
   .df-idle-stack{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:640px}
   .df-idle-chip{
     font-size:12px;font-weight:600;letter-spacing:.04em;padding:5px 13px;border-radius:20px;
-    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+    background:rgba(60,120,255,.13);border:1px solid rgba(60,120,255,.26);
     color:rgba(150,180,240,.55);
   }
   .df-log-empty{opacity:.5;font-size:11px;text-align:center;margin-top:44px;color:rgba(0,200,255,.7);letter-spacing:.06em}
@@ -927,13 +927,13 @@ const css = `
   .df-foot{
     flex-shrink:0;height:30px;display:flex;align-items:center;justify-content:center;
     gap:8px;position:relative;overflow:hidden;
-    background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.04);
+    background:rgba(0,0,0,.2);border-top:1px solid rgba(60,120,255,.13);
   }
   .df-foot::before{
     content:'';position:absolute;inset:0;pointer-events:none;
     background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,rgba(255,255,255,.022) 23px,rgba(255,255,255,.022) 24px);
   }
-  .df-foot-brand{font-size:11px;font-weight:700;color:rgba(200,214,232,.35);letter-spacing:.01em;position:relative}
+  .df-foot-brand{font-size:11px;font-weight:700;color:rgba(175,215,255,.35);letter-spacing:.01em;position:relative}
   .df-foot-brand em{
     font-style:normal;
     background:linear-gradient(90deg,#00d4ff,#bf5fff);
@@ -941,8 +941,8 @@ const css = `
   }
   .df-foot-dots{display:flex;align-items:center;gap:4px;position:relative}
   .df-foot-dot{width:5px;height:5px;border-radius:50%;opacity:.5}
-  .df-foot-sep{font-size:10px;color:rgba(200,214,232,.18);position:relative}
-  .df-foot-tag{font-size:9px;color:rgba(200,214,232,.28);letter-spacing:.07em;text-transform:uppercase;position:relative}
+  .df-foot-sep{font-size:10px;color:rgba(175,215,255,.18);position:relative}
+  .df-foot-tag{font-size:9px;color:rgba(175,215,255,.28);letter-spacing:.07em;text-transform:uppercase;position:relative}
 
   /* ── Fullscreen code viewer ──────────────────────────────────────────── */
   .df-fsv{position:fixed;inset:0;z-index:3000;background:rgba(4,5,14,.97);display:flex;flex-direction:column;animation:fadeUp .15s ease-out}
@@ -962,7 +962,7 @@ const css = `
   .df-fsv-copy:hover{background:rgba(191,95,255,.2);border-color:#bf5fff}
   .df-fsv-copy.copied{color:#00ff88;border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.08)}
   .df-fsv-close{
-    background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(200,214,232,.6);
+    background:transparent;border:1px solid rgba(60,120,255,.28);color:rgba(175,215,255,.6);
     cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:8px;line-height:1;
     display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
   }
@@ -978,7 +978,7 @@ const css = `
   /* Tooltip */
   .recharts-tooltip-wrapper .recharts-default-tooltip{
     background:#0d1128!important;border-color:rgba(0,212,255,.18)!important;
-    font-family:-apple-system,system-ui,sans-serif!important;font-size:11px!important;color:#d4daf5!important;
+    font-family:-apple-system,system-ui,sans-serif!important;font-size:11px!important;color:#e0eaff!important;
     border-radius:8px!important;
   }
 
@@ -1557,9 +1557,9 @@ function ObsPanel({ llmCalls, theme }) {
           <div className="obs-chart-title">Latency Drift — per LLM call</div>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={latencyData} margin={{top:4,right:8,bottom:0,left:-20}}>
-              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
-              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
-              <YAxis tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} unit="ms" />
+              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(175,215,255,.07)","rgba(0,0,0,.07)")} />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(175,215,255,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
+              <YAxis tick={{fill:tc("rgba(175,215,255,.58)","rgba(20,30,80,.6)"),fontSize:10}} unit="ms" />
               <Tooltip content={<ChartTip/>} />
               <ReferenceLine y={avgLatency} stroke="rgba(255,149,0,.4)" strokeDasharray="3 3" label={{value:"avg",fill:"rgba(255,149,0,.7)",fontSize:10}} />
               <Line type="monotone" dataKey="latency" stroke="#00d4ff" strokeWidth={2} dot={{r:3,fill:"#00d4ff"}} name="Latency" unit="ms" />
@@ -1577,9 +1577,9 @@ function ObsPanel({ llmCalls, theme }) {
           <div className="obs-chart-title">Token Usage — by stage</div>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={stageRollup} margin={{top:4,right:8,bottom:0,left:-20}}>
-              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(200,214,232,.07)","rgba(0,0,0,.07)")} />
-              <XAxis dataKey="name" tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
-              <YAxis tick={{fill:tc("rgba(200,214,232,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
+              <CartesianGrid strokeDasharray="2 4" stroke={tc("rgba(175,215,255,.07)","rgba(0,0,0,.07)")} />
+              <XAxis dataKey="name" tick={{fill:tc("rgba(175,215,255,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
+              <YAxis tick={{fill:tc("rgba(175,215,255,.58)","rgba(20,30,80,.6)"),fontSize:10}} />
               <Tooltip content={<ChartTip/>} />
               <Bar dataKey="input"  fill="#00d4ff" name="Input tokens"  radius={[2,2,0,0]} maxBarSize={30}/>
               <Bar dataKey="output" fill="#00ff88" name="Output tokens" radius={[2,2,0,0]} maxBarSize={30}/>
@@ -1619,7 +1619,7 @@ function ObsPanel({ llmCalls, theme }) {
                     </span>
                   </td>
                   <td>
-                    <div style={{marginBottom:3,fontSize:9,color:tc("rgba(200,214,232,.6)","rgba(20,30,80,.6)")}}>{c.inputTok.toLocaleString()} / {c.outputTok.toLocaleString()}</div>
+                    <div style={{marginBottom:3,fontSize:9,color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.6)")}}>{c.inputTok.toLocaleString()} / {c.outputTok.toLocaleString()}</div>
                     <div className="obs-tok-bar">
                       <div className="obs-tok-in"  style={{width:`${inW}%`}}/>
                       <div className="obs-tok-out" style={{width:`${100-inW}%`}}/>
@@ -1650,10 +1650,10 @@ function ObsPanel({ llmCalls, theme }) {
             {lbl:"Total Calls",   val:llmCalls.length,           color:"#bf5fff", sub:"Across all stages"},
             {lbl:"Est. Total Cost",val:`$${totalCost.toFixed(4)}`,color:"#ff9500", sub:"Claude API usage"},
           ].map((m,i)=>(
-            <div key={i} style={{background:tc("rgba(0,0,0,.25)","rgba(0,0,0,.04)"),border:`1px solid ${tc("rgba(200,214,232,.08)","rgba(0,0,0,.09)")}`,borderRadius:4,padding:"10px 12px"}}>
+            <div key={i} style={{background:tc("rgba(0,0,0,.25)","rgba(0,0,0,.04)"),border:`1px solid ${tc("rgba(175,215,255,.08)","rgba(0,0,0,.09)")}`,borderRadius:4,padding:"10px 12px"}}>
               <div style={{fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:800,color:m.color,marginBottom:3}}>{m.val}</div>
-              <div style={{fontSize:9,color:tc("rgba(200,214,232,.65)","rgba(20,30,80,.65)"),marginBottom:2}}>{m.lbl}</div>
-              <div style={{fontSize:10,color:tc("rgba(200,214,232,.58)","rgba(20,30,80,.55)"),letterSpacing:1}}>{m.sub}</div>
+              <div style={{fontSize:9,color:tc("rgba(175,215,255,.65)","rgba(20,30,80,.65)"),marginBottom:2}}>{m.lbl}</div>
+              <div style={{fontSize:10,color:tc("rgba(175,215,255,.58)","rgba(20,30,80,.55)"),letterSpacing:1}}>{m.sub}</div>
             </div>
           ))}
         </div>
@@ -2792,7 +2792,7 @@ export default function DevForgeDashboard() {
         <div className="df-agents">{agentNames.map((name)=>{
           const running = p > 10;
           return(<div key={name} className={`df-agent ${running?"running":""}`} style={{"--ac":agentColors[name]}}>
-            <div className="df-agh"><div className="df-agd" style={{background:running?agentColors[name]:tc("rgba(200,214,232,.15)","rgba(20,30,80,.15)"),animation:running?"pulse .8s infinite":"none"}}/><div>
+            <div className="df-agh"><div className="df-agd" style={{background:running?agentColors[name]:tc("rgba(175,215,255,.15)","rgba(20,30,80,.15)"),animation:running?"pulse .8s infinite":"none"}}/><div>
               <div className="df-agname">{name.charAt(0).toUpperCase()+name.slice(1)} Agent</div>
               <div className="df-agst">{running?"REVIEWING CODE...":"WAITING"}</div>
             </div></div>
@@ -2826,12 +2826,12 @@ export default function DevForgeDashboard() {
               c.badge==="PASS" ? `${c.passed} / ${c.total} passed` :
               c.badge==="ERROR" ? `${c.errors} error${c.errors!==1?"s":""}` :
               `${c.passed} passed, ${c.failed+c.errors} failed`;
-            const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":tc("rgba(200,214,232,.35)","rgba(20,30,80,.4)");
-            const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":tc("rgba(200,214,232,.06)","rgba(20,30,80,.06)");
+            const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":tc("rgba(175,215,255,.35)","rgba(20,30,80,.4)");
+            const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":tc("rgba(175,215,255,.06)","rgba(20,30,80,.06)");
             return (
               <div key={key} className="df-qa-row">
                 <span className="df-qa-type">{label}</span>
-                <span className="df-qa-count" style={{color:tc("rgba(200,214,232,.6)","rgba(20,30,80,.55)"),fontSize:10}}>{count}</span>
+                <span className="df-qa-count" style={{color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.55)"),fontSize:10}}>{count}</span>
                 <span className="df-qa-badge" style={{background:badgeBg,color:badgeColor,minWidth:52,textAlign:"center",animation:badge==="RUNNING"?"pulse .8s infinite":"none"}}>
                   {badge}
                 </span>
@@ -2865,15 +2865,15 @@ export default function DevForgeDashboard() {
               <div style={{display:"flex",gap:10,marginTop:10,marginBottom:12}}>
                 <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"rgba(255,45,107,.08)",border:"1px solid rgba(255,45,107,.2)",textAlign:"center"}}>
                   <div style={{fontSize:20,fontWeight:800,color:"#ff2d6b"}}>{criticals}</div>
-                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Critical</div>
+                  <div style={{fontSize:9,color:"rgba(175,215,255,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Critical</div>
                 </div>
                 <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)",textAlign:"center"}}>
                   <div style={{fontSize:20,fontWeight:800,color:"#f59e0b"}}>{warnings}</div>
-                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Warnings</div>
+                  <div style={{fontSize:9,color:"rgba(175,215,255,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Warnings</div>
                 </div>
                 <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:`rgba(${criticals>0?"255,45,107":warnings>0?"245,158,11":"0,255,136"},.08)`,border:`1px solid rgba(${criticals>0?"255,45,107":warnings>0?"245,158,11":"0,255,136"},.2)`,textAlign:"center"}}>
                   <div style={{fontSize:20,fontWeight:800,color:scoreColor}}>{score}</div>
-                  <div style={{fontSize:9,color:"rgba(200,214,232,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Debt Score</div>
+                  <div style={{fontSize:9,color:"rgba(175,215,255,.5)",letterSpacing:2,textTransform:"uppercase",marginTop:2}}>Debt Score</div>
                 </div>
               </div>
               {Object.entries(byAgent).length === 0 && (
@@ -2888,15 +2888,15 @@ export default function DevForgeDashboard() {
                         <div style={{fontSize:11,fontWeight:700,color:tc("#c8d4f0","#1e3a5c"),flex:1}}>{f.title}</div>
                         <span style={{fontSize:9,fontWeight:700,color:severityColor(f.severity),letterSpacing:1,textTransform:"uppercase",flexShrink:0}}>{f.severity}</span>
                       </div>
-                      <div style={{fontSize:9,color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),marginTop:2}}>{f.standard}{f.file ? ` · ${f.file}` : ""}</div>
-                      <div style={{fontSize:10,color:tc("rgba(200,214,232,.65)","rgba(20,30,80,.7)"),marginTop:4,lineHeight:1.45}}>{f.description}</div>
+                      <div style={{fontSize:9,color:tc("rgba(175,215,255,.45)","rgba(20,30,80,.55)"),marginTop:2}}>{f.standard}{f.file ? ` · ${f.file}` : ""}</div>
+                      <div style={{fontSize:10,color:tc("rgba(175,215,255,.65)","rgba(20,30,80,.7)"),marginTop:4,lineHeight:1.45}}>{f.description}</div>
                       <div style={{fontSize:10,color:"#00d4ff",marginTop:4,lineHeight:1.4}}>↳ {f.recommendation}</div>
                     </div>
                   ))}
                 </div>
               ))}
               {(rpt?.debt_history||[]).length > 1 && (
-                <div style={{marginTop:12,padding:"8px 12px",borderRadius:6,background:tc("rgba(200,214,232,.04)","rgba(20,30,80,.06)"),border:"1px solid rgba(245,158,11,.12)"}}>
+                <div style={{marginTop:12,padding:"8px 12px",borderRadius:6,background:tc("rgba(175,215,255,.04)","rgba(20,30,80,.06)"),border:"1px solid rgba(245,158,11,.12)"}}>
                   <div style={{fontSize:9,color:"#f59e0b",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Compliance Debt History</div>
                   <div style={{display:"flex",gap:4,alignItems:"flex-end",height:32}}>
                     {rpt.debt_history.map((h,i)=>{
@@ -2907,13 +2907,13 @@ export default function DevForgeDashboard() {
                     })}
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
-                    <span style={{fontSize:8,color:tc("rgba(200,214,232,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[0]?.date}</span>
-                    <span style={{fontSize:8,color:tc("rgba(200,214,232,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[rpt.debt_history.length-1]?.date}</span>
+                    <span style={{fontSize:8,color:tc("rgba(175,215,255,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[0]?.date}</span>
+                    <span style={{fontSize:8,color:tc("rgba(175,215,255,.3)","rgba(20,30,80,.4)")}}>{rpt.debt_history[rpt.debt_history.length-1]?.date}</span>
                   </div>
                 </div>
               )}
               <div style={{marginTop:12,padding:"9px 12px",borderRadius:6,background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.2)"}}>
-                <div style={{fontSize:10,color:"rgba(200,214,232,.55)",marginBottom:6}}>This is an optional gate — you may proceed to deploy regardless of findings.</div>
+                <div style={{fontSize:10,color:"rgba(175,215,255,.55)",marginBottom:6}}>This is an optional gate — you may proceed to deploy regardless of findings.</div>
                 <div style={{display:"flex",gap:8}}>
                   <button onClick={()=>{ fetch(`/compliance/decision/${complianceTid}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"approved"})}).catch(()=>{}); addLog("✓ Compliance approved — proceeding to deploy","success"); resumeFn.current && resumeFn.current(); }} style={{flex:1,padding:"6px 10px",borderRadius:5,border:"1px solid rgba(0,255,136,.35)",background:"rgba(0,255,136,.08)",color:"#00ff88",fontSize:11,fontWeight:700,cursor:"pointer"}}>✓ Approve &amp; Deploy</button>
                   <button onClick={()=>{ fetch(`/compliance/decision/${complianceTid}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deployed_anyway"})}).catch(()=>{}); addLog("⚠ Deployed with open compliance findings","warn"); resumeFn.current && resumeFn.current(); }} style={{flex:1,padding:"6px 10px",borderRadius:5,border:"1px solid rgba(245,158,11,.35)",background:"rgba(245,158,11,.08)",color:"#f59e0b",fontSize:11,fontWeight:700,cursor:"pointer"}}>⚡ Deploy Anyway</button>
@@ -2943,7 +2943,7 @@ export default function DevForgeDashboard() {
               <div key={s.key} className={`df-env ${s.done?"live":""}`}>
                 <span className="df-env-name" style={{fontSize:10,minWidth:140}}>{s.label}</span>
                 <div className="df-env-bar"><div className="df-env-fill" style={{width:s.done?"100%":curStep===s.key?"55%":"0%"}}/></div>
-                <span className="df-env-st" style={{color:s.done?"#00ff88":curStep===s.key?"#ffaa00":tc("rgba(200,214,232,.35)","rgba(20,30,80,.35)")}}>{s.done?"✓ DONE":curStep===s.key?"IN PROGRESS":"WAITING"}</span>
+                <span className="df-env-st" style={{color:s.done?"#00ff88":curStep===s.key?"#ffaa00":tc("rgba(175,215,255,.35)","rgba(20,30,80,.35)")}}>{s.done?"✓ DONE":curStep===s.key?"IN PROGRESS":"WAITING"}</span>
               </div>
             ))}
           </div>
@@ -3217,8 +3217,8 @@ export default function DevForgeDashboard() {
             if(pipeCollapsed) return (
               <div key={stage.id} className={`df-rail ${isActive?"active":""} ${isDone&&!isGate?"done":""} ${isGate?"gate":""}`} style={{"--c":isGate?"#ffaa00":stage.color,cursor:clickable?"pointer":"default"}} title={`${stage.num} · ${stage.label} — ${stage.desc}`} onClick={goDetail}>
                 <span className="df-rail-num">{stage.num}</span>
-                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(200,214,232,.25)","var(--c,#5566dd)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
-                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","var(--c)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+                <span className={`df-cicon ${isActive?"spin":""}`} style={{fontSize:16,color:isActive||isDone||isGate?(isGate?"#ffaa00":stage.color):tc("rgba(175,215,255,.25)","var(--c,#5566dd)")}}>{isDone&&!isGate?"✓":isGate?"⏸":stage.icon}</span>
+                <span className="df-rail-dot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(175,215,255,.12)","var(--c)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
               </div>
             );
             return (
@@ -3228,7 +3228,7 @@ export default function DevForgeDashboard() {
                     style={{"--c":isGate?"#ffaa00":stage.color,"--glow":isGate?"rgba(255,170,0,.4)":stage.glow}}>
                     {isActive&&<span className="df-sn-ping"/>}
                     <span className={isActive?"spin":""} style={{display:"inline-block",fontSize:11,transition:"color .3s",
-                      color:isActive?(isGate?"#ffaa00":stage.color):isDone?"#00ff88":isGate?"#ffaa00":tc("rgba(200,214,232,.3)","var(--c,#5566dd)")}}>
+                      color:isActive?(isGate?"#ffaa00":stage.color):isDone?"#00ff88":isGate?"#ffaa00":tc("rgba(175,215,255,.3)","var(--c,#5566dd)")}}>
                       {isDone&&!isGate?"✓":isGate?"⏸":stage.icon}
                     </span>
                   </div>
@@ -3247,7 +3247,7 @@ export default function DevForgeDashboard() {
                         <div className="df-cname" style={{color:isActive?stage.color:isDone?tc("#fff","#0d1526"):isGate?"#ffcc55":tc("rgba(255,255,255,.42)","rgba(13,21,38,.62)")}}>{stage.label}</div>
                         <div className="df-csub">{stage.sub}</div>
                       </div>
-                      <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(200,214,232,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
+                      <div className="df-cdot" style={{background:isDone?"#00ff88":isActive?stage.color:isGate?"#ffaa00":tc("rgba(175,215,255,.12)","rgba(20,30,80,.12)"),animation:isActive||isGate?"pulse 1s infinite":"none"}}/>
                     </div>
                     {(isActive||isDone||isGate)&&<div className="df-cdesc">{isGate?"Awaiting your approval":stage.desc}</div>}
                     {(isActive||isDone)&&<div className="df-cprog"><div className="df-cfill" style={{width:`${isDone?100:p}%`,background:isGate?"#ffaa00":stage.color}}/></div>}
@@ -3280,11 +3280,11 @@ export default function DevForgeDashboard() {
             </div>
             <div className={`df-tab ${tab==="about"?"active":""}`} onClick={()=>setTab("about")}>About</div>
             <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
-              style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(255,255,255,.1)":"rgba(0,0,0,.12)",
-                color:theme==="dark"?"rgba(200,214,232,.5)":"rgba(20,30,80,.5)",
+              style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(60,120,255,.28)":"rgba(0,0,0,.12)",
+                color:theme==="dark"?"rgba(175,215,255,.5)":"rgba(20,30,80,.5)",
                 cursor:"pointer",width:30,height:30,borderRadius:7,fontSize:15,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",flexShrink:0,marginRight:6}}
             >{theme==="dark"?"☀":"🌙"}</button>
-            <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(200,214,232,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
+            <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(175,215,255,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
             {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
@@ -3295,7 +3295,7 @@ export default function DevForgeDashboard() {
         <div className={`df-log ${logView==="wide"?"wide":""} ${logView==="collapsed"?"collapsed":""}`}>
           <div className="df-log-hdr" style={logView==="collapsed"?undefined:{justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:7}}>
-              <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("rgba(200,214,232,.25)","rgba(20,30,80,.2)"),animation:appState==="running"?"pulse 1s infinite":"none"}}/>
+              <div className="df-log-dot" style={{background:appState==="running"?"#00ff88":appState==="gate"||appState==="prod_gate"?"#ffaa00":tc("rgba(175,215,255,.25)","rgba(20,30,80,.2)"),animation:appState==="running"?"pulse 1s infinite":"none"}}/>
               {logView!=="collapsed"&&<span>Live Stream</span>}
             </div>
             <div style={{display:"flex",gap:5}}>
@@ -3576,11 +3576,11 @@ export default function DevForgeDashboard() {
                 </div>
                 <div className="df-set-section">
                   <div className="df-set-sec-title">What's Available</div>
-                  <div style={{fontSize:10,color:tc("rgba(200,214,232,.45)","rgba(20,30,80,.55)"),lineHeight:1.8}}>
+                  <div style={{fontSize:10,color:tc("rgba(175,215,255,.45)","rgba(20,30,80,.55)"),lineHeight:1.8}}>
                     {!settingsData?.anthropic_api_key_set&&<div style={{color:"#ff6644"}}>⚠ No Anthropic API key — pipeline will not run</div>}
                     {!settingsData?.github_token_set&&<div style={{color:"#ffaa00"}}>⚠ No GitHub token — Stage 6 deploy disabled</div>}
                     {!settingsData?.linear_api_key_set&&<div style={{color:"#ffaa00"}}>⚠ No Linear key — task tracking disabled</div>}
-                    {!settingsData?.slack_bot_token_set&&<div style={{color:tc("rgba(200,214,232,.4)","rgba(20,30,80,.45)")}}>ℹ No Slack token — notifications disabled</div>}
+                    {!settingsData?.slack_bot_token_set&&<div style={{color:tc("rgba(175,215,255,.4)","rgba(20,30,80,.45)")}}>ℹ No Slack token — notifications disabled</div>}
                     {settingsData?.anthropic_api_key_set&&settingsData?.github_token_set&&settingsData?.linear_api_key_set&&(
                       <div style={{color:"#00ff88"}}>✓ All core integrations configured — pipeline ready</div>
                     )}
