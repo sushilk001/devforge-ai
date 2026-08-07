@@ -2614,7 +2614,7 @@ export default function DevForgeDashboard() {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
-    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setShowFB(false); setFb(""); setProdCfm("");
     setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setComplianceTid(null); setRealCompliance(null); setRealDeploy(null); setExpandedFile(null);
     setGithubUrl(""); setAttachments([]);
     addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
@@ -2674,7 +2674,7 @@ export default function DevForgeDashboard() {
     clearAll(); reset();
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
-    setShowFB(false); setFb(""); setProdCfm(""); setEnvProg({});
+    setShowFB(false); setFb(""); setProdCfm("");
     setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setQaTid(null); setExpandedFile(null);
     setApiReady({ requirements:true, tasks:true, code_gen:true, pr_review:true, qa:true });
     setLlmCalls([]);
