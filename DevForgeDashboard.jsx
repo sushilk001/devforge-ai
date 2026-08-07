@@ -1875,6 +1875,180 @@ function AboutPanel({ theme }) {
   );
 }
 
+// ── Login Modal ────────────────────────────────────────────────────────────
+const GOOGLE_SVG = (
+  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true" style={{flexShrink:0}}>
+    <path d="M17.64 9.2a10.34 10.34 0 0 0-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+    <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+  </svg>
+);
+const GITHUB_SVG = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{flexShrink:0}}>
+    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+  </svg>
+);
+
+function LoginModal({ onClose, onLogin, theme }) {
+  const tc = (dark, light) => theme === "dark" ? dark : light;
+  const [mode, setMode]         = useState("signin"); // "signin" | "signup"
+  const [email, setEmail]       = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName]         = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState("");
+
+  const cardBg     = tc("rgba(18,22,32,0.96)", "rgba(255,250,244,0.97)");
+  const inputBg    = tc("rgba(255,255,255,0.06)", "rgba(255,255,255,0.8)");
+  const inputBord  = tc("rgba(255,255,255,0.12)", "rgba(0,0,0,0.15)");
+  const textClr    = tc("#e8eaf0", "#1A1916");
+  const subClr     = tc("rgba(200,210,230,0.65)", "#5C5650");
+  const oauthBg    = tc("rgba(255,255,255,0.08)", "#fff");
+  const oauthBord  = tc("rgba(255,255,255,0.14)", "rgba(0,0,0,0.18)");
+  const oauthClr   = tc("#d8e2f0", "#1A1916");
+  const ghBg       = tc("rgba(36,41,56,0.85)", "#24292f");
+  const ghClr      = "#fff";
+  const accentClr  = "#D4662E";
+  const labelClr   = tc("rgba(180,195,220,.75)", "#3D3730");
+
+  const fieldStyle = {
+    width:"100%", padding:"10px 12px", borderRadius:8, border:`1px solid ${inputBord}`,
+    background:inputBg, color:textClr, fontSize:13, outline:"none",
+    boxSizing:"border-box", transition:"border .15s",
+    fontFamily:"Inter,sans-serif",
+  };
+
+  async function submit(e) {
+    e.preventDefault();
+    setError(""); setLoading(true);
+    try {
+      const ep = mode === "signin" ? "/auth/login" : "/auth/signup";
+      const body = mode === "signin"
+        ? { email, password }
+        : { email, password, name };
+      const res = await fetch(ep, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.detail || "Something went wrong"); setLoading(false); return; }
+      onLogin(data.user);
+      onClose();
+    } catch {
+      setError("Network error — please try again");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div onClick={onClose} style={{
+      position:"fixed", inset:0, zIndex:9999,
+      background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)",
+      display:"flex", alignItems:"center", justifyContent:"center", padding:16,
+    }}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        width:"100%", maxWidth:380, borderRadius:16,
+        background:cardBg, backdropFilter:"blur(20px)",
+        border:`1px solid ${tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}`,
+        boxShadow:`0 24px 64px rgba(0,0,0,${tc("0.6","0.18")})`,
+        padding:"28px 28px 24px", position:"relative",
+        fontFamily:"Inter,sans-serif",
+      }}>
+        {/* Close */}
+        <button onClick={onClose} style={{
+          position:"absolute", top:14, right:14, background:"none", border:"none",
+          color:subClr, cursor:"pointer", fontSize:18, lineHeight:1, padding:4,
+        }}>✕</button>
+
+        {/* Title */}
+        <h2 style={{margin:"0 0 6px", fontSize:20, fontWeight:700, color:textClr, letterSpacing:"-.3px"}}>
+          {mode==="signin" ? "Welcome back" : "Create account"}
+        </h2>
+        <p style={{margin:"0 0 20px", fontSize:13, color:subClr}}>
+          {mode==="signin" ? "Sign in to DevForge AI" : "Get started for free"}
+        </p>
+
+        {/* OAuth buttons */}
+        <a href="/auth/github/login" style={{
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          width:"100%", padding:"10px 0", borderRadius:9, marginBottom:8,
+          background:ghBg, color:ghClr, border:"none",
+          fontSize:13, fontWeight:600, textDecoration:"none", cursor:"pointer",
+          transition:"opacity .15s", boxSizing:"border-box",
+        }}>
+          {GITHUB_SVG} Continue with GitHub
+        </a>
+        <a href="/auth/google/login" style={{
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          width:"100%", padding:"10px 0", borderRadius:9, marginBottom:18,
+          background:oauthBg, color:oauthClr,
+          border:`1px solid ${oauthBord}`,
+          fontSize:13, fontWeight:600, textDecoration:"none", cursor:"pointer",
+          transition:"opacity .15s", boxSizing:"border-box",
+        }}>
+          {GOOGLE_SVG} Continue with Google
+        </a>
+
+        {/* Divider */}
+        <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:18}}>
+          <div style={{flex:1, height:1, background:tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}}/>
+          <span style={{fontSize:11, color:subClr, whiteSpace:"nowrap"}}>or</span>
+          <div style={{flex:1, height:1, background:tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}}/>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={submit} style={{display:"flex", flexDirection:"column", gap:10}}>
+          {mode==="signup" && (
+            <div>
+              <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Name</label>
+              <input type="text" value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"
+                style={fieldStyle} autoComplete="name"/>
+            </div>
+          )}
+          <div>
+            <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Email</label>
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"
+              required style={fieldStyle} autoComplete="email"/>
+          </div>
+          <div>
+            <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Password</label>
+            <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
+              placeholder={mode==="signup" ? "At least 6 characters" : "Password"}
+              required style={fieldStyle} autoComplete={mode==="signin"?"current-password":"new-password"}/>
+          </div>
+
+          {error && (
+            <div style={{padding:"8px 12px", borderRadius:7, background:"rgba(255,45,107,0.12)",
+              border:"1px solid rgba(255,45,107,0.25)", color:"#ff6b8a", fontSize:12}}>
+              {error}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} style={{
+            marginTop:4, padding:"11px 0", borderRadius:9, border:"none",
+            background: loading ? tc("rgba(212,102,46,.5)","rgba(212,102,46,.5)") : accentClr,
+            color:"#fff", fontSize:13, fontWeight:700, cursor: loading ? "not-allowed" : "pointer",
+            transition:"background .15s", letterSpacing:"-.1px",
+          }}>
+            {loading ? "Please wait…" : mode==="signin" ? "Sign in" : "Create account"}
+          </button>
+        </form>
+
+        {/* Mode toggle */}
+        <p style={{marginTop:18, textAlign:"center", fontSize:12, color:subClr}}>
+          {mode==="signin" ? "Don't have an account? " : "Already have an account? "}
+          <button onClick={()=>{setMode(m=>m==="signin"?"signup":"signin");setError("");}}
+            style={{background:"none", border:"none", color:accentClr, fontSize:12,
+              fontWeight:600, cursor:"pointer", padding:0}}>
+            {mode==="signin" ? "Sign up" : "Sign in"}
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function DevForgeDashboard() {
   const [input, setInput]           = useState("Users cannot reset passwords without calling support. We get 200+ tickets/week. Need self-service forgot-password via email for enterprise users. Success = 80% ticket drop in 60 days. JWT auth, no SSO/SAML users. Reset link via SES, token expires 24h, max 3 requests/hour. Enforce password complexity (min 8 chars, 1 uppercase, 1 number). Admin audit log. Branded email. Fallback = contact support if no email access.");
@@ -1931,8 +2105,9 @@ export default function DevForgeDashboard() {
   const [customModelInput, setCustomModelInput]   = useState("");
   const [customModelName, setCustomModelName]     = useState("");
   const [customModelAdding, setCustomModelAdding] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem("df-theme") || "dark");
-  const [user,  setUser]  = useState(null);
+  const [theme, setTheme]           = useState(() => localStorage.getItem("df-theme") || "dark");
+  const [user,  setUser]            = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   useEffect(() => { localStorage.setItem("df-theme", theme); }, [theme]);
   useEffect(() => {
     fetch("/auth/me").then(r=>r.ok?r.json():null).then(d=>{ if(d?.user) setUser(d.user); }).catch(()=>{});
@@ -3304,7 +3479,7 @@ export default function DevForgeDashboard() {
             ))}
           </div>
           <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
-          {/* Gmail SSO */}
+          {/* Auth */}
           {user ? (
             <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4}}>
               <img src={user.picture} alt={user.name} referrerPolicy="no-referrer"
@@ -3314,22 +3489,16 @@ export default function DevForgeDashboard() {
                 className="df-settings-btn" style={{fontSize:10,padding:"3px 8px",borderRadius:5}}>Sign out</button>
             </div>
           ) : (
-            <a href="/auth/google/login"
+            <button onClick={()=>setShowLoginModal(true)}
               style={{display:"flex",alignItems:"center",gap:7,padding:"5px 12px",borderRadius:7,
                 border:`1px solid ${tc("rgba(175,215,255,.22)","rgba(0,0,0,.12)")}`,
                 background:tc("rgba(255,255,255,.06)","rgba(255,255,255,.72)"),
                 color:tc("rgba(175,215,255,.8)","#3D3730"),fontSize:11,fontWeight:600,
-                textDecoration:"none",cursor:"pointer",flexShrink:0,
-                backdropFilter:"blur(8px)",transition:"all .2s",marginLeft:4}}>
-              <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                <path d="M17.64 9.2a10.34 10.34 0 0 0-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
-              </svg>
+                cursor:"pointer",flexShrink:0,backdropFilter:"blur(8px)",transition:"all .2s",marginLeft:4}}>
               Sign in
-            </a>
+            </button>
           )}
+          {showLoginModal && <LoginModal theme={theme} onClose={()=>setShowLoginModal(false)} onLogin={u=>{setUser(u);setShowLoginModal(false);}}/>}
         </div>
       </div>
 
