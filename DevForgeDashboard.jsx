@@ -1705,93 +1705,140 @@ const PLANS = [
   },
 ];
 
-function PricingPanel({ theme }) {
-  const dk = theme === "dark";
-  const bg   = dk ? "rgba(16,30,60,.7)"       : "rgba(255,248,238,.92)";
-  const card = dk ? "rgba(16,26,54,.80)"       : "rgba(255,252,244,.95)";
-  const bdr  = dk ? "rgba(60,130,255,.18)"     : "rgba(212,102,46,.18)";
-  const bdrH = dk ? "rgba(0,212,255,.45)"      : "rgba(212,102,46,.45)";
-  const acc  = dk ? "#00d4ff"                  : "#D4662E";
-  const txt  = dk ? "#e0eaff"                  : "#1A1916";
-  const sub  = dk ? "rgba(175,215,255,.55)"    : "#6B6258";
-  const chk  = dk ? "rgba(0,255,136,.8)"       : "#16a34a";
-  const launchBg = dk
-    ? "linear-gradient(135deg,#0055c8,#7c3aed)"
-    : "linear-gradient(135deg,#D4662E,#9A4520)";
+function PricingPanel({ theme, user, onSignIn }) {
+  const dk   = theme === "dark";
+  const bg   = dk ? "rgba(12,20,48,.0)"        : "rgba(0,0,0,0)";
+  const card = dk ? "rgba(16,26,54,.88)"        : "#fff";
+  const bdr  = dk ? "rgba(60,130,255,.2)"       : "rgba(0,0,0,.1)";
+  const gold = dk ? "#f5c842"                   : "#C8902A";
+  const txt  = dk ? "#e0eaff"                   : "#1B2458";
+  const sub  = dk ? "rgba(175,215,255,.55)"     : "#6B6258";
+  const chk  = dk ? "#00ff88"                   : "#16a34a";
+  const popBdr = dk ? "#00d4ff"                 : "#C8902A";
+
+  const ctaBg   = `linear-gradient(135deg,${gold},${dk?"#d4a017":"#E8A832"})`;
+  const ctaClr  = "#fff";
+
+  function handleCta(plan) {
+    if (plan.ctaHref && plan.ctaHref.startsWith("mailto:")) {
+      window.location.href = plan.ctaHref;
+      return;
+    }
+    if (!user && onSignIn) { onSignIn(); return; }
+    // signed-in: future checkout flow
+  }
+
+  const TRUST = [
+    { icon:"🔒", title:"Secure & Encrypted",   sub:"Enterprise-grade TLS, no data stored" },
+    { icon:"⚡", title:"Instant Access",        sub:"Pipeline ready the moment you sign up" },
+    { icon:"✅", title:"Reliable & Trusted",    sub:"99.9% uptime SLA, used by engineering teams" },
+  ];
 
   return (
-    <div style={{padding:"28px 24px",background:bg,minHeight:"100%",overflowY:"auto"}}>
+    <div style={{padding:"32px 24px 28px",minHeight:"100%",overflowY:"auto",background:bg}}>
       {/* Header */}
-      <div style={{textAlign:"center",marginBottom:28}}>
-        <div style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:acc,fontWeight:700,marginBottom:8}}>Pricing</div>
-        <div style={{fontSize:22,fontWeight:800,color:txt,letterSpacing:"-.4px",lineHeight:1.2}}>
-          Automate your entire SDLC
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{fontSize:26,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1.15}}>
+          Choose Your Plan
         </div>
-        <div style={{fontSize:13,color:sub,marginTop:6,maxWidth:380,margin:"8px auto 0"}}>
-          From feature request to deployed PR — powered by 7 autonomous AI agents.
+        <div style={{fontSize:13,color:sub,marginTop:8}}>
+          From feature request to deployed PR — 7 autonomous AI agents, zero handoffs.
         </div>
       </div>
 
       {/* Cards */}
       <div style={{display:"flex",gap:14,alignItems:"stretch",flexWrap:"wrap"}}>
-        {PLANS.map(plan => (
-          <div key={plan.key} style={{
-            flex:"1 1 180px",minWidth:180,
-            background: plan.highlight ? "transparent" : card,
-            backgroundImage: plan.highlight ? launchBg : "none",
-            border:`1.5px solid ${plan.highlight ? "transparent" : bdr}`,
-            borderRadius:12,padding:"20px 18px",
-            boxShadow: plan.highlight
-              ? dk ? "0 0 32px rgba(0,212,255,.18),0 8px 32px rgba(0,0,0,.4)" : "0 0 32px rgba(212,102,46,.22),0 8px 24px rgba(0,0,0,.12)"
-              : "0 2px 16px rgba(0,0,0,.1)",
-            position:"relative",transition:"box-shadow .2s",
-          }}>
-            {/* Badge */}
-            {plan.badge && (
-              <div style={{
-                position:"absolute",top:-11,left:"50%",transform:"translateX(-50%)",
-                background: dk ? "#00d4ff" : "#D4662E",
-                color:"#fff",fontSize:9,fontWeight:800,letterSpacing:1.5,
-                padding:"3px 10px",borderRadius:20,textTransform:"uppercase",whiteSpace:"nowrap",
-              }}>{plan.badge}</div>
-            )}
+        {PLANS.map(plan => {
+          const pop = plan.highlight;
+          return (
+            <div key={plan.key} style={{
+              flex:"1 1 180px",minWidth:180,
+              background: card,
+              border: pop ? `2px solid ${popBdr}` : `1.5px solid ${bdr}`,
+              borderRadius:16,padding:"24px 18px 20px",
+              boxShadow: pop
+                ? dk ? `0 0 0 1px ${popBdr}33, 0 8px 32px rgba(0,212,255,.18), 0 2px 8px rgba(0,0,0,.4)`
+                      : `0 0 0 1px ${popBdr}44, 0 8px 28px rgba(200,144,42,.22), 0 2px 8px rgba(0,0,0,.1)`
+                : dk ? "0 2px 16px rgba(0,0,0,.3)" : "0 2px 14px rgba(0,0,0,.07)",
+              position:"relative",transition:"box-shadow .2s, transform .2s",
+            }}>
+              {/* Popular badge */}
+              {plan.badge && (
+                <div style={{
+                  position:"absolute",top:-13,left:"50%",transform:"translateX(-50%)",
+                  background:ctaBg,
+                  color:"#fff",fontSize:9,fontWeight:800,letterSpacing:2,
+                  padding:"4px 14px",borderRadius:20,textTransform:"uppercase",
+                  whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(200,144,42,.45)",
+                }}>{plan.badge}</div>
+              )}
 
-            <div style={{fontSize:11,fontWeight:700,color: plan.highlight ? "rgba(255,255,255,.7)" : sub,letterSpacing:1,textTransform:"uppercase",marginBottom:6}}>{plan.name}</div>
-            <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:4}}>
-              <span style={{fontSize:28,fontWeight:800,color: plan.highlight ? "#fff" : txt,letterSpacing:"-.5px"}}>{plan.price}</span>
-              <span style={{fontSize:11,color: plan.highlight ? "rgba(255,255,255,.6)" : sub}}>{plan.period}</span>
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",
+                color: pop ? gold : sub, marginBottom:8}}>{plan.name}</div>
+
+              <div style={{display:"flex",alignItems:"baseline",gap:3,marginBottom:2}}>
+                <span style={{fontSize:32,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1}}>{plan.price}</span>
+              </div>
+              <div style={{fontSize:11,color:sub,marginBottom:4,fontWeight:500}}>{plan.period}</div>
+              <div style={{fontSize:12,color:sub,marginBottom:18,lineHeight:1.5}}>{plan.desc}</div>
+
+              {/* CTA */}
+              <button onClick={()=>handleCta(plan)} style={{
+                display:"block",width:"100%",textAlign:"center",
+                padding:"10px 0",borderRadius:10,border:"none",
+                background: ctaBg,
+                color:ctaClr,fontSize:13,fontWeight:700,cursor:"pointer",
+                marginBottom:18,transition:"opacity .15s",letterSpacing:".2px",
+                boxShadow:"0 3px 12px rgba(200,144,42,.35)",
+              }}>
+                {!user && plan.key !== "enterprise" ? "Sign in to Get Started" : plan.cta}
+              </button>
+
+              {/* Features */}
+              <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                {plan.features.map((f,i) => (
+                  <div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}>
+                    <span style={{color:chk,fontSize:11,flexShrink:0,marginTop:2}}>✓</span>
+                    <span style={{fontSize:12,color:txt,lineHeight:1.4}}>{f}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div style={{fontSize:12,color: plan.highlight ? "rgba(255,255,255,.72)" : sub,marginBottom:16,lineHeight:1.5}}>{plan.desc}</div>
+          );
+        })}
+      </div>
 
-            {/* CTA */}
-            <a href={plan.ctaHref} style={{
-              display:"block",textAlign:"center",padding:"8px 0",borderRadius:8,
-              background: plan.highlight
-                ? "rgba(255,255,255,.18)"
-                : dk ? "rgba(0,212,255,.10)" : "rgba(212,102,46,.12)",
-              border: plan.highlight
-                ? "1px solid rgba(255,255,255,.28)"
-                : `1px solid ${bdrH}`,
-              color: plan.highlight ? "#fff" : acc,
-              fontSize:12,fontWeight:700,textDecoration:"none",
-              marginBottom:16,transition:"all .2s",
-            }}>{plan.cta}</a>
-
-            {/* Features */}
-            <div style={{display:"flex",flexDirection:"column",gap:7}}>
-              {plan.features.map((f,i) => (
-                <div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}>
-                  <span style={{color:chk,fontSize:12,flexShrink:0,marginTop:1}}>✓</span>
-                  <span style={{fontSize:12,color: plan.highlight ? "rgba(255,255,255,.82)" : txt,lineHeight:1.4}}>{f}</span>
-                </div>
-              ))}
+      {/* Trust badges */}
+      <div style={{
+        display:"flex",gap:0,marginTop:24,flexWrap:"wrap",
+        background:card,borderRadius:14,
+        border:`1px solid ${bdr}`,
+        boxShadow: dk ? "0 2px 16px rgba(0,0,0,.25)" : "0 2px 12px rgba(0,0,0,.06)",
+        overflow:"hidden",
+      }}>
+        {TRUST.map((t,i) => (
+          <div key={i} style={{
+            flex:"1 1 180px",
+            display:"flex",alignItems:"center",gap:12,
+            padding:"16px 20px",
+            borderRight: i < TRUST.length-1 ? `1px solid ${bdr}` : "none",
+          }}>
+            <div style={{
+              width:38,height:38,borderRadius:"50%",flexShrink:0,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              background: dk ? "rgba(255,255,255,.06)" : "rgba(200,144,42,.08)",
+              border:`1px solid ${dk?"rgba(255,255,255,.1)":popBdr+"33"}`,
+              fontSize:17,
+            }}>{t.icon}</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:txt,marginBottom:2}}>{t.title}</div>
+              <div style={{fontSize:11,color:sub}}>{t.sub}</div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Footer note */}
-      <div style={{textAlign:"center",marginTop:22,fontSize:11,color:sub}}>
+      <div style={{textAlign:"center",marginTop:18,fontSize:11,color:sub}}>
         All plans include demo mode · No setup fees · Cancel anytime
       </div>
     </div>
@@ -3659,7 +3706,7 @@ export default function DevForgeDashboard() {
             <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(175,215,255,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
-            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : tab==="pricing" ? <PricingPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
+            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : tab==="pricing" ? <PricingPanel theme={theme} user={user} onSignIn={()=>setShowLoginModal(true)}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
           </div>
         </div>
 
