@@ -1761,6 +1761,7 @@ function PricingPanel({ theme, user, onSignIn }) {
                       : `0 0 0 1px ${popBdr}44, 0 8px 28px rgba(200,144,42,.22), 0 2px 8px rgba(0,0,0,.1)`
                 : dk ? "0 2px 16px rgba(0,0,0,.3)" : "0 2px 14px rgba(0,0,0,.07)",
               position:"relative",transition:"box-shadow .2s, transform .2s",
+              display:"flex",flexDirection:"column",
             }}>
               {/* Popular badge */}
               {plan.badge && (
@@ -1773,14 +1774,17 @@ function PricingPanel({ theme, user, onSignIn }) {
                 }}>{plan.badge}</div>
               )}
 
-              <div style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",
-                color: pop ? gold : sub, marginBottom:8}}>{plan.name}</div>
+              {/* Top info — fixed min-height so CTA aligns across all cards */}
+              <div style={{minHeight:148}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",
+                  color: pop ? gold : sub, marginBottom:8}}>{plan.name}</div>
 
-              <div style={{display:"flex",alignItems:"baseline",gap:3,marginBottom:2}}>
-                <span style={{fontSize:32,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1}}>{plan.price}</span>
+                <div style={{display:"flex",alignItems:"baseline",gap:3,marginBottom:2}}>
+                  <span style={{fontSize:32,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1}}>{plan.price}</span>
+                </div>
+                <div style={{fontSize:11,color:sub,marginBottom:6,fontWeight:500}}>{plan.period}</div>
+                <div style={{fontSize:12,color:sub,lineHeight:1.5}}>{plan.desc}</div>
               </div>
-              <div style={{fontSize:11,color:sub,marginBottom:4,fontWeight:500}}>{plan.period}</div>
-              <div style={{fontSize:12,color:sub,marginBottom:18,lineHeight:1.5}}>{plan.desc}</div>
 
               {/* CTA */}
               <button onClick={()=>handleCta(plan)} style={{
