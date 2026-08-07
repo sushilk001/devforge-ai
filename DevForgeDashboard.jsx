@@ -3405,10 +3405,11 @@ export default function DevForgeDashboard() {
               <div style={{fontSize:9,opacity:.5,marginTop:4}}>{realDeploy.branch} · {realDeploy.files_pushed} files pushed{realDeploy.linear_issues_closed>0?` · ${realDeploy.linear_issues_closed} issues closed`:""}</div>
             </div>
           )}
-          {(realDeploy?.linear_issues_closed > 0 || (realTasks||[]).some(t=>t.linear_issue_url)) && (() => {
-            const linearUrl = (realTasks||[]).find(t=>t.linear_issue_url)?.linear_issue_url;
-            const workspaceUrl = linearUrl ? linearUrl.replace(/\/issue\/.*$/, "") : null;
+          {(()=>{
             const closedCount = realDeploy?.linear_issues_closed || 0;
+            const linearUrl   = (realTasks||[]).find(t=>t.linear_issue_url)?.linear_issue_url || null;
+            const workspaceUrl = linearUrl ? linearUrl.replace(/\/issue\/.*$/, "") : null;
+            if (!closedCount && !workspaceUrl) return null;
             return (
               <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(130,80,255,.25)",background:"rgba(130,80,255,.05)",marginTop:8}}>
                 <div style={{fontSize:10,color:"#9b6dff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Linear Issues</div>
