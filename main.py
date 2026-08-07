@@ -18,6 +18,7 @@ from api.observability import router as router_obs
 from api.debug_routes import router_debug
 from api.settings_routes import router_settings
 from api.compliance_routes import router_compliance
+from api.auth_routes import router_auth
 from config import get_settings
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -110,6 +111,7 @@ app.include_router(router_obs)
 app.include_router(router_debug)
 app.include_router(router_settings)
 app.include_router(router_compliance)
+app.include_router(router_auth)
 
 
 @app.get("/health")

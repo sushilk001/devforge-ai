@@ -179,9 +179,10 @@ const css = `
   .df-ltag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:rgba(120,190,255,.6);margin-top:4px}
   .df-ltag::before{content:'';width:5px;height:5px;border-radius:50%;background:#00ff88;flex-shrink:0;
     box-shadow:0 0 6px #00ff88;animation:pulse 1.6s infinite}
-  .df-timer{font-size:22px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
-    font-family:'SF Mono','Cascadia Code',monospace;color:#e0eaff}
+  .df-hdr-modes{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;padding:0 16px}
   .df-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid;border-radius:20px}
+  .df-pipe-timer{font-size:13px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+    font-family:'SF Mono','Cascadia Code',monospace;color:rgba(200,220,255,.6);line-height:1}
   .df-badge.idle   {color:rgba(175,215,255,.65);border-color:rgba(175,215,255,.2)}
   .df-badge.running{color:#00ff88;border-color:rgba(0,255,136,.35);animation:pulse 1.5s infinite}
   .df-badge.gate   {color:#ffaa00;border-color:rgba(255,170,0,.35);animation:pulse 1s infinite}
@@ -790,31 +791,31 @@ const css = `
   .obs-empty{text-align:center;padding:60px 20px;opacity:.52;font-size:12px;line-height:2}
 
   /* ── About Panel ─────────────────────────────────────────────────────── */
-  .abt-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;height:100%}
-  .abt-hero{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px;padding:18px 20px}
-  .abt-title{font-size:17px;font-weight:800;letter-spacing:.02em;color:rgba(175,215,255,.95);margin-bottom:3px}
-  .abt-tagline{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,212,255,.6);margin-bottom:10px;font-weight:600}
-  .abt-desc{font-size:12px;line-height:1.75;opacity:.62;margin-bottom:14px}
+  .abt-wrap{padding:20px 24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;height:100%}
+  .abt-hero{background:linear-gradient(135deg,rgba(0,212,255,.07) 0%,rgba(60,80,180,.06) 100%);border:1px solid rgba(0,212,255,.22);border-radius:14px;padding:20px 22px;box-shadow:0 2px 24px rgba(0,0,0,.25)}
+  .abt-title{font-size:20px;font-weight:800;letter-spacing:.01em;color:#fff;margin-bottom:4px}
+  .abt-tagline{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#00d4ff;margin-bottom:12px;font-weight:700;opacity:.9}
+  .abt-desc{font-size:13px;line-height:1.8;color:rgba(200,220,255,.88);margin-bottom:16px}
   .abt-links{display:flex;gap:8px;flex-wrap:wrap}
-  .abt-link{font-size:10px;padding:4px 11px;border-radius:6px;border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.7);text-decoration:none;transition:all .2s;letter-spacing:.04em}
-  .abt-link:hover{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.45)}
-  .abt-link-demo{border-color:rgba(191,95,255,.25);color:rgba(191,95,255,.7)}
-  .abt-link-demo:hover{background:rgba(191,95,255,.08);color:#bf7fff;border-color:rgba(191,95,255,.45)}
-  .abt-stages{display:flex;align-items:stretch;gap:3px;flex-wrap:wrap}
-  .abt-stage{background:rgba(60,120,255,.09);border:1px solid rgba(60,120,255,.22);border-radius:8px;padding:9px 10px;text-align:center;flex:1;min-width:72px;transition:border-color .2s}
-  .abt-stage:hover{border-color:rgba(0,212,255,.2)}
-  .abt-stage-icon{font-size:15px;margin-bottom:3px}
-  .abt-stage-num{font-size:8px;letter-spacing:.1em;color:rgba(0,212,255,.5);text-transform:uppercase;font-weight:600;margin-bottom:2px}
-  .abt-stage-lbl{font-size:10px;font-weight:700;color:rgba(175,215,255,.85);margin-bottom:2px}
-  .abt-stage-sub{font-size:9px;opacity:.42;line-height:1.35}
-  .abt-arrow{color:rgba(0,212,255,.3);font-size:13px;flex-shrink:0;align-self:center}
-  .abt-gates{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
-  .abt-gate-chip{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.22);color:rgba(255,170,0,.65)}
-  .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .abt-stack-group{background:rgba(255,255,255,.018);border:1px solid rgba(60,120,255,.20);border-radius:9px;padding:10px 12px}
-  .abt-stack-cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
-  .abt-stack-items{display:flex;flex-direction:column;gap:4px}
-  .abt-chip{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;opacity:.78;line-height:1.5}
+  .abt-link{font-size:11px;padding:5px 13px;border-radius:7px;border:1px solid rgba(0,212,255,.32);color:rgba(0,212,255,.88);text-decoration:none;transition:all .2s;letter-spacing:.04em;font-weight:600}
+  .abt-link:hover{background:rgba(0,212,255,.12);color:#00d4ff;border-color:rgba(0,212,255,.55)}
+  .abt-link-demo{border-color:rgba(191,95,255,.38);color:rgba(191,95,255,.9)}
+  .abt-link-demo:hover{background:rgba(191,95,255,.12);color:#bf7fff;border-color:rgba(191,95,255,.6)}
+  .abt-stages{display:flex;align-items:stretch;gap:5px;flex-wrap:wrap}
+  .abt-stage{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-top:2.5px solid var(--c,#00d4ff);border-radius:10px;padding:11px 10px;text-align:center;flex:1;min-width:78px;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+  .abt-stage:hover{background:rgba(255,255,255,.07);box-shadow:0 4px 18px rgba(0,0,0,.3),0 0 0 1px var(--c,#00d4ff)44}
+  .abt-stage-icon{font-size:17px;margin-bottom:4px}
+  .abt-stage-num{font-size:8px;letter-spacing:.12em;color:var(--c,#00d4ff);text-transform:uppercase;font-weight:700;margin-bottom:3px}
+  .abt-stage-lbl{font-size:11px;font-weight:700;color:#e8eeff;margin-bottom:3px}
+  .abt-stage-sub{font-size:9px;color:rgba(175,210,255,.65);line-height:1.4}
+  .abt-arrow{color:rgba(0,212,255,.4);font-size:16px;flex-shrink:0;align-self:center}
+  .abt-gates{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .abt-gate-chip{font-size:10px;padding:4px 11px;border-radius:20px;background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.38);color:rgba(255,185,50,.92);font-weight:600;line-height:1.5}
+  .abt-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .abt-stack-group{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-left:2.5px solid var(--sc,#00d4ff);border-radius:10px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .abt-stack-cat{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-bottom:9px;color:var(--sc,#00d4ff)}
+  .abt-stack-items{display:flex;flex-direction:column;gap:5px}
+  .abt-chip{font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid rgba(255,255,255,.12);display:inline-block;color:rgba(210,228,255,.85);line-height:1.6;background:rgba(255,255,255,.04)}
 
   /* ── Log panel ───────────────────────────────────────────────────────── */
   .df-log{
@@ -1041,7 +1042,7 @@ const css = `
     animation:shimmer 6s linear infinite;
   }
   .df[data-theme='light'] .df-ltag{color:#5C5650;font-weight:500}
-  .df[data-theme='light'] .df-timer{color:#1A1916;font-weight:800;letter-spacing:.03em}
+  .df[data-theme='light'] .df-pipe-timer{color:#5C5650}
   .df[data-theme='light'] .df-badge.idle   {color:#5C5650;border-color:rgba(92,86,80,.28);background:rgba(255,255,255,.65)}
   .df[data-theme='light'] .df-badge.running{color:#15803d;border-color:rgba(22,163,74,.4);background:rgba(240,253,244,.8)}
   .df[data-theme='light'] .df-badge.gate   {color:#92400e;border-color:rgba(217,119,6,.4);background:rgba(255,251,235,.8)}
@@ -1379,21 +1380,21 @@ const css = `
 
   /* ── About panel ── */
   .df[data-theme='light'] .abt-wrap{color:#1A1916;background:rgba(248,241,232,.82);backdrop-filter:blur(12px)}
-  .df[data-theme='light'] .abt-hero{background:rgba(252,244,234,.90);backdrop-filter:blur(12px);border:1px solid rgba(212,102,46,.16);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+  .df[data-theme='light'] .abt-hero{background:rgba(252,244,234,.95);backdrop-filter:blur(12px);border:1px solid rgba(212,102,46,.22);box-shadow:0 4px 20px rgba(0,0,0,.08)}
   .df[data-theme='light'] .abt-title{color:#1A1916;font-weight:800}
-  .df[data-theme='light'] .abt-tagline{background:linear-gradient(90deg,#D4662E,#E87C4A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
-  .df[data-theme='light'] .abt-desc{color:#3D3730;opacity:1;line-height:1.8}
-  .df[data-theme='light'] .abt-link{color:#D4662E;border-color:rgba(212,102,46,.28);background:rgba(255,244,236,.82);font-weight:600}
+  .df[data-theme='light'] .abt-tagline{color:#D4662E;-webkit-text-fill-color:initial;font-weight:800;opacity:1}
+  .df[data-theme='light'] .abt-desc{color:#3D3730;line-height:1.8}
+  .df[data-theme='light'] .abt-link{color:#D4662E;border-color:rgba(212,102,46,.32);background:rgba(255,244,236,.82);font-weight:600}
   .df[data-theme='light'] .abt-link:hover{background:rgba(255,232,216,.96)}
-  .df[data-theme='light'] .abt-stage{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08);box-shadow:0 2px 8px rgba(0,0,0,.06)}
-  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 18px rgba(212,102,46,.12)}
-  .df[data-theme='light'] .abt-stage-num{color:#9A4520;font-weight:700}
+  .df[data-theme='light'] .abt-stage{background:#fff;border:1px solid rgba(0,0,0,.08);border-top:2.5px solid var(--c,#D4662E);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+  .df[data-theme='light'] .abt-stage:hover{box-shadow:0 6px 20px rgba(0,0,0,.1),0 0 0 1px var(--c,#D4662E)33}
   .df[data-theme='light'] .abt-stage-lbl{color:#1A1916;font-weight:800}
-  .df[data-theme='light'] .abt-stage-sub{color:#5C5650;font-weight:500;opacity:1}
-  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.18)}
-  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.88);border-color:#d97706;color:#78350f;font-weight:700}
-  .df[data-theme='light'] .abt-stack-group{background:rgba(255,255,255,.80);backdrop-filter:blur(8px);border:1px solid rgba(212,102,46,.08)}
-  .df[data-theme='light'] .abt-chip{opacity:1;font-weight:600;font-size:11px}
+  .df[data-theme='light'] .abt-stage-sub{color:#5C5650;font-weight:500}
+  .df[data-theme='light'] .abt-arrow{color:rgba(0,0,0,.2)}
+  .df[data-theme='light'] .abt-gate-chip{background:rgba(255,251,235,.9);border-color:rgba(217,119,6,.45);color:#78350f;font-weight:700}
+  .df[data-theme='light'] .abt-stack-group{background:#fff;backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.08);border-left:2.5px solid var(--sc)}
+  .df[data-theme='light'] .abt-stack-cat{font-weight:800}
+  .df[data-theme='light'] .abt-chip{color:#3D3730;border-color:rgba(0,0,0,.12);background:rgba(0,0,0,.03);font-weight:600}
 
   /* ── Idle hero ── */
   .df[data-theme='light'] .df-idle-hero-title{color:#1A1916}
@@ -1656,16 +1657,222 @@ function ObsPanel({ llmCalls, theme }) {
   );
 }
 
+// ── Pricing Panel ──────────────────────────────────────────────────────────
+const PLANS = [
+  {
+    key:"starter", name:"Starter", badge:null, price:"Free", period:"forever",
+    highlight:false,
+    desc:"Try the full pipeline on your own project — no credit card needed.",
+    features:[
+      "5 pipeline runs / month",
+      "Requirements + Task planning stages",
+      "Code generation (single file)",
+      "Demo mode (pre-recorded runs)",
+      "Community support",
+    ],
+    cta:"Get started free", ctaHref:"#",
+  },
+  {
+    key:"indie", name:"Indie", badge:null, price:"$20", period:"/month",
+    highlight:false,
+    desc:"For solo developers and indie hackers shipping side projects fast.",
+    features:[
+      "100 pipeline runs / month",
+      "All 7 stages — full pipeline",
+      "GitHub & Slack integrations",
+      "LLM Observability dashboard",
+      "Bring your own Claude API key",
+      "Email support",
+    ],
+    cta:"Start Indie trial", ctaHref:"#",
+  },
+  {
+    key:"pro", name:"Pro", badge:"Most popular", price:"$99", period:"/month",
+    highlight:true,
+    desc:"The full autonomous SDLC engine for engineering teams shipping fast.",
+    features:[
+      "500 pipeline runs / month",
+      "All 7 stages — full pipeline",
+      "Linear, Slack & GitHub integrations",
+      "LLM Observability dashboard",
+      "Compliance & security scanning",
+      "Bring your own Claude API key",
+      "Email support",
+    ],
+    cta:"Start Pro trial", ctaHref:"#",
+  },
+  {
+    key:"enterprise", name:"Enterprise", badge:null, price:"Custom", period:"pricing",
+    highlight:false,
+    desc:"Unlimited scale, custom models, and enterprise security for large teams.",
+    features:[
+      "Unlimited pipeline runs",
+      "All stages + custom agent plugins",
+      "Gmail / SAML SSO",
+      "Custom AI models & fine-tuning",
+      "Dedicated Slack support channel",
+      "99.9% SLA + dedicated CSM",
+      "On-premise / VPC deployment",
+      "Audit logs & RBAC",
+    ],
+    cta:"Contact sales", ctaHref:"mailto:sushil@hackerrank.com",
+  },
+];
+
+function PricingPanel({ theme, user, onSignIn }) {
+  const dk   = theme === "dark";
+  const bg   = dk ? "rgba(12,20,48,.0)"        : "rgba(0,0,0,0)";
+  const card = dk ? "rgba(16,26,54,.88)"        : "#fff";
+  const bdr  = dk ? "rgba(60,130,255,.2)"       : "rgba(0,0,0,.1)";
+  const gold = dk ? "#f5c842"                   : "#C8902A";
+  const txt  = dk ? "#e0eaff"                   : "#1B2458";
+  const sub  = dk ? "rgba(175,215,255,.55)"     : "#6B6258";
+  const chk  = dk ? "#00ff88"                   : "#16a34a";
+  const popBdr = dk ? "#00d4ff"                 : "#C8902A";
+
+  const ctaBg   = `linear-gradient(135deg,${gold},${dk?"#d4a017":"#E8A832"})`;
+  const ctaClr  = "#fff";
+
+  function handleCta(plan) {
+    if (plan.ctaHref && plan.ctaHref.startsWith("mailto:")) {
+      window.location.href = plan.ctaHref;
+      return;
+    }
+    if (!user && onSignIn) { onSignIn(); return; }
+    // signed-in: future checkout flow
+  }
+
+  const TRUST = [
+    { icon:"🔒", title:"Secure & Encrypted",   sub:"Enterprise-grade TLS, no data stored" },
+    { icon:"⚡", title:"Instant Access",        sub:"Pipeline ready the moment you sign up" },
+    { icon:"✅", title:"Reliable & Trusted",    sub:"99.9% uptime SLA, used by engineering teams" },
+  ];
+
+  return (
+    <div style={{padding:"32px 24px 28px",minHeight:"100%",overflowY:"auto",background:bg}}>
+      {/* Header */}
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{fontSize:26,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1.15}}>
+          Choose Your Plan
+        </div>
+        <div style={{fontSize:13,color:sub,marginTop:8}}>
+          From feature request to deployed PR — 7 autonomous AI agents, zero handoffs.
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div style={{display:"flex",gap:14,alignItems:"stretch",flexWrap:"wrap"}}>
+        {PLANS.map(plan => {
+          const pop = plan.highlight;
+          return (
+            <div key={plan.key} style={{
+              flex:"1 1 180px",minWidth:180,
+              background: card,
+              border: pop ? `2px solid ${popBdr}` : `1.5px solid ${bdr}`,
+              borderRadius:16,padding:"24px 18px 20px",
+              boxShadow: pop
+                ? dk ? `0 0 0 1px ${popBdr}33, 0 8px 32px rgba(0,212,255,.18), 0 2px 8px rgba(0,0,0,.4)`
+                      : `0 0 0 1px ${popBdr}44, 0 8px 28px rgba(200,144,42,.22), 0 2px 8px rgba(0,0,0,.1)`
+                : dk ? "0 2px 16px rgba(0,0,0,.3)" : "0 2px 14px rgba(0,0,0,.07)",
+              position:"relative",transition:"box-shadow .2s, transform .2s",
+              display:"flex",flexDirection:"column",
+            }}>
+              {/* Popular badge */}
+              {plan.badge && (
+                <div style={{
+                  position:"absolute",top:-13,left:"50%",transform:"translateX(-50%)",
+                  background:ctaBg,
+                  color:"#fff",fontSize:9,fontWeight:800,letterSpacing:2,
+                  padding:"4px 14px",borderRadius:20,textTransform:"uppercase",
+                  whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(200,144,42,.45)",
+                }}>{plan.badge}</div>
+              )}
+
+              {/* Top info — fixed min-height so CTA aligns across all cards */}
+              <div style={{minHeight:148}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",
+                  color: pop ? gold : sub, marginBottom:8}}>{plan.name}</div>
+
+                <div style={{display:"flex",alignItems:"baseline",gap:3,marginBottom:2}}>
+                  <span style={{fontSize:32,fontWeight:800,color:txt,letterSpacing:"-.5px",lineHeight:1}}>{plan.price}</span>
+                </div>
+                <div style={{fontSize:11,color:sub,marginBottom:6,fontWeight:500}}>{plan.period}</div>
+                <div style={{fontSize:12,color:sub,lineHeight:1.5}}>{plan.desc}</div>
+              </div>
+
+              {/* CTA */}
+              <button onClick={()=>handleCta(plan)} style={{
+                display:"block",width:"100%",textAlign:"center",
+                padding:"10px 0",borderRadius:10,border:"none",
+                background: ctaBg,
+                color:ctaClr,fontSize:13,fontWeight:700,cursor:"pointer",
+                marginBottom:18,transition:"opacity .15s",letterSpacing:".2px",
+                boxShadow:"0 3px 12px rgba(200,144,42,.35)",
+              }}>
+                {!user && plan.key !== "enterprise" ? "Sign in to Get Started" : plan.cta}
+              </button>
+
+              {/* Features */}
+              <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                {plan.features.map((f,i) => (
+                  <div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}>
+                    <span style={{color:chk,fontSize:11,flexShrink:0,marginTop:2}}>✓</span>
+                    <span style={{fontSize:12,color:txt,lineHeight:1.4}}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Trust badges */}
+      <div style={{
+        display:"flex",gap:0,marginTop:24,flexWrap:"wrap",
+        background:card,borderRadius:14,
+        border:`1px solid ${bdr}`,
+        boxShadow: dk ? "0 2px 16px rgba(0,0,0,.25)" : "0 2px 12px rgba(0,0,0,.06)",
+        overflow:"hidden",
+      }}>
+        {TRUST.map((t,i) => (
+          <div key={i} style={{
+            flex:"1 1 180px",
+            display:"flex",alignItems:"center",gap:12,
+            padding:"16px 20px",
+            borderRight: i < TRUST.length-1 ? `1px solid ${bdr}` : "none",
+          }}>
+            <div style={{
+              width:38,height:38,borderRadius:"50%",flexShrink:0,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              background: dk ? "rgba(255,255,255,.06)" : "rgba(200,144,42,.08)",
+              border:`1px solid ${dk?"rgba(255,255,255,.1)":popBdr+"33"}`,
+              fontSize:17,
+            }}>{t.icon}</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:txt,marginBottom:2}}>{t.title}</div>
+              <div style={{fontSize:11,color:sub}}>{t.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{textAlign:"center",marginTop:18,fontSize:11,color:sub}}>
+        All plans include demo mode · No setup fees · Cancel anytime
+      </div>
+    </div>
+  );
+}
+
 // ── About Panel ────────────────────────────────────────────────────────────
 function AboutPanel({ theme }) {
   const STAGES = [
-    { num:1, icon:"📋", label:"Requirements",      sub:"PRD generation" },
-    { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm" },
-    { num:3, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk" },
-    { num:4, icon:"🔍", label:"PR Review",          sub:"4× parallel agents" },
-    { num:5, icon:"🧪", label:"QA",                 sub:"pytest runner" },
-    { num:6, icon:"⚖",  label:"Compliance",         sub:"WCAG · GDPR · OWASP" },
-    { num:7, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack" },
+    { num:1, icon:"📋", label:"Requirements",       sub:"PRD generation",        color:"#00d4ff" },
+    { num:2, icon:"🗂",  label:"Task Orchestration", sub:"Kahn's algorithm",      color:"#00ff88" },
+    { num:3, icon:"💻", label:"Code Generation",    sub:"Full codebase to disk", color:"#bf5fff" },
+    { num:4, icon:"🔍", label:"PR Review",          sub:"4× parallel agents",    color:"#e066ff" },
+    { num:5, icon:"🧪", label:"QA",                 sub:"pytest runner",         color:"#2dd4bf" },
+    { num:6, icon:"⚖",  label:"Compliance",         sub:"WCAG · GDPR · OWASP",  color:"#f59e0b" },
+    { num:7, icon:"🚀", label:"Deploy",             sub:"GitHub + Slack",        color:"#ff2d6b" },
   ];
   const STACK = [
     { cat:"AI / LLM",      color:"#bf7fff", lc:"#6d28d9", items:["claude-sonnet-4-6", "Anthropic API"] },
@@ -1695,7 +1902,7 @@ function AboutPanel({ theme }) {
         <div className="abt-stages">
           {STAGES.map((s, i) => (
             <React.Fragment key={s.num}>
-              <div className="abt-stage">
+              <div className="abt-stage" style={{"--c":s.color}}>
                 <div className="abt-stage-icon">{s.icon}</div>
                 <div className="abt-stage-num">Stage {s.num}</div>
                 <div className="abt-stage-lbl">{s.label}</div>
@@ -1718,17 +1925,191 @@ function AboutPanel({ theme }) {
           {STACK.map(g => {
             const sc = theme === "light" ? g.lc : g.color;
             return (
-              <div key={g.cat} className="abt-stack-group">
-                <div className="abt-stack-cat" style={{color:sc}}>{g.cat}</div>
+              <div key={g.cat} className="abt-stack-group" style={{"--sc":sc}}>
+                <div className="abt-stack-cat">{g.cat}</div>
                 <div className="abt-stack-items">
                   {g.items.map(item => (
-                    <span key={item} className="abt-chip" style={{borderColor:sc+"44",color:sc}}>{item}</span>
+                    <span key={item} className="abt-chip">{item}</span>
                   ))}
                 </div>
               </div>
             );
           })}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Login Modal ────────────────────────────────────────────────────────────
+const GOOGLE_SVG = (
+  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true" style={{flexShrink:0}}>
+    <path d="M17.64 9.2a10.34 10.34 0 0 0-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+    <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+  </svg>
+);
+const GITHUB_SVG = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{flexShrink:0}}>
+    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+  </svg>
+);
+
+function LoginModal({ onClose, onLogin, theme }) {
+  const tc = (dark, light) => theme === "dark" ? dark : light;
+  const [mode, setMode]         = useState("signin"); // "signin" | "signup"
+  const [email, setEmail]       = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName]         = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState("");
+
+  const cardBg     = tc("rgba(18,22,32,0.96)", "rgba(255,250,244,0.97)");
+  const inputBg    = tc("rgba(255,255,255,0.06)", "rgba(255,255,255,0.8)");
+  const inputBord  = tc("rgba(255,255,255,0.12)", "rgba(0,0,0,0.15)");
+  const textClr    = tc("#e8eaf0", "#1A1916");
+  const subClr     = tc("rgba(200,210,230,0.65)", "#5C5650");
+  const oauthBg    = tc("rgba(255,255,255,0.08)", "#fff");
+  const oauthBord  = tc("rgba(255,255,255,0.14)", "rgba(0,0,0,0.18)");
+  const oauthClr   = tc("#d8e2f0", "#1A1916");
+  const ghBg       = tc("rgba(36,41,56,0.85)", "#24292f");
+  const ghClr      = "#fff";
+  const accentClr  = "#D4662E";
+  const labelClr   = tc("rgba(180,195,220,.75)", "#3D3730");
+
+  const fieldStyle = {
+    width:"100%", padding:"10px 12px", borderRadius:8, border:`1px solid ${inputBord}`,
+    background:inputBg, color:textClr, fontSize:13, outline:"none",
+    boxSizing:"border-box", transition:"border .15s",
+    fontFamily:"Inter,sans-serif",
+  };
+
+  async function submit(e) {
+    e.preventDefault();
+    setError(""); setLoading(true);
+    try {
+      const ep = mode === "signin" ? "/auth/login" : "/auth/signup";
+      const body = mode === "signin"
+        ? { email, password }
+        : { email, password, name };
+      const res = await fetch(ep, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.detail || "Something went wrong"); setLoading(false); return; }
+      onLogin(data.user);
+      onClose();
+    } catch {
+      setError("Network error — please try again");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div onClick={onClose} style={{
+      position:"fixed", inset:0, zIndex:9999,
+      background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)",
+      display:"flex", alignItems:"center", justifyContent:"center", padding:16,
+    }}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        width:"100%", maxWidth:380, borderRadius:16,
+        background:cardBg, backdropFilter:"blur(20px)",
+        border:`1px solid ${tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}`,
+        boxShadow:`0 24px 64px rgba(0,0,0,${tc("0.6","0.18")})`,
+        padding:"28px 28px 24px", position:"relative",
+        fontFamily:"Inter,sans-serif",
+      }}>
+        {/* Close */}
+        <button onClick={onClose} style={{
+          position:"absolute", top:14, right:14, background:"none", border:"none",
+          color:subClr, cursor:"pointer", fontSize:18, lineHeight:1, padding:4,
+        }}>✕</button>
+
+        {/* Title */}
+        <h2 style={{margin:"0 0 6px", fontSize:20, fontWeight:700, color:textClr, letterSpacing:"-.3px"}}>
+          {mode==="signin" ? "Welcome back" : "Create account"}
+        </h2>
+        <p style={{margin:"0 0 20px", fontSize:13, color:subClr}}>
+          {mode==="signin" ? "Sign in to DevForge AI" : "Get started for free"}
+        </p>
+
+        {/* OAuth buttons */}
+        <a href="/auth/github/login" style={{
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          width:"100%", padding:"10px 0", borderRadius:9, marginBottom:8,
+          background:ghBg, color:ghClr, border:"none",
+          fontSize:13, fontWeight:600, textDecoration:"none", cursor:"pointer",
+          transition:"opacity .15s", boxSizing:"border-box",
+        }}>
+          {GITHUB_SVG} Continue with GitHub
+        </a>
+        <a href="/auth/google/login" style={{
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          width:"100%", padding:"10px 0", borderRadius:9, marginBottom:18,
+          background:oauthBg, color:oauthClr,
+          border:`1px solid ${oauthBord}`,
+          fontSize:13, fontWeight:600, textDecoration:"none", cursor:"pointer",
+          transition:"opacity .15s", boxSizing:"border-box",
+        }}>
+          {GOOGLE_SVG} Continue with Google
+        </a>
+
+        {/* Divider */}
+        <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:18}}>
+          <div style={{flex:1, height:1, background:tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}}/>
+          <span style={{fontSize:11, color:subClr, whiteSpace:"nowrap"}}>or</span>
+          <div style={{flex:1, height:1, background:tc("rgba(255,255,255,0.1)","rgba(0,0,0,0.1)")}}/>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={submit} style={{display:"flex", flexDirection:"column", gap:10}}>
+          {mode==="signup" && (
+            <div>
+              <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Name</label>
+              <input type="text" value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"
+                style={fieldStyle} autoComplete="name"/>
+            </div>
+          )}
+          <div>
+            <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Email</label>
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"
+              required style={fieldStyle} autoComplete="email"/>
+          </div>
+          <div>
+            <label style={{display:"block", fontSize:11, fontWeight:600, color:labelClr, marginBottom:4}}>Password</label>
+            <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
+              placeholder={mode==="signup" ? "At least 6 characters" : "Password"}
+              required style={fieldStyle} autoComplete={mode==="signin"?"current-password":"new-password"}/>
+          </div>
+
+          {error && (
+            <div style={{padding:"8px 12px", borderRadius:7, background:"rgba(255,45,107,0.12)",
+              border:"1px solid rgba(255,45,107,0.25)", color:"#ff6b8a", fontSize:12}}>
+              {error}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} style={{
+            marginTop:4, padding:"11px 0", borderRadius:9, border:"none",
+            background: loading ? tc("rgba(212,102,46,.5)","rgba(212,102,46,.5)") : accentClr,
+            color:"#fff", fontSize:13, fontWeight:700, cursor: loading ? "not-allowed" : "pointer",
+            transition:"background .15s", letterSpacing:"-.1px",
+          }}>
+            {loading ? "Please wait…" : mode==="signin" ? "Sign in" : "Create account"}
+          </button>
+        </form>
+
+        {/* Mode toggle */}
+        <p style={{marginTop:18, textAlign:"center", fontSize:12, color:subClr}}>
+          {mode==="signin" ? "Don't have an account? " : "Already have an account? "}
+          <button onClick={()=>{setMode(m=>m==="signin"?"signup":"signin");setError("");}}
+            style={{background:"none", border:"none", color:accentClr, fontSize:12,
+              fontWeight:600, cursor:"pointer", padding:0}}>
+            {mode==="signin" ? "Sign up" : "Sign in"}
+          </button>
+        </p>
       </div>
     </div>
   );
@@ -1790,8 +2171,13 @@ export default function DevForgeDashboard() {
   const [customModelInput, setCustomModelInput]   = useState("");
   const [customModelName, setCustomModelName]     = useState("");
   const [customModelAdding, setCustomModelAdding] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem("df-theme") || "dark");
+  const [theme, setTheme]           = useState(() => localStorage.getItem("df-theme") || "dark");
+  const [user,  setUser]            = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   useEffect(() => { localStorage.setItem("df-theme", theme); }, [theme]);
+  useEffect(() => {
+    fetch("/auth/me").then(r=>r.ok?r.json():null).then(d=>{ if(d?.user) setUser(d.user); }).catch(()=>{});
+  }, []);
   useEffect(() => {
     const onKey = e => { if(e.key==="Escape" && fullscreenFile) setFullscreenFile(null); };
     document.addEventListener("keydown", onKey);
@@ -3142,7 +3528,12 @@ export default function DevForgeDashboard() {
           </div>
           <div><div className="df-lname">Dev<span>Forge</span> AI</div><div className="df-ltag">Autonomous SDLC Pipeline · 6 AI Agents</div></div>
         </div>
-        <div className="df-timer" style={{color:timerColor}}>{display}</div>
+        {/* Mode buttons — live in the header center */}
+        <div className="df-hdr-modes">
+          <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>pickMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
+          <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>pickMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
+          <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           {/* Integration status dots */}
           <div className="df-int-dots" title="Integration status: Anthropic · GitHub · Linear · Slack">
@@ -3159,17 +3550,31 @@ export default function DevForgeDashboard() {
             ))}
           </div>
           <div className={`df-badge ${badgeCls}`}>{badgeTxt}</div>
+          {/* Auth */}
+          {user ? (
+            <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4}}>
+              <img src={user.picture} alt={user.name} referrerPolicy="no-referrer"
+                style={{width:28,height:28,borderRadius:"50%",border:`1.5px solid ${tc("rgba(175,215,255,.3)","rgba(212,102,46,.35)")}`}}/>
+              <span style={{fontSize:11,fontWeight:600,color:tc("rgba(175,215,255,.8)","#3D3730"),maxWidth:72,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name.split(" ")[0]}</span>
+              <button onClick={()=>fetch("/auth/logout",{method:"POST"}).then(()=>setUser(null))}
+                className="df-settings-btn" style={{fontSize:10,padding:"3px 8px",borderRadius:5}}>Sign out</button>
+            </div>
+          ) : (
+            <button onClick={()=>setShowLoginModal(true)}
+              style={{display:"flex",alignItems:"center",gap:7,padding:"7px 16px",borderRadius:8,
+                border:`1px solid ${tc("rgba(175,215,255,.22)","rgba(0,0,0,.12)")}`,
+                background:tc("rgba(255,255,255,.06)","rgba(255,255,255,.72)"),
+                color:tc("rgba(175,215,255,.9)","#3D3730"),fontSize:13,fontWeight:600,
+                cursor:"pointer",flexShrink:0,backdropFilter:"blur(8px)",transition:"all .2s",marginLeft:4}}>
+              Sign in
+            </button>
+          )}
         </div>
       </div>
 
       {/* Input */}
       <div className="df-inp-area">
         <div className="df-inp-w">
-          <div className="df-mode-row">
-            <button className={`df-mode-btn${requestMode==="new_software"?" active":""}`} onClick={()=>pickMode("new_software")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>🆕 New Software</button>
-            <button className={`df-mode-btn${requestMode==="add_feature"?" active":""}`} onClick={()=>pickMode("add_feature")} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"}>➕ Add Feature</button>
-            <button className={`df-mode-btn demo${demoMode?" on":""}`} onClick={()=>setDemoMode(d=>!d)} disabled={appState==="running"||appState==="gate"||appState==="prod_gate"} title="Replay a captured run — bulletproof, no live API calls">{demoMode?"▶ DEMO: ON":"◉ DEMO: OFF"}</button>
-          </div>
           <div className="df-inp-lblrow">
             <span className="df-inp-lbl">What do you want to build?</span>
             <button className="df-pipe-btn" onClick={toggleInputSize} title={inputBig?"Shrink input":"Expand input"}>{inputBig?"−":"+"}</button>
@@ -3237,6 +3642,7 @@ export default function DevForgeDashboard() {
         <div className={`df-pipe ${pipeCollapsed?"collapsed":""}`}>
           <div className="df-pipe-toggle">
             {!pipeCollapsed&&<span className="df-pipe-hdr-lbl">Pipeline</span>}
+            {!pipeCollapsed&&<span className="df-pipe-timer" style={{color:timerColor}}>{display}</span>}
             <button className="df-pipe-btn" onClick={()=>setPipeCollapsed(c=>!c)} title={pipeCollapsed?"Expand pipeline":"Collapse pipeline"}>{pipeCollapsed?"»":"«"}</button>
           </div>
           {STAGES.map((stage,i)=>{
@@ -3309,6 +3715,7 @@ export default function DevForgeDashboard() {
               LLM Observability {llmCalls.length>0&&<span style={{marginLeft:6,background:"rgba(0,212,255,.15)",color:"#00d4ff",fontSize:10,padding:"1px 5px",borderRadius:2}}>{llmCalls.length}</span>}
             </div>
             <div className={`df-tab ${tab==="about"?"active":""}`} onClick={()=>setTab("about")}>About</div>
+            <div className={`df-tab ${tab==="pricing"?"active":""}`} onClick={()=>setTab("pricing")}>Pricing</div>
             <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}
               style={{marginLeft:"auto",background:"transparent",border:"1px solid",borderColor:theme==="dark"?"rgba(60,120,255,.28)":"rgba(0,0,0,.12)",
                 color:theme==="dark"?"rgba(175,215,255,.5)":"rgba(20,30,80,.5)",
@@ -3317,7 +3724,7 @@ export default function DevForgeDashboard() {
             <button className="df-tab" onClick={openSettings} style={{display:"flex",alignItems:"center",gap:5,color:theme==="dark"?"rgba(175,215,255,.75)":"rgba(20,30,80,.6)"}}>⚙ Settings</button>
           </div>
           <div className="df-detail">
-            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
+            {tab==="pipeline" ? renderDetail() : tab==="about" ? <AboutPanel theme={theme}/> : tab==="pricing" ? <PricingPanel theme={theme} user={user} onSignIn={()=>setShowLoginModal(true)}/> : <ObsPanel llmCalls={llmCalls} theme={theme}/>}
           </div>
         </div>
 
@@ -3629,6 +4036,8 @@ export default function DevForgeDashboard() {
           </div>
         </div>
       )}
+
+      {showLoginModal && <LoginModal theme={theme} onClose={()=>setShowLoginModal(false)} onLogin={u=>{setUser(u);setShowLoginModal(false);}}/>}
 
     </div>
   );
