@@ -1677,7 +1677,7 @@ const PLANS = [
     highlight:false,
     desc:"For solo developers and indie hackers shipping side projects fast.",
     features:[
-      "25 pipeline runs / month",
+      "100 pipeline runs / month",
       "All 7 stages — full pipeline",
       "GitHub & Slack integrations",
       "LLM Observability dashboard",
@@ -1691,7 +1691,7 @@ const PLANS = [
     highlight:true,
     desc:"The full autonomous SDLC engine for engineering teams shipping fast.",
     features:[
-      "100 pipeline runs / month",
+      "500 pipeline runs / month",
       "All 7 stages — full pipeline",
       "Linear, Slack & GitHub integrations",
       "LLM Observability dashboard",
