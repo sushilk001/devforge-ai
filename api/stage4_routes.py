@@ -138,7 +138,7 @@ def get_status(thread_id: str):
         }
     if thread_id in _stage4_running:
         return {"status": "running", "task_count": 0, "total_files": 0, "output_path": None}
-    return {"status": "not_found", "task_count": 0, "total_files": 0, "output_path": None}
+    raise HTTPException(status_code=404, detail=f"Stage 4 session '{thread_id}' not found.")
 
 
 @router_stage4.get("/code/{thread_id}", response_model=CodeGenResponse)

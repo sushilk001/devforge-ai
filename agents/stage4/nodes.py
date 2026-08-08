@@ -175,7 +175,7 @@ def _synthesize_entrypoint(results: list[dict], prd: dict) -> dict | None:
         return None
 
     file_summaries = "\n\n".join(
-        f"--- {f['filename']} ---\n" + "\n".join(f["content"].splitlines()[:30])
+        f"--- {f['filename']} ---\n{f['content']}"
         for f in impl_files
     )
     prompt = ENTRYPOINT_PROMPT.format(

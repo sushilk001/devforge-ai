@@ -314,27 +314,50 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str | None, st
 
 def _extract_launch_error(stderr: str) -> str:
     """Pull the most useful single line from a uvicorn startup traceback."""
-    # Priority: ValidationError field lines, then ImportError, then last non-empty line
-    for line in stderr.splitlines():
-        line = line.strip()
-        if "Field required" in line or "value is not a valid" in line:
-            # Grab the setting name from the line above
-            pass
-        if "ValidationError" in line and "validation error" in line.lower():
-            return line
-        if line.startswith("pydantic_core") and "ValidationError" in line:
-            return line
-    for line in stderr.splitlines():
-        line = line.strip()
-        if line.startswith("ModuleNotFoundError") or line.startswith("ImportError"):
-            return line
-        if line.startswith("pydantic_core._pydantic_core.ValidationError"):
-            return line
-    # Fall back to last non-empty meaningful line
-    for line in reversed(stderr.splitlines()):
-        line = line.strip()
-        if line and not line.startswith("File ") and not line.startswith("Traceback"):
-            return line[:200]
+    import re
+    lines = stderr.splitlines()
+
+    # Pass 1: any line that looks like a Python exception (ExcType: message)
+    # Skip uvicorn's own summary lines.
+    _UVICORN_NOISE = {
+        "application startup failed",
+        "error: application startup failed",
+        "exiting.",
+        "shutting down",
+    }
+    _EXCEPTION_RE = re.compile(r'^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_.]*)*Error[^:]*:.+')
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.lower() in _UVICORN_NOISE:
+            continue
+        if _EXCEPTION_RE.match(stripped):
+            return stripped[:200]
+
+    # Pass 2: lines starting with known exception types
+    _PREFIXES = (
+        "ModuleNotFoundError", "ImportError", "RuntimeError", "ValueError",
+        "AttributeError", "TypeError", "NameError", "KeyError",
+        "pydantic_core._pydantic_core.ValidationError",
+    )
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith(_PREFIXES):
+            return stripped[:200]
+
+    # Pass 3: last non-empty line that isn't a uvicorn noise line or traceback frame
+    for line in reversed(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("File ") or stripped.startswith("Traceback"):
+            continue
+        if stripped.lower() in _UVICORN_NOISE:
+            continue
+        if stripped.startswith("ERROR:") and "startup failed" in stripped.lower():
+            continue
+        return stripped[:200]
+
     return "Startup error — check generated code"
 
 
