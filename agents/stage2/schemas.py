@@ -64,6 +64,7 @@ class Stage2State(BaseModel):
     human_feedback:     Optional[str]         = None
     revision_count:     int                   = 0
     linear_issue_ids:   list[str]             = Field(default_factory=list)
+    linear_project_url: Optional[str]         = None
     slack_message_ts:   Optional[str]         = None
     error:              Optional[str]         = None
 
@@ -86,3 +87,4 @@ class TasksResponse(BaseModel):
     message:            str
     thread_id:          str
     linear_issue_ids:   list[str]                  = Field(default_factory=list)
+    linear_project_url: Optional[str]              = None

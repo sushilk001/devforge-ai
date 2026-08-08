@@ -210,7 +210,8 @@ def create_linear_issues(state: Stage2State) -> Stage2State:
     )
     project_id = project["id"] if project else None
     if project_id:
-        logger.info(f"[Stage2/Node4] Project created: {project['name']}")
+        logger.info(f"[Stage2/Node4] Project created: {project['name']} — {project.get('url')}")
+        state.linear_project_url = project.get("url")
 
     tasks = state.tasks
     task_map = {t.id: t for t in tasks}

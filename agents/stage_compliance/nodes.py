@@ -23,8 +23,8 @@ def get_llm():
         model=get_model(),
         api_key=get_api_key(),
         temperature=0.1,
-        max_tokens=2048,
-        timeout=60.0,
+        max_tokens=4096,
+        timeout=90.0,
     )
 
 
@@ -44,26 +44,54 @@ def _llm_invoke(llm, messages, stage: str, label: str):
 
 
 def _parse_json_findings(content: str) -> list:
-    """Strip ```json fences and parse a JSON array. Returns [] on any error."""
+    """Strip ```json fences and parse a JSON array.
+    If the response was truncated (max_tokens hit), salvage complete objects
+    already present before the cut-off rather than discarding everything.
+    """
+    content = content.strip()
+    if content.startswith("```"):
+        parts = content.split("```")
+        inner = parts[1]
+        if inner.startswith("json"):
+            inner = inner[4:]
+        content = inner.strip()
+
+    # Fast path — well-formed response
     try:
-        content = content.strip()
-        if content.startswith("```"):
-            parts = content.split("```")
-            # parts[1] is the fenced block; strip leading "json" language tag
-            inner = parts[1]
-            if inner.startswith("json"):
-                inner = inner[4:]
-            content = inner.strip()
         result = json.loads(content)
         if isinstance(result, list):
             return result
-        # Some models wrap in {"findings": [...]}
         if isinstance(result, dict):
             return result.get("findings", [])
         return []
-    except Exception as e:
-        logger.warning(f"[Compliance] JSON parse failed: {e} — raw: {content[:200]}")
-        return []
+    except Exception:
+        pass
+
+    # Truncated response — extract every complete {...} object from the array
+    findings = []
+    depth = 0
+    start = None
+    for i, ch in enumerate(content):
+        if ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0 and start is not None:
+                try:
+                    obj = json.loads(content[start:i + 1])
+                    if isinstance(obj, dict):
+                        findings.append(obj)
+                except Exception:
+                    pass
+                start = None
+
+    if findings:
+        logger.warning(f"[Compliance] Truncated response — salvaged {len(findings)} complete finding(s)")
+    else:
+        logger.warning(f"[Compliance] JSON parse failed — raw: {content[:200]}")
+    return findings
 
 
 def _read_files_summary(output_path: Path, max_chars: int = 14000) -> str:

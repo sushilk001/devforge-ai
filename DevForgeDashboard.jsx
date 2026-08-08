@@ -2136,7 +2136,8 @@ export default function DevForgeDashboard() {
   const [stage4ThreadId, setS4Tid]   = useState(null);
   const [apiReady, setApiReady]      = useState({});
   const [realPrd, setRealPrd]        = useState(null);
-  const [realTasks, setRealTasks]    = useState([]);
+  const [realTasks, setRealTasks]         = useState([]);
+  const [linearProjectUrl, setLinearProjectUrl] = useState(null);
   const [realReview, setRealReview]  = useState(null);
   const [realCodeGen, setRealCodeGen]= useState(null);
   const [realQA, setRealQA]          = useState(null);
@@ -2145,6 +2146,7 @@ export default function DevForgeDashboard() {
   const [realCompliance, setRealCompliance] = useState(null);
   const [realDeploy, setRealDeploy]  = useState(null);
   const [expandedFile, setExpandedFile]   = useState(null);
+  const [expandedQaCat, setExpandedQaCat] = useState(null);
   const [fullscreenFile, setFullscreenFile] = useState(null); // {filename, content, taskTitle, copied}
   const [pipeCollapsed, setPipeCollapsed] = useState(false);
   const [logView, setLogView] = useState("normal"); // "collapsed" | "normal" | "wide"
@@ -2565,6 +2567,7 @@ export default function DevForgeDashboard() {
 
   const runCompliance = (onComplete) => {
     const s4Tid = s4TidRef.current;
+    resumeFn.current = onComplete;   // set immediately — compliance API may return before the 5.8s stage timer fires
     runStage("compliance", onComplete);
     const FALLBACK = (verdict) => ({ findings:[], score:0, criticals:0, warnings_count:0, verdict, debt_history:[] });
     fetch(`/compliance/start/${s4Tid}`, {method:"POST"})
@@ -2615,7 +2618,7 @@ export default function DevForgeDashboard() {
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm("");
-    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setComplianceTid(null); setRealCompliance(null); setRealDeploy(null); setExpandedFile(null);
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setApiReady({}); setRealPrd(null); setRealTasks([]); setRealDepGraph(null); setRealReview(null); setRealCodeGen(null); setRealQA(null); setQaTid(null); setComplianceTid(null); setRealCompliance(null); setRealDeploy(null); setExpandedFile(null); setExpandedQaCat(null); setLinearProjectUrl(null);
     setGithubUrl(""); setAttachments([]);
     addLog(`⟡ DevForge AI pipeline started — ${requestMode === "new_software" ? "New Software" : "Add Feature"}`,"info");
     addLog("⟡ Source: Slack #devforge-requests","info");
@@ -2675,7 +2678,7 @@ export default function DevForgeDashboard() {
     setAppState("running"); setActive(null); setDone(new Set()); setReviews({});
     setProgress({}); setLogs([]); setDetail(null); setGateStage(null);
     setShowFB(false); setFb(""); setProdCfm("");
-    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setQaTid(null); setExpandedFile(null);
+    setS1Tid(null); setS2Tid(null); setS3Tid(null); setS4Tid(null); setQaTid(null); setExpandedFile(null); setExpandedQaCat(null); setLinearProjectUrl(null);
     setApiReady({ requirements:true, tasks:true, code_gen:true, pr_review:true, qa:true });
     setLlmCalls([]);
 
@@ -2695,7 +2698,7 @@ export default function DevForgeDashboard() {
     });
     const load = {
       requirements: () => setRealPrd(D.prd),
-      tasks:        () => { setRealTasks(D.tasks); setRealDepGraph(D.depGraph); },
+      tasks:        () => { setRealTasks(D.tasks); setRealDepGraph(D.depGraph); if(D.deploy?.linear_project_url) setLinearProjectUrl(D.deploy.linear_project_url); },
       code_gen:     () => setRealCodeGen(D.codeGen),
       pr_review:    () => setRealReview(D.review),
       qa:           () => setRealQA(D.qa),
@@ -2747,7 +2750,7 @@ export default function DevForgeDashboard() {
       setProgress(p=>({...p,deploy:100}));
       setDone(p=>new Set([...p,"deploy"]));
       setActive(null); setAppState("done"); setDetail("done");
-      addLog("🎉 Feature shipped — PR created on GitHub","done");
+      if(!demoModeRef.current) addLog("🎉 Feature shipped — PR created on GitHub","done");
     } else if(realDeploy?.status === "error") {
       setProgress(p=>({...p,deploy:100}));
       setDone(p=>new Set([...p,"deploy"]));
@@ -2781,6 +2784,7 @@ export default function DevForgeDashboard() {
         addLog(`✓ ${count} Linear issues created in new project`,"success");
         // Re-sync tasks so linear_issue_url is populated for the deploy panel
         if(Array.isArray(data.tasks) && data.tasks.length) setRealTasks(data.tasks);
+        if(data.linear_project_url) setLinearProjectUrl(data.linear_project_url);
         // Auto-start Stage 4 Code Gen
         fetch(`/stage4/start/${tid}`, {method:"POST"})
           .then(r=>{
@@ -3209,7 +3213,7 @@ export default function DevForgeDashboard() {
             ? <span style={{animation:"pulse .8s infinite",display:"inline-block"}}>⟳ Running pytest on generated tests...</span>
             : `${qr.passed} passed · ${qr.failed} failed · ${qr.errors} errors · ${qr.total} total`}
         </div>
-        <div className="df-qa-list" style={{marginTop:10}}>
+        <div className="df-qa-list" style={{marginTop:10,display:"flex",flexDirection:"column",gap:0}}>
           {QA_ROWS.map(({key,label})=>{
             const c = cats?.[key];
             const hasSome = c && c.total > 0;
@@ -3220,13 +3224,46 @@ export default function DevForgeDashboard() {
               `${c.passed} passed, ${c.failed+c.errors} failed`;
             const badgeColor = badge==="PASS"?"#2dd4bf":badge==="FAIL"?"#ff2d6b":badge==="ERROR"?"#ffaa00":tc("rgba(175,215,255,.35)","rgba(20,30,80,.4)");
             const badgeBg    = badge==="PASS"?"rgba(45,212,191,.12)":badge==="FAIL"?"rgba(255,45,107,.12)":badge==="ERROR"?"rgba(255,170,0,.12)":tc("rgba(175,215,255,.06)","rgba(20,30,80,.06)");
+            const hasFails   = !running && hasSome && (badge==="FAIL" || badge==="ERROR");
+            const isOpen     = expandedQaCat === key;
+            const failedInCat = hasFails ? (qr.tests||[]).filter(t=>(t.status==="FAILED"||t.status==="ERROR") && t.category===key) : [];
+            const stdoutSnip  = (hasFails && isOpen && realQA?.stdout) ? realQA.stdout.slice(-2000) : null;
             return (
-              <div key={key} className="df-qa-row">
-                <span className="df-qa-type">{label}</span>
-                <span className="df-qa-count" style={{color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.55)"),fontSize:10}}>{count}</span>
-                <span className="df-qa-badge" style={{background:badgeBg,color:badgeColor,minWidth:52,textAlign:"center",animation:badge==="RUNNING"?"pulse .8s infinite":"none"}}>
-                  {badge}
-                </span>
+              <div key={key} style={{borderRadius:4,overflow:"hidden",marginBottom:4,border:`1px solid ${hasFails?"rgba(255,45,107,.2)":tc("rgba(175,215,255,.08)","rgba(20,30,80,.12)")}`}}>
+                <div
+                  className="df-qa-row"
+                  onClick={hasFails ? ()=>setExpandedQaCat(isOpen?null:key) : undefined}
+                  style={{cursor:hasFails?"pointer":"default",background:isOpen?"rgba(255,45,107,.05)":"transparent",margin:0,borderRadius:0,border:"none"}}
+                >
+                  <span className="df-qa-type">{label}</span>
+                  <span className="df-qa-count" style={{color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.55)"),fontSize:10}}>{count}</span>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    {hasFails && <span style={{fontSize:9,color:"rgba(255,45,107,.6)"}}>{isOpen?"▲":"▼"}</span>}
+                    <span className="df-qa-badge" style={{background:badgeBg,color:badgeColor,minWidth:52,textAlign:"center",animation:badge==="RUNNING"?"pulse .8s infinite":"none"}}>
+                      {badge}
+                    </span>
+                  </div>
+                </div>
+                {isOpen && hasFails && (
+                  <div style={{padding:"8px 10px",background:"rgba(255,45,107,.04)",borderTop:"1px solid rgba(255,45,107,.12)"}}>
+                    {failedInCat.length > 0 ? (
+                      <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:stdoutSnip?8:0}}>
+                        {failedInCat.map((t,i)=>(
+                          <div key={i} style={{fontSize:10,padding:"4px 8px",borderRadius:2,background:t.status==="ERROR"?"rgba(255,170,0,.08)":"rgba(255,45,107,.08)",border:`1px solid ${t.status==="ERROR"?"rgba(255,170,0,.2)":"rgba(255,45,107,.18)"}`}}>
+                            <span style={{color:t.status==="ERROR"?"#ffaa00":"#ff4466",fontWeight:"bold",marginRight:6,fontSize:9}}>{t.status}</span>
+                            <span style={{color:"#c8d6e8",fontFamily:"'Space Mono',monospace",fontSize:9}}>{t.name}</span>
+                            {t.path && <div style={{fontSize:8,opacity:.45,marginTop:1}}>{t.path}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{fontSize:9,opacity:.5,marginBottom:stdoutSnip?8:0}}>No individual test details available</div>
+                    )}
+                    {stdoutSnip && (
+                      <pre style={{fontSize:9,lineHeight:1.5,fontFamily:"'Space Mono',monospace",padding:"8px 10px",borderRadius:3,background:"#0d1117",border:"1px solid rgba(255,45,107,.15)",overflowX:"auto",overflowY:"auto",maxHeight:200,whiteSpace:"pre",margin:0,color:"#c8d6e8"}}>{stdoutSnip}</pre>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -3409,26 +3446,30 @@ export default function DevForgeDashboard() {
           )}
           {(()=>{
             const closedCount = realDeploy?.linear_issues_closed || 0;
-            const linearUrl   = (realTasks||[]).find(t=>t.linear_issue_url)?.linear_issue_url || null;
-            const workspaceUrl = linearUrl ? linearUrl.replace(/\/issue\/.*$/, "") : null;
-            if (!closedCount && !workspaceUrl) return null;
+            const projectUrl  = linearProjectUrl || null;
+            if (!closedCount && !projectUrl) return null;
             return (
               <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(130,80,255,.25)",background:"rgba(130,80,255,.05)",marginTop:8}}>
-                <div style={{fontSize:10,color:"#9b6dff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Linear Issues</div>
-                {workspaceUrl
-                  ? <a href={workspaceUrl} target="_blank" rel="noopener noreferrer" style={{color:"#9b6dff",fontSize:11,wordBreak:"break-all",display:"block"}}>🔗 {workspaceUrl}</a>
-                  : <span style={{color:"#9b6dff",fontSize:11}}>🔗 Linear workspace</span>}
+                <div style={{fontSize:10,color:"#9b6dff",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>Linear Project</div>
+                {projectUrl
+                  ? <a href={projectUrl} target="_blank" rel="noopener noreferrer" style={{color:"#9b6dff",fontSize:11,wordBreak:"break-all",display:"block"}}>🔗 View Project in Linear</a>
+                  : <span style={{color:"#9b6dff",fontSize:11}}>🔗 Linear project</span>}
                 <div style={{fontSize:9,opacity:.5,marginTop:4}}>{closedCount > 0 ? `${closedCount} issue${closedCount!==1?"s":""} closed` : "Issues linked"}</div>
               </div>
             );
           })()}
-          {realDeploy?.app_url && (
+          {realDeploy?.app_url ? (
             <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(0,255,136,.25)",background:"rgba(0,255,136,.06)",marginTop:8}}>
               <div style={{fontSize:10,color:"#00ff88",letterSpacing:3,textTransform:"uppercase",marginBottom:5}}>🟢 App Running</div>
               <a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:12,fontWeight:"bold",display:"block",marginBottom:4}}>🚀 {realDeploy.app_url}</a>
               {realDeploy.app_docs_url && <a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.7)",fontSize:10,display:"block"}}>📖 API Docs — {realDeploy.app_docs_url}</a>}
             </div>
-          )}
+          ) : realDeploy?.status === "complete" ? (
+            <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(255,170,0,.2)",background:"rgba(255,170,0,.05)",marginTop:8}}>
+              <div style={{fontSize:10,color:"#ffaa00",letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>App Launch</div>
+              <div style={{fontSize:10,color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.6)")}}>Auto-launch not available for this project type. Run the generated code manually from the output directory.</div>
+            </div>
+          ) : null}
           {realDeploy?.status==="error" && <div style={{color:"#ff4444",fontSize:11,marginTop:8,padding:"8px 12px",border:"1px solid rgba(255,68,68,.2)",borderRadius:3}}>⚠ {realDeploy.error}</div>}
           {!realDeploy && (
             <div style={{marginTop:12}}>
@@ -3547,7 +3588,7 @@ export default function DevForgeDashboard() {
     );
     if(detail==="done") {
       const s=Math.floor(elapsed/1000),m=Math.floor(s/60);
-      return <div className="df-done"><Confetti/><div className="df-done-ic">🎉</div><div className="df-done-t">{requestMode==="new_software"?"Software Built & Deployed":"Feature Shipped to Production"}</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:"100%",l:"Tests Green"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.app_url&&<a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:13,fontWeight:"bold",marginTop:16,display:"block",textAlign:"center",letterSpacing:1,padding:"10px 0",border:"1px solid rgba(0,255,136,.3)",borderRadius:4,background:"rgba(0,255,136,.07)"}}>🚀 Open App — {realDeploy.app_url}</a>}{realDeploy?.app_docs_url&&<a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.6)",fontSize:10,marginTop:6,display:"block",textAlign:"center",letterSpacing:1}}>📖 API Docs — {realDeploy.app_docs_url}</a>}{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,marginTop:8,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
+      return <div className="df-done"><Confetti/><div className="df-done-ic">🎉</div><div className="df-done-t">{requestMode==="new_software"?"Software Built & Deployed":"Feature Shipped to Production"}</div><div className="df-done-s">6 stages · 5 approvals · zero handoffs</div><div className="df-metrics">{[{v:`${m}m ${s%60}s`,l:"Total Time"},{v:llmCalls.length,l:"LLM Calls"},{v:`$${llmCalls.reduce((a,c)=>a+c.cost,0).toFixed(4)}`,l:"API Cost"},{v:realQA?.result ? (realQA.result.failed===0?`${realQA.result.passed}/${realQA.result.total} ✓`:`${realQA.result.passed}/${realQA.result.total}`) : "100%", l:"Tests Run"}].map((m,i)=><div key={i} className="df-metric"><div className="df-mv">{m.v}</div><div className="df-ml">{m.l}</div></div>)}</div>{realDeploy?.app_url&&<a href={realDeploy.app_url} target="_blank" rel="noopener noreferrer" style={{color:"#00ff88",fontSize:13,fontWeight:"bold",marginTop:16,display:"block",textAlign:"center",letterSpacing:1,padding:"10px 0",border:"1px solid rgba(0,255,136,.3)",borderRadius:4,background:"rgba(0,255,136,.07)"}}>🚀 Open App — {realDeploy.app_url}</a>}{realDeploy?.app_docs_url&&<a href={realDeploy.app_docs_url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(0,255,136,.6)",fontSize:10,marginTop:6,display:"block",textAlign:"center",letterSpacing:1}}>📖 API Docs — {realDeploy.app_docs_url}</a>}{realDeploy?.pr_url&&<a href={realDeploy.pr_url} target="_blank" rel="noopener noreferrer" style={{color:"#00d4ff",fontSize:11,marginTop:8,display:"block",textAlign:"center",letterSpacing:1}}>🔗 View Pull Request — PR #{realDeploy.pr_number}</a>}</div>;
     }
     return null;
   };

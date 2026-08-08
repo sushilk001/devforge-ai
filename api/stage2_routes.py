@@ -140,6 +140,7 @@ async def get_tasks(stage2_thread_id: str):
         message=f"Task status: {state.task_status.value}",
         thread_id=stage2_thread_id,
         linear_issue_ids=state.linear_issue_ids,
+        linear_project_url=state.linear_project_url,
     )
 
 
@@ -180,6 +181,7 @@ async def review_tasks(stage2_thread_id: str, body: TaskReviewAction):
             ),
             thread_id=stage2_thread_id,
             linear_issue_ids=final_state.linear_issue_ids,
+            linear_project_url=final_state.linear_project_url,
         )
 
     elif body.action == "reject":
