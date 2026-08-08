@@ -3467,7 +3467,10 @@ export default function DevForgeDashboard() {
           ) : realDeploy?.status === "complete" ? (
             <div style={{padding:"9px 12px",borderRadius:3,border:"1px solid rgba(255,170,0,.2)",background:"rgba(255,170,0,.05)",marginTop:8}}>
               <div style={{fontSize:10,color:"#ffaa00",letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>App Launch</div>
-              <div style={{fontSize:10,color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.6)")}}>Auto-launch not available for this project type. Run the generated code manually from the output directory.</div>
+              {realDeploy.app_launch_error
+                ? <div style={{fontSize:10,color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.6)")}}>Could not auto-launch: <span style={{color:"rgba(255,170,0,.85)",fontFamily:"'Space Mono',monospace"}}>{realDeploy.app_launch_error}</span></div>
+                : <div style={{fontSize:10,color:tc("rgba(175,215,255,.6)","rgba(20,30,80,.6)")}}>No runnable entrypoint detected. Run the generated code manually from the output directory.</div>
+              }
             </div>
           ) : null}
           {realDeploy?.status==="error" && <div style={{color:"#ff4444",fontSize:11,marginTop:8,padding:"8px 12px",border:"1px solid rgba(255,68,68,.2)",borderRadius:3}}>⚠ {realDeploy.error}</div>}
