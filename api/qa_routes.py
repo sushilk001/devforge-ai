@@ -187,6 +187,9 @@ def _run_qa(qa_thread_id: str, stage4_thread_id: str):
 @router_qa.post("/run/{stage4_thread_id}")
 async def run_qa(stage4_thread_id: str, background_tasks: BackgroundTasks):
     """Kick off pytest on the generated test files for a stage4 session."""
+    from api.stage4_routes import _stage4_sessions, _stage4_output_paths
+    if stage4_thread_id not in _stage4_sessions and stage4_thread_id not in _stage4_output_paths:
+        raise HTTPException(status_code=404, detail=f"Stage 4 session '{stage4_thread_id}' not found.")
     qa_thread_id = str(uuid.uuid4())
     _qa_sessions[qa_thread_id] = {
         "status": "running",

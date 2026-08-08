@@ -133,7 +133,11 @@ async def submit_feature_request(
         _sessions[thread_id] = final_state
 
         if final_state.error:
-            raise HTTPException(status_code=422, detail=final_state.error)
+            return PRDResponse(
+                status=PRDStatus.DRAFT,
+                prd=None,
+                message=final_state.error,
+            )
 
         if final_state.prd:
             slack_ts = post_prd_for_review(final_state)
@@ -152,6 +156,8 @@ async def submit_feature_request(
 
         raise HTTPException(status_code=500, detail="Unexpected graph state — no PRD generated.")
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.exception(f"[API Stage1] Error running graph: {e}")
         raise HTTPException(status_code=500, detail=str(e))

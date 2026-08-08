@@ -144,6 +144,7 @@ const ADD_FEATURE = {
     pr_url: "https://github.com/sushilk001/devforge-ai-output/pull/42",
     pr_number: 42,
     linear_issues_closed: 6,
+    linear_project_url: "https://linear.app/devforgeai/project/self-service-password-reset-0daeebfd0001/overview",
   },
 
   llmCalls: [
@@ -264,21 +265,23 @@ const NEW_SOFTWARE = {
   qa: {
     status: "complete",
     result: {
-      passed: 22, failed: 0, errors: 0, total: 22,
+      passed: 20, failed: 2, errors: 0, total: 22,
       tests: [
-        { name: "test_create_link_returns_slug", status: "PASSED" },
-        { name: "test_custom_slug_honored", status: "PASSED" },
-        { name: "test_duplicate_slug_409", status: "PASSED" },
-        { name: "test_redirect_302_and_target", status: "PASSED" },
-        { name: "test_unknown_slug_404", status: "PASSED" },
-        { name: "test_reject_javascript_url", status: "PASSED" },
-        { name: "test_click_counter_increments", status: "PASSED" },
-        { name: "test_ui_create_flow_e2e", status: "PASSED" },
+        { name: "test_create_link_returns_slug",   path: "tests/unit/test_links.py::test_create_link_returns_slug",   status: "PASSED",  category: "unit" },
+        { name: "test_custom_slug_honored",         path: "tests/unit/test_links.py::test_custom_slug_honored",         status: "PASSED",  category: "unit" },
+        { name: "test_duplicate_slug_409",          path: "tests/unit/test_links.py::test_duplicate_slug_409",          status: "PASSED",  category: "unit" },
+        { name: "test_redirect_302_and_target",     path: "tests/unit/test_links.py::test_redirect_302_and_target",     status: "PASSED",  category: "unit" },
+        { name: "test_unknown_slug_404",            path: "tests/unit/test_links.py::test_unknown_slug_404",            status: "PASSED",  category: "unit" },
+        { name: "test_reject_javascript_url",       path: "tests/unit/test_links.py::test_reject_javascript_url",       status: "PASSED",  category: "unit" },
+        { name: "test_click_counter_increments",    path: "tests/integration/test_analytics.py::test_click_counter_increments", status: "PASSED",  category: "integration" },
+        { name: "test_ip_hashed_before_storage",    path: "tests/integration/test_analytics.py::test_ip_hashed_before_storage", status: "FAILED",  category: "integration" },
+        { name: "test_ui_create_flow_e2e",          path: "tests/e2e/test_browser.py::test_ui_create_flow_e2e",         status: "PASSED",  category: "e2e" },
+        { name: "test_redirect_preserves_query_params", path: "tests/e2e/test_browser.py::test_redirect_preserves_query_params", status: "FAILED", category: "e2e" },
       ],
       categories: {
-        unit:        { total: 12, passed: 12, failed: 0, errors: 0, badge: "PASS" },
-        integration: { total: 6,  passed: 6,  failed: 0, errors: 0, badge: "PASS" },
-        e2e:         { total: 4,  passed: 4,  failed: 0, errors: 0, badge: "PASS" },
+        unit:        { total: 6,  passed: 6,  failed: 0, errors: 0, badge: "PASS" },
+        integration: { total: 8,  passed: 7,  failed: 1, errors: 0, badge: "FAIL" },
+        e2e:         { total: 8,  passed: 7,  failed: 1, errors: 0, badge: "FAIL" },
         visual:      { total: 0,  passed: 0,  failed: 0, errors: 0, badge: "—" },
       },
     },
@@ -313,6 +316,7 @@ const NEW_SOFTWARE = {
     linear_issues_closed: 7,
     app_url: "http://localhost:8001",
     app_docs_url: "http://localhost:8001/docs",
+    linear_project_url: "https://linear.app/devforgeai/project/fastapi-url-shortener-rest-api-0daeebfd98ef/overview",
   },
 
   llmCalls: [

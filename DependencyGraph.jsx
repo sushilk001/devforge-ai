@@ -40,12 +40,12 @@ export default function DependencyGraph({ tasks = [], graph }) {
     || tasks.reduce((a, t) => a + (t.estimate_hours || 0), 0);
 
   return (
-    <div>
+    <div style={{ background: "#0d1117", borderRadius: 8, padding: "10px 12px", border: "1px solid rgba(0,255,136,.15)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 8, letterSpacing: 3, color: "rgba(0,212,255,.55)", textTransform: "uppercase" }}>
+        <span style={{ fontSize: 8, letterSpacing: 3, color: "#00d4ff", textTransform: "uppercase" }}>
           Dependency Graph
         </span>
-        <span style={{ fontSize: 9, opacity: .5 }}>
+        <span style={{ fontSize: 9, color: "#6b8299" }}>
           {tasks.length} tasks · {Number(totalH).toFixed(1)}h · {levels.length} parallel tracks
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 9, marginLeft: "auto", color: CRIT }}>
@@ -55,8 +55,8 @@ export default function DependencyGraph({ tasks = [], graph }) {
       </div>
 
       <div style={{
-        overflow: "auto", maxHeight: 360, borderRadius: 6,
-        border: "1px solid rgba(0,255,136,.12)", background: "rgba(0,0,0,.25)", padding: 4,
+        overflow: "auto", maxHeight: 360, borderRadius: 4,
+        border: "1px solid rgba(0,255,136,.1)", background: "#0a0f16", padding: 4,
       }}>
         <svg width={width} height={height} style={{ display: "block" }}>
           {/* edges */}
@@ -93,9 +93,9 @@ export default function DependencyGraph({ tasks = [], graph }) {
                 <text x={p.x + 10} y={p.y + 18} fontFamily="'Space Mono',monospace" fontSize={9}
                   fontWeight="700" fill={color}>{id}</text>
                 <text x={p.x + NODE_W - 10} y={p.y + 18} fontFamily="'Space Mono',monospace"
-                  fontSize={8} textAnchor="end" fill="rgba(200,214,232,.6)">{t.estimate_hours || 0}h</text>
+                  fontSize={8} textAnchor="end" fill="#7a8fa8">{t.estimate_hours || 0}h</text>
                 <text x={p.x + 10} y={p.y + 35} fontFamily="'Space Mono',monospace" fontSize={9}
-                  fill="rgba(232,244,255,.82)">{title}</text>
+                  fill="#c0cfe0">{title}</text>
               </g>
             );
           })}
