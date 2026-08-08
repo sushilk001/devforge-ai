@@ -249,18 +249,17 @@ def _find_entrypoint(output_dir: Path) -> tuple[str, str] | None:
     return module, "app"
 
 
-def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | None:
-    """Start the generated app on a free port. Returns (app_url, docs_url) or None."""
+def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str | None, str | None, str | None]:
+    """Start the generated app on a free port.
+    Returns (app_url, docs_url, error_reason) — app_url/docs_url are None on failure."""
     entry = _find_entrypoint(output_dir)
     if not entry:
-        logger.info("[Stage6] No FastAPI entrypoint found — skipping auto-launch")
-        return None
+        return None, None, "No runnable entrypoint found in generated code."
 
     module, app_var = entry
     port = _find_free_port()
     if not port:
-        logger.warning("[Stage6] No free port found for app launch")
-        return None
+        return None, None, "No free port available for app launch."
 
     # Install dependencies if requirements.txt is present
     req_file = output_dir / "requirements.txt"
@@ -274,33 +273,69 @@ def _launch_app(deploy_thread_id: str, output_dir: Path) -> tuple[str, str] | No
         except Exception as e:
             logger.warning(f"[Stage6] pip install failed (continuing anyway): {e}")
 
+    import tempfile, io
+    stderr_file = tempfile.NamedTemporaryFile(delete=False, suffix=".log")
     cmd = [sys.executable, "-m", "uvicorn", f"{module}:{app_var}",
            "--host", "0.0.0.0", "--port", str(port)]
     try:
         proc = subprocess.Popen(
             cmd, cwd=str(output_dir),
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL, stderr=stderr_file,
         )
         _app_processes[deploy_thread_id] = proc
-        # Wait up to 8s for the port to actually accept connections
+        # Wait up to 8s for the port to accept connections
         for _ in range(8):
             time.sleep(1)
             if proc.poll() is not None:
-                logger.warning(f"[Stage6] App process exited (rc={proc.returncode})")
-                return None
+                stderr_file.flush(); stderr_file.close()
+                try:
+                    raw = Path(stderr_file.name).read_text(errors="replace")
+                    # Extract the most useful line: ValidationError, ImportError, etc.
+                    reason = _extract_launch_error(raw)
+                except Exception:
+                    reason = f"Process exited (rc={proc.returncode})"
+                logger.warning(f"[Stage6] App crashed on startup: {reason}")
+                return None, None, reason
             if _port_in_use(port):
                 break
         else:
-            logger.warning(f"[Stage6] App did not bind to port {port} within 8s")
+            stderr_file.close()
             proc.kill()
-            return None
+            return None, None, "App did not bind to its port within 8 seconds."
+        stderr_file.close()
         app_url  = f"http://localhost:{port}"
         docs_url = f"http://localhost:{port}/docs"
         logger.info(f"[Stage6] App launched: {app_url} (pid={proc.pid})")
-        return app_url, docs_url
+        return app_url, docs_url, None
     except Exception as e:
         logger.warning(f"[Stage6] App launch failed: {e}")
-        return None
+        return None, None, str(e)
+
+
+def _extract_launch_error(stderr: str) -> str:
+    """Pull the most useful single line from a uvicorn startup traceback."""
+    # Priority: ValidationError field lines, then ImportError, then last non-empty line
+    for line in stderr.splitlines():
+        line = line.strip()
+        if "Field required" in line or "value is not a valid" in line:
+            # Grab the setting name from the line above
+            pass
+        if "ValidationError" in line and "validation error" in line.lower():
+            return line
+        if line.startswith("pydantic_core") and "ValidationError" in line:
+            return line
+    for line in stderr.splitlines():
+        line = line.strip()
+        if line.startswith("ModuleNotFoundError") or line.startswith("ImportError"):
+            return line
+        if line.startswith("pydantic_core._pydantic_core.ValidationError"):
+            return line
+    # Fall back to last non-empty meaningful line
+    for line in reversed(stderr.splitlines()):
+        line = line.strip()
+        if line and not line.startswith("File ") and not line.startswith("Traceback"):
+            return line[:200]
+    return "Startup error — check generated code"
 
 
 def _run_deploy(deploy_thread_id: str, stage4_thread_id: str,
@@ -406,12 +441,10 @@ def _run_deploy(deploy_thread_id: str, stage4_thread_id: str,
 
         # 6 — auto-launch generated app
         sess["step"] = "launching"
-        app_result = _launch_app(deploy_thread_id, output_dir)
-        if app_result:
-            sess["app_url"], sess["app_docs_url"] = app_result
-        else:
-            sess["app_url"] = None
-            sess["app_docs_url"] = None
+        app_url, app_docs_url, app_launch_error = _launch_app(deploy_thread_id, output_dir)
+        sess["app_url"]          = app_url
+        sess["app_docs_url"]     = app_docs_url
+        sess["app_launch_error"] = app_launch_error
 
         sess["status"] = "complete"
         sess["step"]   = "done"
@@ -475,6 +508,7 @@ async def start_deploy(body: dict, background_tasks: BackgroundTasks):
         "slack_ts":             None,
         "app_url":              None,
         "app_docs_url":         None,
+        "app_launch_error":     None,
         "error":                None,
     }
     background_tasks.add_task(
