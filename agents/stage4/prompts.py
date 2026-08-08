@@ -23,6 +23,8 @@ Generate 1 implementation file and 1 test file for this task. Rules:
 - CRITICAL: Both files must be fully self-contained — ZERO cross-module imports to other generated files.
   * Implementation: ALWAYS import real third-party packages (httpx, whois, requests, ssl, certifi, etc.) — do NOT stub them. Only stub OTHER generated src.* modules: if your logic needs a DB session, config object, or another src.* class, define it as an inline Protocol/TypedDict stub. Never import from src.db, src.config, src.main, or any other src.* module.
   * Tests: only import from the implementation file generated alongside them. Use unittest.mock.patch or monkeypatch for external HTTP calls. Never import from src.main or app fixtures.
+- SQLAlchemy type safety: NEVER use `TIMESTAMPTZ` — it does not exist in SQLAlchemy. Use `sa.DateTime(timezone=True)` or `sa.TIMESTAMP(timezone=True)` for timestamptz columns. Only import `UUID`, `JSONB`, `ARRAY`, `INET`, `CIDR`, `TSVECTOR` from `sqlalchemy.dialects.postgresql`; all other column types come from `sqlalchemy` directly.
+- FastAPI route parameters: Route function parameters MUST be Pydantic BaseModel subclasses (body), Python primitives (str/int/float/bool and Optional thereof) for path/query params, or Header()/Depends() helpers. NEVER use Protocol, TypedDict, dataclasses, or any custom class as a route parameter — FastAPI cannot resolve them and raises FastAPIError. If a route calls business logic that needs a DB stub, pass it as a local variable inside the route body (e.g. `db = None`), not as a function parameter.
 
 Return ONLY a JSON object with this exact structure:
 {{
@@ -66,6 +68,7 @@ Then generate the appropriate `main.py`:
 - Generate `main.py` as a FastAPI app that imports every `router = APIRouter()` from the files.
 - Mount all routers with appropriate prefixes.
 - Include a `/health` GET endpoint returning {{"status": "ok"}}.
+- CRITICAL lifespan rule: Scan the full file content below for any `async def lifespan` or `@asynccontextmanager` that manages DB/Redis startup. If found, import that exact name and pass it to FastAPI: `app = FastAPI(lifespan=<exact_name>)`. NEVER invent function names like `init_db`, `close_db`, `setup_db`, `startup`, `shutdown` — import ONLY names that actually appear as `def` or `async def` in the files below. If no lifespan is found, do not add one.
 
 **If script/other:**
 - Generate `main.py` as a simple script that imports and calls the main entry function.
@@ -74,7 +77,16 @@ For `requirements.txt`:
 - List every third-party package actually imported across all files.
 - For CLI projects: include click or typer (whichever is used), plus any other real imports.
 - For FastAPI projects: include fastapi, uvicorn[standard], pydantic, plus others.
+- Always include `pytest`, `pytest-asyncio`, `anyio[asyncio]` for the test suite.
 - Do NOT add fastapi/uvicorn to a CLI-only project.
+
+Also generate a `conftest.py` at the project root with:
+```python
+import pytest
+
+pytest_plugins = ("anyio",)
+```
+This enables async test support for all `@pytest.mark.asyncio` tests.
 
 PRD title: {prd_title}
 
@@ -95,9 +107,15 @@ Return ONLY a JSON object:
       "language": "text",
       "content": "package1\\npackage2\\n...",
       "description": "Third-party dependencies for this project"
+    }},
+    {{
+      "filename": "conftest.py",
+      "language": "python",
+      "content": "import pytest\\n\\npytest_plugins = (\\"anyio\\",)\\n",
+      "description": "Pytest configuration enabling async test support"
     }}
   ],
-  "summary": "Entry point and requirements generated"
+  "summary": "Entry point, requirements, and pytest config generated"
 }}
 
 Return valid JSON only — no markdown fences."""

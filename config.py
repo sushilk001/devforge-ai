@@ -1,6 +1,9 @@
 # Copyright (c) 2026 Sushil Kumar. Licensed under BSL 1.1 — see LICENSE or https://devforgeai.in/license
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+_ENV_FILE = Path(__file__).parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -40,7 +43,7 @@ class Settings(BaseSettings):
     app_port: int = 8000
 
     class Config:
-        env_file = ".env"
+        env_file = str(_ENV_FILE)
         extra = "ignore"
 
 
